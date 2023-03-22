@@ -1,0 +1,83 @@
+/**/scale_truck_control_node:
+  ros__parameters:
+    params/index: 0
+    params/target_vel: 0.00
+    params/safety_vel: 0.45
+    params/fv_max_vel: 1.20
+    params/rcm_vel: 0.6
+    params/lv_stop_dist: 0.5
+    params/fv_stop_dist: 0.3
+    params/safety_dist: 1.5
+    params/target_dist: 0.8
+    params/rcm_dist: 0.8
+    params/angle_degree: 0.0
+    params/Kp_d: 2.0
+    params/Ki_d: 0.2
+    params/K: 0.15
+
+    params/a/a: 0.
+    params/a/b: -0.37169
+    params/a/c: 1.2602
+    params/a/d: -1.5161
+    params/a/e: 0.70696
+
+    params/b/a: 0.
+    params/b/b: -1.7536
+    params/b/c: 5.0931
+    params/b/d: -4.9047
+    params/b/e: 1.6722
+
+    Calibration/f_matrix/a: 329.10805843346054
+    Calibration/f_matrix/b: 0.
+    Calibration/f_matrix/c: 320.
+    Calibration/f_matrix/d: 0.
+    Calibration/f_matrix/e: 329.10805843346054
+    Calibration/f_matrix/f: 240. 
+    Calibration/f_matrix/g: 0.
+    Calibration/f_matrix/h: 0.
+    Calibration/f_matrix/i: 1.
+
+    Calibration/f_dist_coef/a: -0.34335984453339752
+    Calibration/f_dist_coef/b: 0.14676511736197059
+    Calibration/f_dist_coef/c: 0.
+    Calibration/f_dist_coef/d: 0.
+    Calibration/f_dist_coef/e: -0.032260115806245951
+
+    Calibration/r_matrix/a: 326.31389227574556
+    Calibration/r_matrix/b: 0.
+    Calibration/r_matrix/c: 320.
+    Calibration/r_matrix/d: 0.
+    Calibration/r_matrix/e: 326.31389227574556
+    Calibration/r_matrix/f: 240.
+    Calibration/r_matrix/g: 0.
+    Calibration/r_matrix/h: 0.
+    Calibration/r_matrix/i: 1.
+
+    Calibration/r_dist_coef/a: -0.33295846454356126
+    Calibration/r_dist_coef/b: 0.12386827336557986
+    Calibration/r_dist_coef/c: 0.
+    Calibration/r_dist_coef/d: 0.
+    Calibration/r_dist_coef/e: -0.022565312043601477
+
+    ROI/front_cam/width: 640
+    ROI/front_cam/height: 480
+    ROI/front_cam/top_gap: 0.416
+    ROI/front_cam/top_height: 0.185
+    ROI/front_cam/bot_height: 0.47
+    ROI/front_cam/extra_f: 0.00
+    ROI/front_cam/extra_b: 0.00
+    ROI/front_cam/extra_up: 140
+    ROI/front_cam/extra_down: 180
+    
+    ROI/rear_cam/width: 640
+    ROI/rear_cam/height: 480
+    ROI/rear_cam/top_gap: 0.405
+    ROI/rear_cam/bot_gap: 0.17
+    ROI/rear_cam/top_height: 0.99
+    ROI/rear_cam/bot_height: 0.47
+    ROI/rear_cam/extra_f: 1
+    ROI/rear_cam/extra_b: 10
+    ROI/rear_cam/extra_up: 140
+    ROI/rear_cam/extra_down: 180
+
+    rear_camera_usage/use: true

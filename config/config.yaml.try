@@ -1,0 +1,52 @@
+scale_truck_control_node:
+  ros__parameters:
+    subscribers:
+      camera_reading:
+        topic: /usb_cam/image_raw
+        queue_size: 1
+      obstacle_reading:
+        topic: /tracked_obstacles
+        queue_size: 100
+      lrc_to_xavier:
+        topic: /lrc2xav_msg
+        queue_size: 10
+      yolo_detector:
+        topic: /yolo_object_detection/bounding_box
+        queue_size: 1
+      cluster_reading:
+        topic: /preceding_truck_points
+        queue_size: 5
+
+    publishers:
+      xavier_to_lrc:
+        topic: /xav2lrc_msg
+        queue_size: 10
+      run_yolo:
+        topic: /run_yolo_flag
+        queue_size: 1
+
+    LaneDetector:
+      steer_angle: 0.0
+      eL_height: 0.2
+      e1_height: 1.2563
+      trust_height: 0.6667
+      lp: 609.3
+      eL_height2: 0.8
+
+    ROI:
+      dynamic_roi: true
+      threshold: 128
+      canny:
+        thresh1: 100
+        thresh2: 200
+
+    crop:
+      x: 100
+      y: 0
+      width: 440
+      height: 380
+
+    image_view:
+      enable_opencv: true
+      wait_key_delay: 1
+      enable_console_output: true 
