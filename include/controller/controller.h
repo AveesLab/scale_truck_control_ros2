@@ -102,13 +102,15 @@ private:
     const std::shared_ptr<Ros2Node> ros2_node;
 
     //Publisher 
+    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr XavPublisher_;
     rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr LrcPublisher_;
 
     //Subscriber 
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr XavSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LrcSubscriber_;
 
     //Callback Func
-    void LrcSubCallback(const scale_truck_control_ros2::msg::CmdData &msg);
+    void SubCallback(const scale_truck_control_ros2::msg::CmdData &msg);
 
 //    cv::Mat display_Map(CmdData cmd_data);
     LVThread* lv_thread_;

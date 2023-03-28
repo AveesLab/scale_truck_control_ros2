@@ -63,7 +63,6 @@ set(msg_files
   "msg/Lrc2ocr.msg"
   "msg/Lrc2xav.msg"
   "msg/Xav2lrc.msg"
-  "msg/Xav2cmd.msg"
   "msg/CmdData.msg"
   "msg/LV2FV.msg"
 )

@@ -34,7 +34,7 @@ void LocalRC::init(){
   std::string FVPubTopicName;
   int FVPubQueueSize;
 
-  this->get_parameter_or("params/truck_info", index_, 0);
+  this->get_parameter_or("params/truck_info", index_, 10);
 
   this->get_parameter_or("LrcParams/lrc_log_path", log_path_, std::string("/home/jetson/catkin_ws/logfiles/"));
   this->get_parameter_or("LrcParams/epsilon", epsilon_, 1.0f);
@@ -49,7 +49,7 @@ void LocalRC::init(){
   this->get_parameter_or("LrcSubPub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
   this->get_parameter_or("LrcSubPub/ocr_to_lrc/topic", OcrSubTopicName, std::string("/ocr2lrc_msg"));
   this->get_parameter_or("LrcSubPub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/LV_to_FVs/topic", LVSubTopicName, std::string("/LV_lrc2FVs_msg"));
+  this->get_parameter_or("LrcSubPub/LV_to_FVs/topic", LVSubTopicName, std::string("/lv2fv_msg"));
   this->get_parameter_or("LrcSubPub/LV_to_FVs/queue_size", LVSubQueueSize, 1);
 
   /******************************/
@@ -59,8 +59,8 @@ void LocalRC::init(){
   this->get_parameter_or("LrcSubPub/lrc_to_xavier/queue_size", XavPubQueueSize, 1);
   this->get_parameter_or("LrcSubPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("/lrc2ocr_msg"));
   this->get_parameter_or("LrcSubPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/lrc_to_FVs/topic", FVPubTopicName, std::string("/LV_lrc2FV_msg"));
-  this->get_parameter_or("LrcSubPub/lrc_to_FVs/queue_size", FVPubQueueSize, 1);
+  this->get_parameter_or("LrcSubPub/lv_to_fv/topic", FVPubTopicName, std::string("/lv2fv_msg"));
+  this->get_parameter_or("LrcSubPub/lv_to_fv/queue_size", FVPubQueueSize, 1);
 
   /************************/
   /* ROS Topic Subscriber */
@@ -70,7 +70,7 @@ void LocalRC::init(){
   XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
 
   if (index_ == 11 || index_ == 12){
-    LVSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::LV2FV>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
+    LVSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
   }
 
   /************************/
@@ -79,7 +79,7 @@ void LocalRC::init(){
   XavPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Lrc2xav>(XavPubTopicName, XavPubQueueSize);  
   OcrPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
   if (index_ == 10) {
-    FVPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::LV2FV>(FVPubTopicName, FVPubQueueSize);
+    FVPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::CmdData>(FVPubTopicName, FVPubQueueSize);
   }
 
   /*********************/
@@ -101,7 +101,7 @@ bool LocalRC::isNodeRunning(){
 /****************/
 void LocalRC::radio()
 {
-  scale_truck_control_ros2::msg::LV2FV lv_data_;
+  scale_truck_control_ros2::msg::CmdData lv_data_;
   while(isNodeRunning()){
     {
       std::scoped_lock lock(data_mutex_);
@@ -237,16 +237,12 @@ void LocalRC::OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPt
 /***************/
 /* FVs from LV */
 /***************/
-void LocalRC::LVCallback(const scale_truck_control_ros2::msg::LV2FV::SharedPtr msg)
+void LocalRC::LVCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   tar_vel_ = msg->tar_vel;
   tar_dist_ = msg->tar_dist;
 }
-
-
-
-
 
 
 

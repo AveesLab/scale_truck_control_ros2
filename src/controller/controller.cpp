@@ -45,15 +45,15 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
     /************************/
     /* Ros Topic Subscriber */
     /************************/
-    LrcSubscriber_ = ros2_node->create_subscription<CmdData>(LrcSubTopicName, LrcSubQueueSize, std::bind(&Controller::LrcSubCallback, this, std::placeholders::_1));
-//    XavSubscriber_ = ros2_node->create_subscription<scale_truck_control_ros2::msg::Cmd2lrc>(LrcSubTopicName, LrcSubQueueSize, std::bind(&Controller::LrcSubCallback, this, std::placeholders::_1));
+    LrcSubscriber_ = ros2_node->create_subscription<CmdData>(LrcSubTopicName, LrcSubQueueSize, std::bind(&Controller::SubCallback, this, std::placeholders::_1));
+    XavSubscriber_ = ros2_node->create_subscription<CmdData>(XavSubTopicName, XavSubQueueSize, std::bind(&Controller::SubCallback, this, std::placeholders::_1));
 
 
     /***********************/
     /* Ros Topic Publisher */
     /***********************/
-    //LrcPublisher_ = ros2_node->create_publisher<scale_truck_control_ros2::msg::Cmd2lrc>(LrcPubTopicName, LrcPubQueueSize);
-    LrcPublisher_ = ros2_node->create_publisher<CmdData>("/cmd2lrc_msg", 1);
+    LrcPublisher_ = ros2_node->create_publisher<CmdData>(LrcPubTopicName, LrcPubQueueSize);
+    XavPublisher_ = ros2_node->create_publisher<CmdData>(XavPubTopicName, XavPubQueueSize);
 
     /**********************************/
     /* Control & Communication Thread */
@@ -148,7 +148,7 @@ Controller::~Controller()
     delete fv2_thread_;
 }
 
-void Controller::LrcSubCallback(const CmdData &msg)
+void Controller::SubCallback(const CmdData &msg)
 {
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();
