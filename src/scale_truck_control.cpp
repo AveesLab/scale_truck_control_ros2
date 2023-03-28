@@ -36,6 +36,8 @@ ScaleTruckController::~ScaleTruckController() {
   controlThread_.join();
   tcpThread_.join();
 
+  delete cmd_data_;
+
   RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] Stop.");
 }
 
@@ -86,6 +88,9 @@ void ScaleTruckController::init()
   int objectQueueSize;
   std::string XavSubTopicName;
   int XavSubQueueSize;
+  std::string CmdSubTopicName;
+  int CmdSubQueueSize;
+
   std::string LrcPubTopicName;
   int LrcPubQueueSize;
   std::string CmdPubTopicName;
@@ -100,6 +105,8 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", XavSubTopicName, std::string("/lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", XavSubQueueSize, 1);
+  this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
+  this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
 
   /****************************/
   /* Ros Topic Publish Option */
@@ -113,6 +120,9 @@ void ScaleTruckController::init()
   /* Ros Topic Subscriber */
   /************************/
   XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(XavSubTopicName, XavSubQueueSize, std::bind(&ScaleTruckController::XavSubCallback, this, std::placeholders::_1));
+
+  CmdSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
+
   //objectSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Ocr2lrc>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 //  laneSubscriber_ = nodeHandle_.subscribe(laneTopicName, laneQueueSize, &ScaleTruckController::LaneCallback, this);
 
@@ -120,21 +130,26 @@ void ScaleTruckController::init()
   /* Ros Topic Publisher */
   /***********************/
   LrcPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
-  CmdPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Xav2lrc>(CmdPubTopicName, CmdPubQueueSize);  
+  CmdPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::CmdData>(CmdPubTopicName, CmdPubQueueSize);  
 
   /**********************/
   /* Safety Start Setup */
   /**********************/
   distance_ = 10.f;
   distAngle_ = 0;
-  
+
+  /************/
+  /* CMD Data */
+  /************/
+  cmd_data_ = new scale_truck_control_ros2::msg::CmdData;
+  cmd_data_->src_index = index_;
+  cmd_data_->tar_index = 20;  //Control center
+
   /**********************************/
   /* Control & Communication Thread */
   /**********************************/
   controlThread_ = std::thread(&ScaleTruckController::spin, this);
-  
-  /* PC와 통신 */
-//  tcpThread_ = std::thread(&ScaleTruckController::reply, this); 
+  tcpThread_ = std::thread(&ScaleTruckController::reply, this, cmd_data_); //send to PC_Commend 
 }
 
 bool ScaleTruckController::getImageStatus(void)
@@ -146,40 +161,44 @@ bool ScaleTruckController::getImageStatus(void)
 /***************/
 /* cmd publish */
 /***************/
-//void ScaleTruckController::reply(){
-//  scale_truck_control_ros2::msg::Xav2cmd cmd;
-//  
-//  while(isNodeRunning_){
-//    {
-//      std::scoped_lock lock(vel_mutex_, dist_mutex_);
-//      cmd.cur_vel = CurVel_;
-//      cmd.cur_dist = actDist_;
-//      cmd.cur_angle = AngleDegree_;
-//    }
-//    {
-//      std::scoped_lock lock(lane_mutex_);
-//      cmd->coef[0].a = laneDetector_.lane_coef_.left.a;
-//      cmd->coef[0].b = laneDetector_.lane_coef_.left.b;
-//      cmd->coef[0].c = laneDetector_.lane_coef_.left.c;
-//      cmd->coef[1].a = laneDetector_.lane_coef_.right.a;
-//      cmd->coef[1].b = laneDetector_.lane_coef_.right.b;
-//      cmd->coef[1].c = laneDetector_.lane_coef_.right.c;
-//      cmd->coef[2].a = laneDetector_.lane_coef_.center.a;
-//      cmd->coef[2].b = laneDetector_.lane_coef_.center.b;
-//      cmd->coef[2].c = laneDetector_.lane_coef_.center.c;
-//    }
-//   CmdPublisher_->publish(cmd);
-//
-//   std::this_thread::sleep_for(std::chrono::milliseconds(2));
-//  }
-//}
+void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
+{
+  while(isNodeRunning_){
+    {
+      if(cmd->tar_index == 20){
+        {
+          std::scoped_lock lock(vel_mutex_, dist_mutex_);
+          cmd->cur_vel = CurVel_;
+          cmd->cur_dist = actDist_;
+          cmd->cur_angle = AngleDegree_;
+	}
+      }
+    }
+    {
+      std::scoped_lock lock(lane_mutex_);
+//      cmd->coef_a[0] = laneDetector_.lane_coef_.left.a;
+//      cmd->coef_b[0] = laneDetector_.lane_coef_.left.b;
+//      cmd->coef_c[0] = laneDetector_.lane_coef_.left.c;
+//      cmd->coef_a[1] = laneDetector_.lane_coef_.right.a;
+//      cmd->coef_b[1] = laneDetector_.lane_coef_.right.b;
+//      cmd->coef_c[1] = laneDetector_.lane_coef_.right.c;
+//      cmd->coef_a[2] = laneDetector_.lane_coef_.center.a;
+//      cmd->coef_b[2] = laneDetector_.lane_coef_.center.b;
+//      cmd->coef_c[2] = laneDetector_.lane_coef_.center.c;
+    }
+   CmdPublisher_->publish(*cmd);
+
+   std::this_thread::sleep_for(std::chrono::milliseconds(2));
+ }
+}
 
 
 /* LaneDetection Node에 CurVel_ 전달해야함. */
 /* 카메라 오류 검출은 Lane Node에서 진행 */
 /* Angle값 받음. LRC에서 받아도 될듯? 일단 여기에서 진행 */
 
-void* ScaleTruckController::lanedetectInThread() {
+void* ScaleTruckController::lanedetectInThread() 
+{
 //  static int cnt = 10;
 //  Mat dst;
 //  std::vector<Mat>channels;
@@ -415,7 +434,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-//void ScaleTruckController::laneSubCallback(const scale_truck_control_ros2::msg::Lane2xav::SharedPtr msg)
+//void ScaleTruckController::LaneSubCallback(const scale_truck_control_ros2::msg::Lane2xav::SharedPtr msg)
 //{
 //  /* Callback from LaneDetetion Node   */
 //  {
@@ -438,22 +457,19 @@ void ScaleTruckController::XavSubCallback(const scale_truck_control_ros2::msg::L
   {
     std::scoped_lock lock(vel_mutex_);
     CurVel_ = msg->cur_vel;
-
-    RCLCPP_INFO(this->get_logger(), "CurVel_ : %.3f\n", CurVel_);
   }
 }
 
-//void ScaleTruckController::CmdSubCallback(const scale_truck_control_ros2::msg::Cmd2xav::SharedPtr msg)
-//{
-//  /* Callback from Command PC   */
-//  {
-//    std::scoped_lock lock(rep_mutex_);
-//    if(index_ == 0){  //LV 
-//      TargetVel_ = msg->tar_vel;
-//      TargetDist_ = msg->tar_dist;
-//    }
-//  }
-//}
+void ScaleTruckController::CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg)
+{
+  {
+    std::scoped_lock lock(rep_mutex_);
+    if(msg->tar_index == 0){  //LV 
+      TargetVel_ = msg->tar_vel;
+      TargetDist_ = msg->tar_dist;
+    }
+  }
+}
 
 
 } /* namespace scale_truck_control */

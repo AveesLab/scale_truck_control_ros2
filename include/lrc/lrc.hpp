@@ -26,6 +26,7 @@
 #include "scale_truck_control_ros2/msg/ocr2lrc.hpp"
 #include "scale_truck_control_ros2/msg/xav2lrc.hpp"
 #include "scale_truck_control_ros2/msg/lrc2xav.hpp"
+#include "scale_truck_control_ros2/msg/lv2_fv.hpp"
 
 using namespace std::chrono_literals;
 
@@ -43,22 +44,24 @@ private:
 
     rclcpp::Subscription<scale_truck_control_ros2::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr XavSubscriber_;
-//    rclcpp::Subscription<scale_truck_control_ros2::msg::LV2FVs>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::LV2FV>::SharedPtr LVSubscriber_;
 
     rclcpp::Publisher<scale_truck_control_ros2::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
     rclcpp::Publisher<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr XavPublisher_;
     rclcpp::TimerBase::SharedPtr OcrPublishTimer_;
-//    rclcpp::Publisher<scale_truck_control_ros2::msg::LV2FVs>::SharedPtr FVsPublisher_;
+    rclcpp::Publisher<scale_truck_control_ros2::msg::LV2FV>::SharedPtr FVPublisher_;
 
     void Lrc2ocrCallback(void);
     void OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPtr msg);
     void XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPtr msg);
+    void LVCallback(const scale_truck_control_ros2::msg::LV2FV::SharedPtr msg);
 
     bool isNodeRunning();
     void rosPub();
     void recordData(struct timeval *startTime);
     void printStatus();
     void communicate();
+    void radio();
 
     int index_;
     bool isNodeRunning_;

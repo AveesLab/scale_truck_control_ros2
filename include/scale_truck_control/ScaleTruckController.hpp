@@ -26,6 +26,7 @@
 #include "scale_truck_control_ros2/msg/ocr2lrc.hpp"
 #include "scale_truck_control_ros2/msg/xav2lrc.hpp"
 #include "scale_truck_control_ros2/msg/lrc2xav.hpp"
+#include "scale_truck_control_ros2/msg/cmd_data.hpp"
 
 using namespace std::chrono_literals;
 
@@ -46,22 +47,27 @@ private:
  
     //Publisher 
     rclcpp::Publisher<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr LrcPublisher_;
-    rclcpp::Publisher<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr CmdPublisher_;
+    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdPublisher_;
 
     //Subscriber 
     rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr XavSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
 //    rclcpp::Subscription<scale_truck_control_ros2::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
     void XavSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
+    void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
 //  void objectCallback(const obstacle_detector::Obstacles &msg);
     
     void spin();
     bool getImageStatus(void);
     void displayConsole();
     void recordData(struct timeval startTime);
-    void reply();
+    void reply(scale_truck_control_ros2::msg::CmdData* cmd);
+
+    //CmdData
+    scale_truck_control_ros2::msg::CmdData* cmd_data_;
 
     //.cpp config
     double CycleTime_ = 0.0;
@@ -113,6 +119,7 @@ private:
     float ppAngle_ = 0.0f;
     float x_coord_ = 0.0f;
     float y_coord_ = 0.0f;
+
 
     void* lanedetectInThread();
     void* objectdetectInThread();
