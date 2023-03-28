@@ -80,12 +80,9 @@ private:
 
     //image
     bool viewImage_;
-    bool rear_camera_;
     int waitKeyDelay_;
     bool enableConsoleOutput_;
-    int sync_flag_;
-    bool fi_camera_ = false;
-    bool beta_ = false;
+    int sync_flag_; // ?
     bool imageStatus_ = false;
 
     float AngleDegree_; // -1 ~ 1  - Twist msg angular.z
@@ -99,26 +96,13 @@ private:
     int ObjCircles_;
     float distance_ = 0.8f;
     float distAngle_ = 0.0f;
-    float ampersand_ = 0.0f;
-    float ampersand2_ = 0.0f;
     float LVstopDist_;
     float FVstopDist_;
     float TargetDist_;
     float SafetyDist_;
     uint32_t LdrErrMsg_;
-    bool fi_lidar_ = false;
-    bool gamma_ = false;
-    float log_est_dist_ = 0.0f;
-    float AngleDegree2_ = 0.0f;
-    float actAngleDegree_ = 0.0f;
-    float Lw_ = 0.34f;
     float Ld_offset_ = 0.0f;
-    float Ld_offset2_ = 0.0f;
     float actDist_ = 0.8f;
-    float estimatedDist_;
-    float ppAngle_ = 0.0f;
-    float x_coord_ = 0.0f;
-    float y_coord_ = 0.0f;
 
 
     void* lanedetectInThread();

@@ -211,16 +211,16 @@ void Controller::requestData(CmdData cmd_data)
 
     if (send_data.tar_index == 0){
         gettimeofday(&startTime, NULL);
-        LrcPublisher_->publish(send_data);
+        XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
         req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
         //recordData(&startTime_);
     }
     else if (send_data.tar_index == 1){
-        LrcPublisher_->publish(send_data);
+        XavPublisher_->publish(send_data);
     }
     else if (send_data.tar_index == 2){
-        LrcPublisher_->publish(send_data);
+        XavPublisher_->publish(send_data);
     }
 }
 

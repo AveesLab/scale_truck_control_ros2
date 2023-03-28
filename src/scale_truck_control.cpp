@@ -13,7 +13,7 @@ ScaleTruckController::ScaleTruckController()
     rclcpp::shutdown();  
   }
 
-  RCLCPP_INFO(this->get_logger(), "waitKeyDelay1 : %d\n", waitKeyDelay_);
+  //RCLCPP_INFO(this->get_logger(), "waitKeyDelay1 : %d\n", waitKeyDelay_);
   init();
 }
 
@@ -65,15 +65,6 @@ bool ScaleTruckController::readParameters() {
   this->get_parameter_or("params/fv_stop_dist", FVstopDist_, 0.5f); // m
   this->get_parameter_or("params/safety_dist", SafetyDist_, 1.5f); // m
   this->get_parameter_or("params/target_dist", TargetDist_, 0.8f); // m
-
-  /***********************/
-  /* Pure Pursuit Option */
-  /***********************/
-  this->get_parameter_or("params/Lw", Lw_, 0.34f);
-  this->get_parameter_or("params/LdOffset", Ld_offset_, 0.0f);
-  this->get_parameter_or("params/LdOffset2", Ld_offset2_, 0.0f);
-
-  RCLCPP_INFO(this->get_logger(), "waitKeyDelay : %d\n", waitKeyDelay_);
 
   return true;
 }
@@ -321,6 +312,7 @@ void ScaleTruckController::spin()
     }
     std::this_thread::sleep_for(wait_duration);
   }
+  printf("After Wait image.\n");
 
   scale_truck_control_ros2::msg::Xav2lrc msg;
   std::thread lanedetect_thread;

@@ -64,7 +64,6 @@ set(msg_files
   "msg/Lrc2xav.msg"
   "msg/Xav2lrc.msg"
   "msg/CmdData.msg"
-  "msg/LV2FV.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}

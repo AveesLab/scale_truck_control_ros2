@@ -67,7 +67,7 @@ void LocalRC::init(){
   /************************/
   OcrSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Ocr2lrc>(OcrSubTopicName, OcrSubQueueSize, std::bind(&LocalRC::OcrCallback, this, std::placeholders::_1));
 
-  XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
+  XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
 
   if (index_ == 11 || index_ == 12){
     LVSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
@@ -218,8 +218,8 @@ void LocalRC::XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPt
   angle_degree_ = msg->steer_angle;
   cur_dist_ = msg->cur_dist;
   if(index_ == 10){  //only LV LRC
-    tar_dist_ = msg->tar_dist;
     tar_vel_ = msg->tar_vel;
+    tar_dist_ = msg->tar_dist;
   }
 }
 
