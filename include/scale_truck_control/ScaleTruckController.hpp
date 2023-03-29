@@ -85,7 +85,7 @@ private:
     int sync_flag_; // ?
     bool imageStatus_ = false;
 
-    float AngleDegree_; // -1 ~ 1  - Twist msg angular.z
+    float AngleDegree_ = 0.0f; // -1 ~ 1  - Twist msg angular.z
     float TargetVel_ = 0.0f; // -1 ~ 1  - Twist msg linear.x
     float SafetyVel_;
     float ResultVel_;

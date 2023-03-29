@@ -15,6 +15,7 @@ LocalRC::LocalRC(void)
 
 LocalRC::~LocalRC(){
   isNodeRunning_ = false; 
+  udpThread_.join();
 }
 
 void LocalRC::init(){
@@ -186,7 +187,7 @@ void LocalRC::printStatus(){
 void LocalRC::communicate(){
   while(rclcpp::ok()){
     rosPub();
-    //printStatus();
+    printStatus();
 
     //recordData(&startTime);
 

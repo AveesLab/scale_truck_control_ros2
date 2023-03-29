@@ -143,11 +143,11 @@ void ScaleTruckController::init()
   tcpThread_ = std::thread(&ScaleTruckController::reply, this, cmd_data_); //send to PC_Commend 
 }
 
-bool ScaleTruckController::getImageStatus(void)
-{
-  std::scoped_lock lock(image_mutex_);
-  return imageStatus_;
-}
+//bool ScaleTruckController::getImageStatus(void)
+//{
+//  std::scoped_lock lock(image_mutex_);
+//  return imageStatus_;
+//}
 
 /***************/
 /* cmd publish */
@@ -221,82 +221,82 @@ void* ScaleTruckController::lanedetectInThread()
 
 
 void* ScaleTruckController::objectdetectInThread() {
-  float dist, angle;
-  float dist_tmp, angle_tmp;
-
-  dist_tmp = 10.f;
-  /**************/
-  /* Lidar Data */
-  /**************/
-//  {
-//    std::scoped_lock lock(lane_mutex_, object_mutex_);
-//    ObjSegments_ = Obstacle_.segments.size();
-//    ObjCircles_ = Obstacle_.circles.size();
+//  float dist, angle;
+//  float dist_tmp, angle_tmp;
 //
+//  dist_tmp = 10.f;
+//  /**************/
+//  /* Lidar Data */
+//  /**************/
+////  {
+////    std::scoped_lock lock(lane_mutex_, object_mutex_);
+////    ObjSegments_ = Obstacle_.segments.size();
+////    ObjCircles_ = Obstacle_.circles.size();
+////
+////  }
+////
+////  for(int i = 0; i < ObjCircles_; i++)
+////  {
+////    //dist = sqrt(pow(Obstacle_.circles[i].center.x,2)+pow(Obstacle_.circles[i].center.y,2));
+////    dist = -Obstacle_.circles[i].center.x - Obstacle_.circles[i].true_radius;
+////    angle = atanf(Obstacle_.circles[i].center.y/Obstacle_.circles[i].center.x)*(180.0f/M_PI);
+////    if(dist_tmp >= dist) {
+////      dist_tmp = dist;
+////      angle_tmp = angle;
+////    }
+////  }
+////  actDist_ = dist_tmp;
+////
+////  if(ObjCircles_ != 0)
+////  {
+////    distance_ = dist_tmp;
+////    distAngle_ = angle_tmp;
+////  }
+//  /*****************************/
+//  /* Dynamic ROI Distance Data */
+//  /*****************************/
+//  {
+//    std::scoped_lock lock(rep_mutex_, lane_mutex_);
+//    /* LaneDetection Node에 ROI거리, 트리거=true 보낸다.  */
+//    if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
+//    {
+////      laneDetector_.distance_ = (int)((1.24f - dist_tmp)*490.0f)+20;
+//    }
+//    else {
+////      laneDetector_.distance_ = 0;
+//    }
+//    droi_ready_ = true;
+//    cv_.notify_one(); // 현규형은 안썼음 일단 대기. 
 //  }
-//
-//  for(int i = 0; i < ObjCircles_; i++)
-//  {
-//    //dist = sqrt(pow(Obstacle_.circles[i].center.x,2)+pow(Obstacle_.circles[i].center.y,2));
-//    dist = -Obstacle_.circles[i].center.x - Obstacle_.circles[i].true_radius;
-//    angle = atanf(Obstacle_.circles[i].center.y/Obstacle_.circles[i].center.x)*(180.0f/M_PI);
-//    if(dist_tmp >= dist) {
-//      dist_tmp = dist;
-//      angle_tmp = angle;
+//  if(index_ == 0){  //LV
+//    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+//    if(distance_ <= LVstopDist_) {
+//    // Emergency Brake
+//      ResultVel_ = 0.0f;
+//    }
+//    else if (distance_ <= SafetyDist_){
+//      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
+//      if (TargetVel_ < TmpVel_){
+//        ResultVel_ = TargetVel_;
+//      }
+//      else{
+//        ResultVel_ = TmpVel_;
+//      }
+//    }
+//    else{
+//      ResultVel_ = TargetVel_;
 //    }
 //  }
-//  actDist_ = dist_tmp;
-//
-//  if(ObjCircles_ != 0)
-//  {
-//    distance_ = dist_tmp;
-//    distAngle_ = angle_tmp;
+//  else{  //FVs
+//    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+//    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
+//    // Emergency Brake
+//      ResultVel_ = 0.0f;
+//    }
+//    else {
+//      ResultVel_ = TargetVel_;
+//    }
 //  }
-  /*****************************/
-  /* Dynamic ROI Distance Data */
-  /*****************************/
-  {
-    std::scoped_lock lock(rep_mutex_, lane_mutex_);
-    /* LaneDetection Node에 ROI거리, 트리거=true 보낸다.  */
-    if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
-    {
-//      laneDetector_.distance_ = (int)((1.24f - dist_tmp)*490.0f)+20;
-    }
-    else {
-//      laneDetector_.distance_ = 0;
-    }
-    droi_ready_ = true;
-    cv_.notify_one(); // 현규형은 안썼음 일단 대기. 
-  }
-  if(index_ == 0){  //LV
-    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-    if(distance_ <= LVstopDist_) {
-    // Emergency Brake
-      ResultVel_ = 0.0f;
-    }
-    else if (distance_ <= SafetyDist_){
-      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
-      if (TargetVel_ < TmpVel_){
-        ResultVel_ = TargetVel_;
-      }
-      else{
-        ResultVel_ = TmpVel_;
-      }
-    }
-    else{
-      ResultVel_ = TargetVel_;
-    }
-  }
-  else{  //FVs
-    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
-    // Emergency Brake
-      ResultVel_ = 0.0f;
-    }
-    else {
-      ResultVel_ = TargetVel_;
-    }
-  }
 }
 
 void ScaleTruckController::spin() 
@@ -304,15 +304,14 @@ void ScaleTruckController::spin()
   double diff_time=0.0;
   int cnt = 0;
 
-  const auto wait_duration = std::chrono::milliseconds(2000);
-  while(!getImageStatus()) {
-    printf("Waiting for image.\n");
-    if(!isNodeRunning_) {
-      return;
-    }
-    std::this_thread::sleep_for(wait_duration);
-  }
-  printf("After Wait image.\n");
+//  const auto wait_duration = std::chrono::milliseconds(2000);
+//  while(!getImageStatus()) {
+//    printf("Waiting for image.\n");
+//    if(!isNodeRunning_) {
+//      return;
+//    }
+//    std::this_thread::sleep_for(wait_duration);
+//  }
 
   scale_truck_control_ros2::msg::Xav2lrc msg;
   std::thread lanedetect_thread;
@@ -347,7 +346,7 @@ void ScaleTruckController::spin()
       controlDone_ = true;
       rclcpp::shutdown();
     }
-    
+
     if(enableConsoleOutput_)
       displayConsole();
 
@@ -362,13 +361,12 @@ void ScaleTruckController::spin()
             diff_time = 0.0;
             cnt = 0;
     }
+
   }
 }
 
 
 void ScaleTruckController::displayConsole() {
-//  static std::string ipAddr = ZMQ_SOCKET_.getIPAddress();
-
   printf("\033[2J");
   printf("\033[1;1H");
   printf("\nAngle           : %2.3f degree", AngleDegree_);

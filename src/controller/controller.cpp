@@ -143,9 +143,6 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
 Controller::~Controller()
 {
     delete ui;
-    delete lv_thread_;
-    delete fv1_thread_;
-    delete fv2_thread_;
 }
 
 void Controller::SubCallback(const CmdData &msg)
@@ -215,12 +212,6 @@ void Controller::requestData(CmdData cmd_data)
         gettimeofday(&endTime, NULL);
         req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
         //recordData(&startTime_);
-    }
-    else if (send_data.tar_index == 1){
-        XavPublisher_->publish(send_data);
-    }
-    else if (send_data.tar_index == 2){
-        XavPublisher_->publish(send_data);
     }
 }
 
