@@ -44,8 +44,17 @@ def generate_launch_description():
             parameters = [ros_param_file, vehicle_param_file, lrc_param_file],
             output='screen')
 
+    opencr_node=Node(
+            package='micro_ros_agent', 
+ #           namespace='LV', 
+            name='opencr', 
+            executable='micro_ros_agent', 
+            arguments = ["serial", "--dev", "/dev/ttyACM0"],
+            output='screen')
+
     ld.add_action(control_node)
     ld.add_action(lrc_node)
+    ld.add_action(opencr_node)
 
     return ld
 
