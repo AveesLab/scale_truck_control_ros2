@@ -2,7 +2,7 @@
 scale_truck_control ros2 version
 
 
-# Install Micro-ros 
+# Install Micro-ros-Aruduino
 - 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
 ```
 cd ~/ros2_ws/src 
