@@ -7,8 +7,8 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 #include <std_msgs/msg/int32.h>
-#include <cpp_pubsub/msg/ocr2lrc.h>
-#include <cpp_pubsub/msg/lrc2ocr.h>
+#include <scale_truck_control_ros2/msg/ocr2lrc.h>
+#include <scale_truck_control_ros2/msg/lrc2ocr.h>
 
 // OpenCR, ros 1 library
 #include <stdio.h>
@@ -29,14 +29,14 @@ rcl_allocator_t allocator;
 
 // publisher 
 rcl_publisher_t OcrPublisher_;
-cpp_pubsub__msg__Ocr2lrc pub_msg_;
+scale_truck_control_ros2__msg__Ocr2lrc pub_msg_;
 std_msgs__msg__Int32 test_msg_;
 rclc_executor_t executor_pub_;
 rcl_timer_t timer;
 
 // subscriber 
 rcl_subscription_t OcrSubscriber_;
-cpp_pubsub__msg__Lrc2ocr sub_msg_;
+scale_truck_control_ros2__msg__Lrc2ocr sub_msg_;
 rclc_executor_t executor_sub_;
 
 sensor_msgs::Imu imu_msg_;
@@ -101,16 +101,12 @@ HardwareTimer Timer3(TIMER_CH3); // Angle
    ros Subscribe Callback Function
 */
 void LrcCallback(const void *msgin) {
-  const cpp_pubsub__msg__Lrc2ocr *msg = (const cpp_pubsub__msg__Lrc2ocr *)msgin;
+  const scale_truck_control_ros2__msg__Lrc2ocr *msg = (const scale_truck_control_ros2__msg__Lrc2ocr *)msgin;
   Index_ = msg->index;
   tx_steer_ = msg->steer_angle;  // float32
   tx_dist_ = msg->cur_dist;
   tx_tdist_ = msg->tar_dist;
   tx_throttle_ = msg->tar_vel;
-  est_vel_ = msg->est_vel;
-  preceding_truck_vel_ = msg->preceding_truck_vel;
-  fi_encoder_ = msg->fi_encoder;
-  Alpha_ = msg->alpha;
 }
 /*
    SPEED to RPM
@@ -337,21 +333,22 @@ void setup() {
   set_microros_transports();
   allocator = rcl_get_default_allocator();
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+
   /*
-   ros variable
+   ros2 variable
   */
   RCCHECK(rclc_node_init_default(&node, "opencr_node", "", &support)); // "": namespace
   
   RCCHECK(rclc_subscription_init_default(
       &OcrSubscriber_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(cpp_pubsub, msg, Lrc2ocr),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Lrc2ocr),
       "/lrc2ocr_msg"));
       
   RCCHECK(rclc_publisher_init_default(
       &OcrPublisher_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(cpp_pubsub, msg, Ocr2lrc),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Ocr2lrc),
       "/ocr2lrc_msg"));
       
   RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
@@ -364,6 +361,5 @@ void loop() {
   RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(100)));
   RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(100)));
 
-  pub_msg_.cur_vel = tx_throttle_ - 0.65;
   RCSOFTCHECK(rcl_publish(&OcrPublisher_, &pub_msg_, NULL));
 }
