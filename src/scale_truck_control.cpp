@@ -77,8 +77,8 @@ void ScaleTruckController::init()
   int imageQueueSize;
   std::string objectTopicName;
   int objectQueueSize;
-  std::string XavSubTopicName;
-  int XavSubQueueSize;
+  std::string LrcSubTopicName;
+  int LrcSubQueueSize;
   std::string CmdSubTopicName;
   int CmdSubQueueSize;
 
@@ -94,8 +94,8 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/camera_reading/queue_size", imageQueueSize, 1);
   this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("/raw_obstacles"));
   this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
-  this->get_parameter_or("subscribers/lrc_to_xavier/topic", XavSubTopicName, std::string("/lrc2xav_msg"));
-  this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", XavSubQueueSize, 1);
+  this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("/lrc2xav_msg"));
+  this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
   this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
   this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
 
@@ -110,7 +110,7 @@ void ScaleTruckController::init()
   /************************/
   /* Ros Topic Subscriber */
   /************************/
-  XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(XavSubTopicName, XavSubQueueSize, std::bind(&ScaleTruckController::XavSubCallback, this, std::placeholders::_1));
+  LrcSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
 
   CmdSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
@@ -442,7 +442,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
 //  }
 //}
 
-void ScaleTruckController::XavSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg)
+void ScaleTruckController::LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg)
 {
   {
     std::scoped_lock lock(vel_mutex_);

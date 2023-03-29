@@ -207,10 +207,13 @@ void Controller::requestData(CmdData cmd_data)
     struct timeval startTime, endTime;
 
     if (send_data.tar_index == 0){
+        lv_mutex_.lock();
+        qDebug() << send_data.tar_vel;
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
         req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
+        lv_mutex_.unlock();
         //recordData(&startTime_);
     }
 }
@@ -518,6 +521,7 @@ void Controller::on_Send_clicked()
     ui->FV1DistSlider->setValue(dist);
     ui->FV2DistSlider->setValue(dist);
 
+    qDebug() << ui->LVVelSlider->value();
     if(ui->LVVelSlider->value() >= 10) {
       tar_vel = ui->LVVelSlider->value()/100.0f;
     }
@@ -529,6 +533,7 @@ void Controller::on_Send_clicked()
     cmd_data.tar_index = 0;
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
+    qDebug() << cmd_data.tar_vel;
 
     requestData(cmd_data);
 }

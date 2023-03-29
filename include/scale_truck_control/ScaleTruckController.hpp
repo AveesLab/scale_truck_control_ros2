@@ -50,13 +50,13 @@ private:
     rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdPublisher_;
 
     //Subscriber 
-    rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr XavSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
 //    rclcpp::Subscription<scale_truck_control_ros2::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
-    void XavSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
+    void LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
     void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
 //  void objectCallback(const obstacle_detector::Obstacles &msg);
     
