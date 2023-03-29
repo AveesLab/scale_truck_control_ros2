@@ -30,7 +30,7 @@ def generate_launch_description():
 
     control_node=Node(
             package='scale_truck_control_ros2', 
-#            namespace='LV', 
+            namespace='LV', 
             name='scale_truck_control_node', 
             executable='control_node', 
             parameters = [ros_param_file, vehicle_param_file],
@@ -38,7 +38,7 @@ def generate_launch_description():
 
     lrc_node=Node(
             package='scale_truck_control_ros2', 
- #           namespace='LV', 
+            namespace='LV', 
             name='LRC', 
             executable='lrc_node', 
             parameters = [ros_param_file, vehicle_param_file, lrc_param_file],
@@ -46,7 +46,7 @@ def generate_launch_description():
 
     opencr_node=Node(
             package='micro_ros_agent', 
- #           namespace='LV', 
+            namespace='LV', 
             name='opencr', 
             executable='micro_ros_agent', 
             arguments = ["serial", "--dev", "/dev/ttyACM0"],

@@ -173,12 +173,10 @@ void LocalRC::printStatus(){
   if (EnableConsoleOutput_){
     printf("\033[2J");
     printf("\033[1;1H");
-    printf("\nPredict Velocity:\t%.3f", est_vel_);
     printf("\nTarget Velocity:\t%.3f", tar_vel_);
     printf("\nCurrent Velocity:\t%.3f", cur_vel_);
     printf("\nTarget Distance:\t%.3f", tar_dist_);
     printf("\nCurrent Distance:\t%.3f", cur_dist_);
-    printf("\nEstimated Value:\t%.3f", fabs(cur_vel_ - hat_vel_));
     printf("\n");
   }
 }
@@ -200,19 +198,6 @@ void LocalRC::communicate(){
   }
 }
 
-// test lrc->ocr
-void LocalRC::Lrc2ocrCallback(void) 
-{
-  auto msg = scale_truck_control_ros2::msg::Lrc2ocr();
-  msg.tar_vel = 1.0;                                                     
-  msg.tar_dist = 0.8;                                                    
-  msg.cur_dist = 0.62;                                                   
-  msg.steer_angle = 5.0;                                                   
-  msg.est_vel = 1.0;                                                   
-  //RCLCPP_INFO(this->get_logger(), "Publishing: '%.3f'", msg.tar_vel);
-  OcrPublisher_->publish(msg);
-}
-
 void LocalRC::XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
@@ -228,12 +213,8 @@ void LocalRC::OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPt
 {
   std::scoped_lock lock(data_mutex_);
   ref_vel_ = msg->ref_vel;
-  //cur_vel_ = msg->cur_vel;
-  cur_vel_ = 0.815;
+  cur_vel_ = msg->cur_vel;
   sat_vel_ = msg->u_k;  //saturated velocity
-
-  RCLCPP_INFO(this->get_logger(), "I heard: '%.3f'", msg->ref_vel);     
-  RCLCPP_INFO(this->get_logger(), "I heard: '%.3f'", msg->cur_vel);     
 }
 
 /***************/

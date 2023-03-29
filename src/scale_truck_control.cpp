@@ -161,8 +161,8 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
           std::scoped_lock lock(vel_mutex_, dist_mutex_);
           cmd->cur_vel = CurVel_;
 //          cmd->cur_dist = actDist_;
-//          cmd->cur_angle = AngleDegree_;
           cmd->cur_dist = 0.65;
+//          cmd->cur_angle = AngleDegree_;
           cmd->cur_angle = 4.5;
 	}
       }
@@ -219,9 +219,6 @@ void* ScaleTruckController::lanedetectInThread()
 //    AngleDegree_ = AngleDegree;
 }
 
-
-
-
 void* ScaleTruckController::objectdetectInThread() {
 //  float dist, angle;
 //  float dist_tmp, angle_tmp;
@@ -270,35 +267,35 @@ void* ScaleTruckController::objectdetectInThread() {
 //    droi_ready_ = true;
 //    cv_.notify_one(); // 현규형은 안썼음 일단 대기. 
 //  }
-//  if(index_ == 0){  //LV
+  if(index_ == 0){  //LV
 //    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-//    if(distance_ <= LVstopDist_) {
-//    // Emergency Brake
-//      ResultVel_ = 0.0f;
-//    }
-//    else if (distance_ <= SafetyDist_){
-//      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
-//      if (TargetVel_ < TmpVel_){
-//        ResultVel_ = TargetVel_;
-//      }
-//      else{
-//        ResultVel_ = TmpVel_;
-//      }
-//    }
-//    else{
-//      ResultVel_ = TargetVel_;
-//    }
-//  }
-//  else{  //FVs
+    if(distance_ <= LVstopDist_) {
+    // Emergency Brake
+      ResultVel_ = 0.0f;
+    }
+    else if (distance_ <= SafetyDist_){
+      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
+      if (TargetVel_ < TmpVel_){
+        ResultVel_ = TargetVel_;
+      }
+      else{
+        ResultVel_ = TmpVel_;
+      }
+    }
+    else{
+      ResultVel_ = TargetVel_;
+    }
+  }
+  else{  //FVs
 //    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-//    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
-//    // Emergency Brake
-//      ResultVel_ = 0.0f;
-//    }
-//    else {
-//      ResultVel_ = TargetVel_;
-//    }
-//  }
+    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
+    // Emergency Brake
+      ResultVel_ = 0.0f;
+    }
+    else {
+      ResultVel_ = TargetVel_;
+    }
+  }
 }
 
 void ScaleTruckController::spin() 
@@ -331,8 +328,7 @@ void ScaleTruckController::spin()
     lanedetect_thread.join();
     objectdetect_thread.join();
 
-    //msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
-    msg.tar_vel = 7.5;  //Xavier to LRC and LRC to OpenCR
+    msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
     {
       std::scoped_lock lock(dist_mutex_);
       //msg.steer_angle = AngleDegree_; // get from objectThread
