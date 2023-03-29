@@ -11,9 +11,9 @@ void LVThread::run()
     CmdData lv_tmp;
     while(1)
     {
-        lv_tmp.src_index = 255;
-        lv_tmp.tar_index = 0;
-        emit request(lv_tmp);
+        //lv_tmp.src_index = 255;
+        //lv_tmp.tar_index = 0;
+        //emit request(lv_tmp); // -> requestData() -> Publish()
 
         Controller::lv_mutex_.lock();
         lv_tmp = Controller::lv_data_;

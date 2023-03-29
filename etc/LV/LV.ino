@@ -1,3 +1,4 @@
+// https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR/master/arduino/opencr_release/package_opencr_index.json
 // micro-ros library
 #include <micro_ros_arduino.h>
 #include <stdio.h>
@@ -6,6 +7,8 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 #include <std_msgs/msg/int32.h>
+#include <cpp_pubsub/msg/ocr2lrc.h>
+#include <cpp_pubsub/msg/lrc2ocr.h>
 
 // OpenCR, ros 1 library
 #include <stdio.h>
@@ -24,18 +27,17 @@ rcl_node_t node;
 rclc_support_t support;
 rcl_allocator_t allocator;
 
-// publisher
-rcl_publisher_t rosPubMsg;
-rcl_publisher_t testPubMsg;
-scale_truck_control::ocr2lrc pub_msg_;
+// publisher 
+rcl_publisher_t OcrPublisher_;
+cpp_pubsub__msg__Ocr2lrc pub_msg_;
 std_msgs__msg__Int32 test_msg_;
-rclc_executor_t executor_pub;
+rclc_executor_t executor_pub_;
 rcl_timer_t timer;
 
-// subscriber
-rcl_subscription_t rosSubMsg;
-scale_truck_control::lrc2ocr sub_msg_;
-rclc_executor_t executor_sub;
+// subscriber 
+rcl_subscription_t OcrSubscriber_;
+cpp_pubsub__msg__Lrc2ocr sub_msg_;
+rclc_executor_t executor_sub_;
 
 sensor_msgs::Imu imu_msg_;
 
@@ -99,7 +101,7 @@ HardwareTimer Timer3(TIMER_CH3); // Angle
    ros Subscribe Callback Function
 */
 void LrcCallback(const void *msgin) {
-  const scale_truck_control::lrc2ocr *msg = (const scale_truck_control::lrc2ocr *)msgin;
+  const cpp_pubsub__msg__Lrc2ocr *msg = (const cpp_pubsub__msg__Lrc2ocr *)msgin;
   Index_ = msg->index;
   tx_steer_ = msg->steer_angle;  // float32
   tx_dist_ = msg->cur_dist;
@@ -338,32 +340,30 @@ void setup() {
   /*
    ros variable
   */
-  RCCHECK(rclc_node_init_default(&node, "OpenCR_node", "", &support));
+  RCCHECK(rclc_node_init_default(&node, "opencr_node", "", &support)); // "": namespace
+  
   RCCHECK(rclc_subscription_init_default(
-      &rosSubMsg,
+      &OcrSubscriber_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(cpp_pubsub, msg, Lrc2ocr),
       "/lrc2ocr_msg"));
+      
   RCCHECK(rclc_publisher_init_default(
-      &rosPubMsg,
+      &OcrPublisher_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(cpp_pubsub, msg, Ocr2lrc),
       "/ocr2lrc_msg"));
-  RCCHECK(rclc_publisher_init_default(
-      &testPubMsg,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-      "/testPub_msg"));
-  RCCHECK(rclc_executor_init(&executor_pub, &support.context, 1, &allocator));
-  RCCHECK(rclc_executor_init(&executor_sub, &support.context, 1, &allocator));
-  RCCHECK(rclc_executor_add_subscription(&executor_sub, &rosSubMsg, &sub_msg_, &LrcCallback, ON_NEW_DATA));
+      
+  RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
+  RCCHECK(rclc_executor_init(&executor_sub_, &support.context, 1, &allocator));
+  RCCHECK(rclc_executor_add_subscription(&executor_sub_, &OcrSubscriber_, &sub_msg_, &LrcCallback, ON_NEW_DATA));
 }
 
 void loop() {
   delay(100);
-  RCCHECK(rclc_executor_spin_some(&executor_pub, RCL_MS_TO_NS(100)));
-  RCCHECK(rclc_executor_spin_some(&executor_sub, RCL_MS_TO_NS(100)));
-  RCSOFTCHECK(rcl_publish(&rosPubMsg, &pub_msg_, NULL));
-  RCSOFTCHECK(rcl_publish(&testPubMsg, &test_msg_, NULL));
-  test_msg_.data++;
+  RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(100)));
+  RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(100)));
+
+  pub_msg_.cur_vel = tx_throttle_ - 0.65;
+  RCSOFTCHECK(rcl_publish(&OcrPublisher_, &pub_msg_, NULL));
 }

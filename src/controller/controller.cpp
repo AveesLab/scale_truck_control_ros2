@@ -64,11 +64,11 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
 
     qRegisterMetaType<CmdData>("CmdData");
 
-    connect(lv_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
+//    connect(lv_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
     connect(lv_thread_, SIGNAL(setValue(CmdData)),this,SLOT(updateData(CmdData)), Qt::AutoConnection);
-    connect(fv1_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
+//    connect(fv1_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
     connect(fv1_thread_, SIGNAL(setValue(CmdData)),this,SLOT(updateData(CmdData)), Qt::AutoConnection);
-    connect(fv2_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
+//    connect(fv2_thread_, SIGNAL(request(CmdData)), this, SLOT(requestData(CmdData)), Qt::DirectConnection);
     connect(fv2_thread_, SIGNAL(setValue(CmdData)),this,SLOT(updateData(CmdData)), Qt::AutoConnection);
 
     lv_thread_->start();
@@ -208,7 +208,7 @@ void Controller::requestData(CmdData cmd_data)
 
     if (send_data.tar_index == 0){
         lv_mutex_.lock();
-        qDebug() << send_data.tar_vel;
+        qDebug() << send_data.tar_vel; /* check */
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
@@ -364,18 +364,18 @@ void Controller::on_LVVelSlider_valueChanged(int value)
     value_vel = value;
     value_dist = ui->LVDistSlider->value();
 
-    if(value_vel >= 10) {
-      tar_vel = value_vel/100.0f;
-    }
-    else {
-      tar_vel = 0;
-    }
-    tar_dist = value_dist/100.0f;
-    cmd_data.src_index = 20;
-    cmd_data.tar_index = 0;
-    cmd_data.tar_vel = tar_vel;
-    cmd_data.tar_dist = tar_dist;
-    requestData(cmd_data);
+//    if(value_vel >= 10) {
+//      tar_vel = value_vel/100.0f;
+//    }
+//    else {
+//      tar_vel = 0;
+//    }
+//    tar_dist = value_dist/100.0f;
+//    cmd_data.src_index = 20;
+//    cmd_data.tar_index = 0;
+//    cmd_data.tar_vel = tar_vel;
+//    cmd_data.tar_dist = tar_dist;
+//    requestData(cmd_data);
 
     ui->LVVelSlider->setValue(value_vel);
     ui->FV1VelSlider->setValue(value_vel);
@@ -394,18 +394,18 @@ void Controller::on_LVDistSlider_valueChanged(int value)
     value_vel = ui->LVVelSlider->value();
     value_dist = value;
 
-    if(value_vel >= 10) {
-      tar_vel = value_vel/100.0f;
-    }
-    else {
-      tar_vel = 0;
-    }
-    tar_dist = value_dist/100.0f;
-    cmd_data.src_index = 20;
-    cmd_data.tar_index = 0;
-    cmd_data.tar_vel = tar_vel;
-    cmd_data.tar_dist = tar_dist;
-    requestData(cmd_data);
+//    if(value_vel >= 10) {
+//      tar_vel = value_vel/100.0f;
+//    }
+//    else {
+//      tar_vel = 0;
+//    }
+//    tar_dist = value_dist/100.0f;
+//    cmd_data.src_index = 20;
+//    cmd_data.tar_index = 0;
+//    cmd_data.tar_vel = tar_vel;
+//    cmd_data.tar_dist = tar_dist;
+//    requestData(cmd_data);
 
     ui->LVDistSlider->setValue(value_dist);
     ui->FV1DistSlider->setValue(value_dist);
@@ -521,7 +521,6 @@ void Controller::on_Send_clicked()
     ui->FV1DistSlider->setValue(dist);
     ui->FV2DistSlider->setValue(dist);
 
-    qDebug() << ui->LVVelSlider->value();
     if(ui->LVVelSlider->value() >= 10) {
       tar_vel = ui->LVVelSlider->value()/100.0f;
     }
@@ -533,7 +532,6 @@ void Controller::on_Send_clicked()
     cmd_data.tar_index = 0;
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
-    qDebug() << cmd_data.tar_vel;
 
     requestData(cmd_data);
 }

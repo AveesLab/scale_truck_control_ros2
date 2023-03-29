@@ -12,9 +12,9 @@ void FV2Thread::run()
 
     while(1)
     {
-        fv2_tmp.src_index = 255;
-        fv2_tmp.tar_index = 2;
-        emit request(fv2_tmp);
+//        fv2_tmp.src_index = 255;
+//        fv2_tmp.tar_index = 2;
+//        emit request(fv2_tmp);
 
         Controller::fv2_mutex_.lock();
         fv2_tmp = Controller::fv2_data_;
