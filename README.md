@@ -3,29 +3,27 @@ scale_truck_control ros2 version
 
 
 # Install Micro-ros 
-#본인의 ROS2 워크스페이스에서 작업하면 됩니다.
+본인의 ROS2 워크스페이스에서 작업하면 됩니다.
 cd ~/robot2_ws/src 
 git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git
 
-# rosdep으로 의존 패키지 업데이트
+rosdep으로 의존 패키지 업데이트
 sudo apt update && rosdep update
 rosdep install --from-paths src --ignore-src -y
 
-# pip 설치
+pip 설치
 sudo apt-get install python3-pip
 
-# micro-ROS tools 과 소스 빌드
+micro-ROS tools 과 소스 빌드
 cd ~/robot2_ws
 colcon build --packages-select micro_ros_setup
 source install/local_setup.bash
 
-# micro-ROS agent 패키지 설치
-
+micro-ROS agent 패키지 설치
 cd ~/robot_ws
 ros2 run micro_ros_setup create_agent_ws.sh
-
 ros2 run micro_ros_setup build_agent.sh
 source install/local_setup.bash
 
-# Test
+Test
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
