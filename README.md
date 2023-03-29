@@ -16,7 +16,7 @@ rosdep install --from-paths src --ignore-src -y
 ```
 
 - pip 설치
-`sudo apt-get install python3-pip`
+```sudo apt-get install python3-pip```
 
 - micro-ROS tools 과 소스 빌드
 ```
@@ -34,4 +34,4 @@ source install/local_setup.bash
 ```
 
 - Test
-`ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0`
+```ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0```
