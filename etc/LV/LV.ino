@@ -23,24 +23,6 @@
 #include <lrc2ocr.h>
 #include <ocr2lrc.h>
 
-rcl_node_t node;
-rclc_support_t support;
-rcl_allocator_t allocator;
-
-// publisher 
-rcl_publisher_t OcrPublisher_;
-scale_truck_control_ros2__msg__Ocr2lrc pub_msg_;
-std_msgs__msg__Int32 test_msg_;
-rclc_executor_t executor_pub_;
-rcl_timer_t timer;
-
-// subscriber 
-rcl_subscription_t OcrSubscriber_;
-scale_truck_control_ros2__msg__Lrc2ocr sub_msg_;
-rclc_executor_t executor_sub_;
-
-sensor_msgs::Imu imu_msg_;
-
 // Check
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -72,6 +54,24 @@ sensor_msgs::Imu imu_msg_;
 
 #define DATA_LOG      (0)
 
+rcl_node_t node;
+rclc_support_t support;
+rcl_allocator_t allocator;
+
+// publisher 
+rcl_publisher_t OcrPublisher_;
+scale_truck_control_ros2__msg__Ocr2lrc pub_msg_;
+std_msgs__msg__Int32 test_msg_; // test_msg_.data = 10;
+rclc_executor_t executor_pub_;
+rcl_timer_t timer;
+
+// subscriber 
+rcl_subscription_t OcrSubscriber_;
+scale_truck_control_ros2__msg__Lrc2ocr sub_msg_;
+rclc_executor_t executor_sub_;
+
+sensor_msgs::Imu imu_msg_;
+
 cIMU  IMU;
 Servo throttle_;
 Servo steer_;
@@ -89,13 +89,12 @@ float output_;
 volatile int EN_pos_;
 volatile int CountT_;
 volatile int cumCountT_;
-char filename_[] = "FV2_00.TXT";
+char filename_[] = "LV1_00.TXT";
 File logfile_;
 
 HardwareTimer Timer1(TIMER_CH1); // T Method
 HardwareTimer Timer2(TIMER_CH2); // Check EN
 HardwareTimer Timer3(TIMER_CH3); // Angle
-
 
 /*
    ros Subscribe Callback Function
@@ -120,7 +119,6 @@ float Kf_ = 1.0;  // feed forward const.
 float dt_ = 0.1;
 float circ_ = WHEEL_DIM * M_PI;
 
-
 float setSPEED(float tar_vel, float current_vel) { 
   static float output, err, P_err, I_err;
   static float prev_u_k, prev_u, A_err;
@@ -129,9 +127,6 @@ float setSPEED(float tar_vel, float current_vel) {
   float u_dist = 0.f, u_dist_k = 0.f;
   float ref_vel = 0.f, cur_vel = 0.f;
   cur_vel = current_vel;
-  //if(Alpha_){
-    //cur_vel = est_vel_;
-  //}
   pub_msg_.cur_vel = cur_vel;
   //if(tar_vel <= 0 ) {
     //output = ZERO_PWM;
@@ -329,14 +324,56 @@ void CountT() {
   CountT_ += 1;
 }
 
+/*
+   Arduino setup()
+*/
 void setup() {
-  set_microros_transports();
-  allocator = rcl_get_default_allocator();
-  RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+  throttle_.attach(THROTTLE_PIN);
+  steer_.attach(STEER_PIN);
+  pinMode(EN_PINA, INPUT);
+  pinMode(EN_PINB, INPUT);
+  attachInterrupt(0, getENA, CHANGE);
+  IMU.begin();
+  Serial.begin(BAUD_RATE);
+  if(!SD.begin(10)){
+    Serial.println("Card failed, or not present");
+  } else {
+    Serial.println("card initialized.");
+    for(uint8_t i=0; i<100; i++){
+      filename_[4] = i/10 + '0';
+      filename_[5] = i%10 + '0';
+      if(! SD.exists(filename_)){
+        logfile_ = SD.open(filename_, FILE_WRITE);
+        break;
+      }
+    }
+    Serial.print("Logging to: ");
+    Serial.print(filename_);
+    logfile_.close();
+  }
+  Timer1.stop();
+  Timer1.setPeriod(T_TIME);
+  Timer1.attachInterrupt(CountT);
+  Timer1.start();
+  Timer2.stop();
+  Timer2.setPeriod(CYCLE_TIME);
+  Timer2.attachInterrupt(CheckEN);
+  Timer2.start();
+  Timer3.stop();
+  Timer3.setPeriod(ANGLE_TIME);
+  Timer3.attachInterrupt(setANGLE);
+  Timer3.start();
+  Serial.print("[OpenCR] setup()");
+  tx_throttle_ = 0.0;
+  tx_steer_ = 0.0;
 
   /*
    ros2 variable
   */
+  set_microros_transports();
+  allocator = rcl_get_default_allocator();
+  RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+
   RCCHECK(rclc_node_init_default(&node, "opencr_node", "", &support)); // "": namespace
   
   RCCHECK(rclc_subscription_init_default(
@@ -357,9 +394,36 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
-  RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(100)));
-  RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(100)));
+  static unsigned long prevTime = 0;
+  static unsigned long currentTime;
 
-  RCSOFTCHECK(rcl_publish(&OcrPublisher_, &pub_msg_, NULL));
+//  if(DATA_LOG)
+//  {
+//    static float speed_vel;
+//    static boolean flag_ = false;
+//    if(Serial.available() > 0) {
+//      //tx_steer_ = Serial.parseFloat();
+//      //tx_throttle_ = Serial.parseFloat();
+//      speed_vel = Serial.parseFloat();
+//      flag_ = true;
+//      Serial.println(speed_vel);
+//    }
+//    if(flag_) {
+//      delay(1000);
+//      tx_throttle_ = speed_vel;
+//      delay(5000);
+//      tx_throttle_ = 0;
+//      flag_ = false;
+//    }
+//  }
+
+  RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(1)));
+  RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(1)));
+
+  currentTime = millis();
+  if ((currentTime - prevTime) >= (ANGLE_TIME / 1000)) {
+    RCSOFTCHECK(rcl_publish(&OcrPublisher_, &pub_msg_, NULL));
+    prevTime = currentTime;
+  }
+
 }

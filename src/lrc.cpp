@@ -228,7 +228,8 @@ void LocalRC::OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPt
 {
   std::scoped_lock lock(data_mutex_);
   ref_vel_ = msg->ref_vel;
-  cur_vel_ = msg->cur_vel;
+  //cur_vel_ = msg->cur_vel;
+  cur_vel_ = 0.815;
   sat_vel_ = msg->u_k;  //saturated velocity
 
   RCLCPP_INFO(this->get_logger(), "I heard: '%.3f'", msg->ref_vel);     

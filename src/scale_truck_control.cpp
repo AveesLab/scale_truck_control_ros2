@@ -160,8 +160,10 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
         {
           std::scoped_lock lock(vel_mutex_, dist_mutex_);
           cmd->cur_vel = CurVel_;
-          cmd->cur_dist = actDist_;
-          cmd->cur_angle = AngleDegree_;
+//          cmd->cur_dist = actDist_;
+//          cmd->cur_angle = AngleDegree_;
+          cmd->cur_dist = 0.65;
+          cmd->cur_angle = 4.5;
 	}
       }
     }
@@ -329,11 +331,14 @@ void ScaleTruckController::spin()
     lanedetect_thread.join();
     objectdetect_thread.join();
 
-    msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
+    //msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
+    msg.tar_vel = 7.5;  //Xavier to LRC and LRC to OpenCR
     {
       std::scoped_lock lock(dist_mutex_);
-      msg.steer_angle = AngleDegree_; // get from objectThread
-      msg.cur_dist = distance_;       // ''
+      //msg.steer_angle = AngleDegree_; // get from objectThread
+      msg.steer_angle = 4.5; // get from objectThread
+      //msg.cur_dist = distance_;       // ''
+      msg.cur_dist = 7.543;       // ''
     }
     {
       std::scoped_lock lock(rep_mutex_);
