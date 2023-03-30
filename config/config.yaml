@@ -1,13 +1,13 @@
-/**/scale_truck_control_node:
-  ros__parameters:
+/LV/scale_truck_control_node:
+  ros__parameters:    
     subscribers/camera_reading/topic: /usb_cam/image_raw
     subscribers/camera_reading/queue_size: 1
     subscribers/obstacle_reading/topic: /raw_obstacles
     subscribers/obstacle_reading/queue_size: 100
-    subscribers/lrc_to_xavier/topic: /lrc2xav_msg
+    subscribers/lrc_to_xavier/topic: lrc2xav_msg
     subscribers/lrc_to_xavier/queue_size: 1
 
-    publishers/xavier_to_lrc/topic: /xav2lrc_msg
+    publishers/xavier_to_lrc/topic: xav2lrc_msg
     publishers/xavier_to_lrc/queue_size: 1
 
     params/LdOffset: 0.0

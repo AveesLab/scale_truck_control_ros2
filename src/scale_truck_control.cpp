@@ -38,7 +38,8 @@ ScaleTruckController::~ScaleTruckController() {
 
   delete cmd_data_;
 
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] Stop.");
+  //RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] Stop.");
+  printf("[ScaleTruckController] Stop.");
 }
 
 bool ScaleTruckController::readParameters() {
@@ -71,7 +72,8 @@ bool ScaleTruckController::readParameters() {
 
 void ScaleTruckController::init() 
 {
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] init()");
+  //RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] init()");
+  printf("[ScaleTruckController] init()");
 
   std::string imageTopicName;
   int imageQueueSize;
@@ -90,21 +92,21 @@ void ScaleTruckController::init()
   /******************************/
   /* Ros Topic Subscribe Option */
   /******************************/
-  this->get_parameter_or("subscribers/camera_reading/topic", imageTopicName, std::string("/usb_cam/image_raw"));
-  this->get_parameter_or("subscribers/camera_reading/queue_size", imageQueueSize, 1);
-  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("/raw_obstacles"));
-  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
-  this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("/lrc2xav_msg"));
+//  this->get_parameter_or("subscribers/camera_reading/topic", imageTopicName, std::string("/usb_cam/image_raw"));
+//  this->get_parameter_or("subscribers/camera_reading/queue_size", imageQueueSize, 1);
+//  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("/raw_obstacles"));
+//  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
+  this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
-  this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
+  this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("cmd2xav_msg"));
   this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
 
   /****************************/
   /* Ros Topic Publish Option */
   /****************************/
-  this->get_parameter_or("publishers/xavier_to_lrc/topic", LrcPubTopicName, std::string("/xav2lrc_msg"));
+  this->get_parameter_or("publishers/xavier_to_lrc/topic", LrcPubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("publishers/xavier_to_lrc/queue_size", LrcPubQueueSize, 1);
-  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("/xav2cmd_msg"));
+  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("xav2cmd_msg"));
   this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
 
   /************************/

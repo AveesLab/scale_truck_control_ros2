@@ -46,9 +46,9 @@ void LocalRC::init(){
   /******************************/
   /* ROS Topic Subscribe Option */
   /******************************/
-  this->get_parameter_or("LrcSubPub/xavier_to_lrc/topic", XavSubTopicName, std::string("/xav2lrc_msg"));
+  this->get_parameter_or("LrcSubPub/xavier_to_lrc/topic", XavSubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("LrcSubPub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/ocr_to_lrc/topic", OcrSubTopicName, std::string("/ocr2lrc_msg"));
+  this->get_parameter_or("LrcSubPub/ocr_to_lrc/topic", OcrSubTopicName, std::string("ocr2lrc_msg"));
   this->get_parameter_or("LrcSubPub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
   this->get_parameter_or("LrcSubPub/LV_to_FVs/topic", LVSubTopicName, std::string("/lv2fv_msg"));
   this->get_parameter_or("LrcSubPub/LV_to_FVs/queue_size", LVSubQueueSize, 1);
@@ -56,9 +56,9 @@ void LocalRC::init(){
   /******************************/
   /* ROS Topic Publish Option */
   /******************************/
-  this->get_parameter_or("LrcSubPub/lrc_to_xavier/topic", XavPubTopicName, std::string("/lrc2xav_msg"));
+  this->get_parameter_or("LrcSubPub/lrc_to_xavier/topic", XavPubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("LrcSubPub/lrc_to_xavier/queue_size", XavPubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("/lrc2ocr_msg"));
+  this->get_parameter_or("LrcSubPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("lrc2ocr_msg"));
   this->get_parameter_or("LrcSubPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
   this->get_parameter_or("LrcSubPub/lv_to_fv/topic", FVPubTopicName, std::string("/lv2fv_msg"));
   this->get_parameter_or("LrcSubPub/lv_to_fv/queue_size", FVPubQueueSize, 1);
