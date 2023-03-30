@@ -1,119 +1,82 @@
-tcp_ip:
-  ip_addr_server: "tcp://*"
-  ip_addr_client: "tcp://192.168.0.30"
-  interface_name: "wlan0"
-  req_port: "5555"
-  rep_port: "8888"
-  zipcode: "00001"
+/**/scale_truck_control_node:
+  ros__parameters:
+    params/index: 1
+    params/target_vel: 0.00
+    params/safety_vel: 0.45
+    params/fv_max_vel: 1.20
+    params/lv_stop_dist: 0.5
+    params/fv_stop_dist: 0.4
+    params/safety_dist: 0.8
+    params/target_dist: 0.8
+    params/angle_degree: 0.0
+    params/Kp_d: 2.0
+    params/Ki_d: 0.2
+    params/K: 0.15
 
-tcpimg_ip:
-  ip_addr_server: "tcp://*"
-  ip_addr_client: "tcp://192.168.0.12"
-  req_port: ""
-  rep_port: "50000"
+    params/a/a: 0.
+    params/a/b: -0.22027
+    params/a/c: 0.847
+    params/a/d: -1.1516
+    params/a/e: 0.60261
 
-udp_ip:
-  ip_addr: "udp://239.255.255.251"
-  port: "9091"
-  send_group: "FV"
-  recv_group: "LV"
+    params/b/a: 0.
+    params/b/b: -1.3982
+    params/b/c: 4.1189
+    params/b/d: -4.0208
+    params/b/e: 1.41
 
-socket:
-  rad_flag: false
-  dsh_flag: false
-  req_flag: false
-  rep_flag: true
-  req_img_flag: false
-  rep_img_flag: true
+    Calibration/f_matrix/a: 325.45672218217680
+    Calibration/f_matrix/b: 0.
+    Calibration/f_matrix/c: 320.
+    Calibration/f_matrix/d: 0.
+    Calibration/f_matrix/e: 325.45672218217680
+    Calibration/f_matrix/f: 240. 
+    Calibration/f_matrix/g: 0.
+    Calibration/f_matrix/h: 0.
+    Calibration/f_matrix/i: 1.
 
-params:
-  index: 1
-  target_vel: 0.00
-  safety_vel: 0.45
-  fv_max_vel: 1.20
-  lv_stop_dist: 0.5
-  fv_stop_dist: 0.4
-  safety_dist: 0.8
-  target_dist: 0.8
-  angle_degree: 0.0
-  Kp_d: 2.0
-  Kd_d: 0.4
-  K: 0.15
-  a:
-    a: 0.
-    b: -0.22027
-    c: 0.847
-    d: -1.1516
-    e: 0.60261
-  b:
-    a: 0.
-    b: -1.3982
-    c: 4.1189
-    d: -4.0208
-    e: 1.41
-  K3: 0.20 # 0.25 
-  K4: 0.30 # 0.51
-  Lw: 0.34
-  LdOffset: 0 # -0.37 35 ~ 38-0.5
-  LdOffset2: -0.5 # -0.5
-  
-Calibration:
-  f_matrix:
-    a: 325.45672218217680
-    b: 0.
-    c: 320. 
-    d: 0. 
-    e: 325.45672218217680
-    f: 240. 
-    g: 0. 
-    h: 0. 
-    i: 1.
-  f_dist_coef:
-    a: -0.35139098089507653
-    b: 0.15748570446604712
-    c: 0.
-    d: 0. 
-    e: -0.037408338000060472
-  r_matrix:
-    a: 326.31389227574556
-    b: 0.
-    c: 320. 
-    d: 0. 
-    e: 326.31389227574556
-    f: 240. 
-    g: 0. 
-    h: 0. 
-    i: 1.
-  r_dist_coef:
-    a: -0.33295846454356126
-    b: 0.12386827336557986
-    c: 0.
-    d: 0. 
-    e: -0.022565312043601477
+    Calibration/f_dist_coef/a: -0.35139098089507653
+    Calibration/f_dist_coef/b: 0.15748570446604712
+    Calibration/f_dist_coef/c: 0.
+    Calibration/f_dist_coef/d: 0.
+    Calibration/f_dist_coef/e: -0.037408338000060472
 
-ROI:
-  front_cam:
-    width: 640
-    height: 480
-    top_gap: 0.413
-    bot_gap: 0.185
-    top_height: 0.99
-    bot_height: 0.485
-    extra_f: 8.00
-    extra_b: 8.00
-    extra_up: 140
-    extra_down: 180
-  rear_cam:
-    width: 640
-    height: 480
-    top_gap: 0.405
-    bot_gap: 0.17
-    top_height: 0.99
-    bot_height: 0.47
-    extra_f: 1
-    extra_b: 10
-    extra_up: 140
-    extra_down: 180
+    Calibration/r_matrix/a: 326.31389227574556
+    Calibration/r_matrix/b: 0.
+    Calibration/r_matrix/c: 320.
+    Calibration/r_matrix/d: 0.
+    Calibration/r_matrix/e: 326.31389227574556
+    Calibration/r_matrix/f: 240.
+    Calibration/r_matrix/g: 0.
+    Calibration/r_matrix/h: 0.
+    Calibration/r_matrix/i: 1.
 
-rear_camera_usage:
-  use: false
+    Calibration/r_dist_coef/a: -0.33295846454356126
+    Calibration/r_dist_coef/b: 0.12386827336557986
+    Calibration/r_dist_coef/c: 0.
+    Calibration/r_dist_coef/d: 0.
+    Calibration/r_dist_coef/e: -0.022565312043601477
+
+    ROI/front_cam/width: 640
+    ROI/front_cam/height: 480
+    ROI/front_cam/top_gap: 0.413
+    ROI/front_cam/bot_gap: 0.185
+    ROI/front_cam/top_height: 0.99
+    ROI/front_cam/bot_height: 0.485
+    ROI/front_cam/extra_f: 8.00
+    ROI/front_cam/extra_b: 8.00
+    ROI/front_cam/extra_up: 140
+    ROI/front_cam/extra_down: 180
+    
+    ROI/rear_cam/width: 640
+    ROI/rear_cam/height: 480
+    ROI/rear_cam/top_gap: 0.405
+    ROI/rear_cam/bot_gap: 0.17
+    ROI/rear_cam/top_height: 0.99
+    ROI/rear_cam/bot_height: 0.47
+    ROI/rear_cam/extra_f: 1
+    ROI/rear_cam/extra_b: 10
+    ROI/rear_cam/extra_up: 140
+    ROI/rear_cam/extra_down: 180
+
+    rear_camera_usage/use: true
