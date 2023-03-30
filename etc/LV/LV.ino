@@ -383,13 +383,13 @@ void setup() {
       &OcrSubscriber_,
       &node,
       ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Lrc2ocr),
-      "/lrc2ocr_msg"));
+      "lrc2ocr_msg"));
       
   RCCHECK(rclc_publisher_init_default(
       &OcrPublisher_,
       &node,
       ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Ocr2lrc),
-      "/ocr2lrc_msg"));
+      "ocr2lrc_msg"));
       
   RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_init(&executor_sub_, &support.context, 1, &allocator));
