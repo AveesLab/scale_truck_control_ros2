@@ -128,6 +128,7 @@ float setSPEED(float tar_vel, float current_vel) {
   float ref_vel = 0.f, cur_vel = 0.f;
   cur_vel = current_vel;
   pub_msg_.cur_vel = cur_vel;
+  pub_msg_.cur_vel = 6.5;
   //if(tar_vel <= 0 ) {
     //output = ZERO_PWM;
     //I_err = 0;
@@ -150,6 +151,7 @@ float setSPEED(float tar_vel, float current_vel) {
     }
 
     pub_msg_.ref_vel = ref_vel;
+    pub_msg_.ref_vel = 6.5;
 
     err = ref_vel - cur_vel;
     P_err = Kp_ * err;
@@ -169,6 +171,7 @@ float setSPEED(float tar_vel, float current_vel) {
     else u_k = u;
 
     pub_msg_.u_k = u_k;
+    pub_msg_.u_k = 6.5;
 
     if(tar_vel <= 0){
       output = ZERO_PWM;
@@ -374,7 +377,7 @@ void setup() {
   allocator = rcl_get_default_allocator();
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
-  RCCHECK(rclc_node_init_default(&node, "opencr_node", "", &support)); // "": namespace
+  RCCHECK(rclc_node_init_default(&node, "opencr_node", "LV", &support)); // "": namespace
   
   RCCHECK(rclc_subscription_init_default(
       &OcrSubscriber_,
