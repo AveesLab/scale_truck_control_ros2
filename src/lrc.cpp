@@ -169,10 +169,14 @@ void LocalRC::printStatus(){
   if (EnableConsoleOutput_){
     printf("\033[2J");
     printf("\033[1;1H");
-    printf("\nTarget Velocity:\t%.3f", tar_vel_);
-    printf("\nCurrent Velocity:\t%.3f", cur_vel_);
-    printf("\nTarget Distance:\t%.3f", tar_dist_);
-    printf("\nCurrent Distance:\t%.3f", cur_dist_);
+    printf("LrcParams/lrc_index :%d\n", index_);
+    printf("Target Velocity:\t%.3f\n", tar_vel_);
+    printf("Current Velocity:\t%.3f\n", cur_vel_);
+    printf("Target Distance:\t%.3f\n", tar_dist_);
+    printf("Current Distance:\t%.3f\n", cur_dist_);
+//    printf("Tar|Cur Vel     : %3.3f | %3.3f m/s\n", tar_vel_, cur_vel_);
+//    printf("Tar|Cur Dist    : %3.3f | %3.3f m\n", tar_dist_, cur_dist_);
+
   }
 }
 
