@@ -175,16 +175,27 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
       }
     }
     {
-      std::scoped_lock lock(lane_mutex_);
-//      cmd->coef_a[0] = laneDetector_.lane_coef_.left.a;
-//      cmd->coef_b[0] = laneDetector_.lane_coef_.left.b;
-//      cmd->coef_c[0] = laneDetector_.lane_coef_.left.c;
-//      cmd->coef_a[1] = laneDetector_.lane_coef_.right.a;
-//      cmd->coef_b[1] = laneDetector_.lane_coef_.right.b;
-//      cmd->coef_c[1] = laneDetector_.lane_coef_.right.c;
-//      cmd->coef_a[2] = laneDetector_.lane_coef_.center.a;
-//      cmd->coef_b[2] = laneDetector_.lane_coef_.center.b;
-//      cmd->coef_c[2] = laneDetector_.lane_coef_.center.c;
+//      std::scoped_lock lock(lane_mutex_);
+//      cmd->coef[0].left.a = laneDetector_.lane_coef_.left.a;
+//      cmd->coef[0].left.b = laneDetector_.lane_coef_.left.b;
+//      cmd->coef[0].left.c = laneDetector_.lane_coef_.left.c;
+//      cmd->coef[1].right.a = laneDetector_.lane_coef_.right.a;
+//      cmd->coef[1].right.b = laneDetector_.lane_coef_.right.b;
+//      cmd->coef[1].right.c = laneDetector_.lane_coef_.right.c;
+//      cmd->coef[2].center.a = laneDetector_.lane_coef_.center.a;
+//      cmd->coef[2].center.b = laneDetector_.lane_coef_.center.b;
+//      cmd->coef[2].center.c = laneDetector_.lane_coef_.center.c;
+
+      cmd->coef.resize(3);
+      cmd->coef[0].a  = 1.0f;
+      cmd->coef[0].b  = 1.0f;
+      cmd->coef[0].c  = 1.0f;
+      cmd->coef[1].a = 1.0f;
+      cmd->coef[1].b = 1.0f;
+      cmd->coef[1].c = 1.0f;
+      cmd->coef[2].a = 1.0f;
+      cmd->coef[2].b = 1.0f;
+      cmd->coef[2].c = 1.0f;
     }
    CmdPublisher_->publish(*cmd);
 

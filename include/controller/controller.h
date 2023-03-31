@@ -30,7 +30,7 @@
 #include <fstream>
 #include <string>
 
-//#include <opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "controller/lvthread.h"
 #include "controller/fv1thread.h"
@@ -110,7 +110,7 @@ private:
     //Callback Func
     void XavSubCallback(const scale_truck_control_ros2::msg::CmdData &msg);
 
-//    cv::Mat display_Map(CmdData cmd_data);
+    cv::Mat display_Map(CmdData cmd_data);
     LVThread* lv_thread_;
     FV1Thread* fv1_thread_;
     FV2Thread* fv2_thread_;

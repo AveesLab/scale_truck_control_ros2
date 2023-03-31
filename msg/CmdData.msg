@@ -8,7 +8,5 @@ float32 cur_angle
 float32 tar_vel
 float32 tar_dist 
 
-float32[] coef_a
-float32[] coef_b
-float32[] coef_c
+Lane[] coef 
 

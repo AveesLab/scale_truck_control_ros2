@@ -21,6 +21,8 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(scale_truck_control_ros2 REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(cv_bridge REQUIRED)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Quick REQUIRED)
@@ -56,6 +58,7 @@ set(PROJECT_SOURCES_DEPENDENCIES
   Qt5Widgets 
   ament_index_cpp 
   scale_truck_control_ros2
+  cv_bridge
 )
 
 set(msg_files
@@ -64,6 +67,7 @@ set(msg_files
   "msg/Lrc2xav.msg"
   "msg/Xav2lrc.msg"
   "msg/CmdData.msg"
+  "msg/Lane.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -72,8 +76,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 )
 
 include_directories(
-	include 
-) # Set PATH for custom header file
+  include 
+  ${OpenCV_INCLUDE_DIRS}
+) 
 
 add_executable(controller ${PROJECT_SOURCES})
 ament_target_dependencies(controller ${PROJECT_SOURCES_DEPENDENCIES})

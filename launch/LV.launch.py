@@ -51,7 +51,7 @@ def generate_launch_description():
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
 
-#    ld.add_action(control_node)
+    ld.add_action(control_node)
     ld.add_action(lrc_node)
 #    ld.add_action(opencr_node)
 

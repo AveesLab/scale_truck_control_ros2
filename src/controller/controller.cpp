@@ -230,9 +230,9 @@ void Controller::updateData(CmdData cmd_data)
               dist = MaxDist;
           }
           ui->LVDistBar->setValue(dist);
-//          cv::Mat frame;
-//          display_Map(tmp).copyTo(frame);
-//          ui->LV_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+          cv::Mat frame;
+          display_Map(tmp).copyTo(frame);
+          ui->LV_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
       }
       else if (tmp.src_index == 1)
       {
@@ -246,9 +246,9 @@ void Controller::updateData(CmdData cmd_data)
             dist = MaxDist;
           }
           ui->FV1DistBar->setValue(dist);
-//          cv::Mat frame;
-//          display_Map(tmp).copyTo(frame);
-//          ui->FV1_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+          cv::Mat frame;
+          display_Map(tmp).copyTo(frame);
+          ui->FV1_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
       }
       else if (tmp.src_index == 2)
       {
@@ -262,71 +262,71 @@ void Controller::updateData(CmdData cmd_data)
             dist = MaxDist;
           }
           ui->FV2DistBar->setValue(dist);
-//          cv::Mat frame;
-//          display_Map(tmp).copyTo(frame);
-//          ui->FV2_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+          cv::Mat frame;
+          display_Map(tmp).copyTo(frame);
+          ui->FV2_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
       }
     }
 }
 
-//cv::Mat Controller::display_Map(CmdData value)
-//{
-//    int width = 350;
-//    int height = 350;
-//    cv::Mat map_frame = cv::Mat::zeros(cv::Size(width,height), CV_8UC3);
-//    int check_dist = 50;
-//    for(int i=0;i<height;i+=check_dist)
-//        cv::line(map_frame, cv::Point(0,i), cv::Point(width,i),cv::Scalar::all(100));
-//    for(int i=0;i<width;i+=check_dist)
-//        cv::line(map_frame, cv::Point(i,0), cv::Point(i,height),cv::Scalar::all(100));
-//
-//    int centerY = height-100, centerX=width/2;
-//    cv::rectangle(map_frame, cv::Rect(cv::Point(centerX-9, centerY+50), cv::Point(centerX+9, centerY)), cv::Scalar(20,20,255), -1);
-//
-//    std::vector<cv::Point> RpointList;
-//    std::vector<cv::Point> LpointList;
-//    std::vector<cv::Point> CpointList;
-//    int cam_height = 480, cam_width = 640; // pixel
-//    float cam_y_dist = 98, cam_x_dist = 77; // cm
-//    for(int i = -550; i < cam_height*1.2; i++){
-//        cv::Point temp_point;
-//        temp_point.y = i*cam_y_dist/cam_height-26;
-//        temp_point.y += (centerY-cam_y_dist);
-//        temp_point.x = (value.coef[0].a*pow(i,2) + value.coef[0].b*i + value.coef[0].c)*cam_x_dist/cam_width;
-//        temp_point.x += centerX-cam_x_dist/2;
-//        RpointList.push_back(temp_point);
-//        temp_point.x = (value.coef[1].a*pow(i,2) + value.coef[1].b*i + value.coef[1].c)*cam_x_dist/cam_width;
-//        temp_point.x += centerX-cam_x_dist/2;
-//        LpointList.push_back(temp_point);
-//        temp_point.x = (value.coef[2].a*pow(i,2) + value.coef[2].b*i + value.coef[2].c)*cam_x_dist/cam_width;
-//        temp_point.x += centerX-cam_x_dist/2;
-//        CpointList.push_back(temp_point);
-//    }
-//    const cv::Point* right_points_point = (const cv::Point*) cv::Mat(RpointList).data;
-//    int right_points_number = cv::Mat(RpointList).rows;
-//    const cv::Point* left_points_point = (const cv::Point*) cv::Mat(LpointList).data;
-//    int left_points_number = cv::Mat(LpointList).rows;
-//    const cv::Point* center_points_point = (const cv::Point*) cv::Mat(CpointList).data;
-//    int center_points_number = cv::Mat(CpointList).rows;
-//
-//    cv::polylines(map_frame, &right_points_point, &right_points_number, 1, false, cv::Scalar::all(255), 2);
-//    cv::polylines(map_frame, &left_points_point, &left_points_number, 1, false, cv::Scalar::all(255), 2);
-//    cv::polylines(map_frame, &center_points_point, &center_points_number, 1, false, cv::Scalar(200,255,200), 2);
-//
-//    float r = value.cur_dist*100; // cm
-//    float theta = value.cur_angle*M_PI/180; // rad
-//    if(r < 250) {
-//      int X = r*sin(theta)+centerX;
-//      int Y = -r*cos(theta)+centerY;
-//      cv::circle(map_frame,cv::Point(X,Y), 5, cv::Scalar(50,50,255), -1);
-//    }
-//
-//    //cv::line(map_frame, cv::Point(width/2 - check_dist,124 + value.roi_dist*100/490),cv::Point(width/2 + check_dist,124+value.roi_dist*100/490), cv::Scalar(255,100,100),3);
-//
-//    cv::Mat swap_frame;
-//    cv::cvtColor(map_frame, swap_frame, cv::COLOR_BGR2RGB);
-//    return swap_frame;
-//}
+cv::Mat Controller::display_Map(CmdData value)
+{
+    int width = 350;
+    int height = 350;
+    cv::Mat map_frame = cv::Mat::zeros(cv::Size(width,height), CV_8UC3);
+    int check_dist = 50;
+    for(int i=0;i<height;i+=check_dist)
+        cv::line(map_frame, cv::Point(0,i), cv::Point(width,i),cv::Scalar::all(100));
+    for(int i=0;i<width;i+=check_dist)
+        cv::line(map_frame, cv::Point(i,0), cv::Point(i,height),cv::Scalar::all(100));
+
+    int centerY = height-100, centerX=width/2;
+    cv::rectangle(map_frame, cv::Rect(cv::Point(centerX-9, centerY+50), cv::Point(centerX+9, centerY)), cv::Scalar(20,20,255), -1);
+
+    std::vector<cv::Point> RpointList;
+    std::vector<cv::Point> LpointList;
+    std::vector<cv::Point> CpointList;
+    int cam_height = 480, cam_width = 640; // pixel
+    float cam_y_dist = 98, cam_x_dist = 77; // cm
+    for(int i = -550; i < cam_height*1.2; i++){
+        cv::Point temp_point;
+        temp_point.y = i*cam_y_dist/cam_height-26;
+        temp_point.y += (centerY-cam_y_dist);
+        temp_point.x = (value.coef[0].a*pow(i,2) + value.coef[0].b*i + value.coef[0].c)*cam_x_dist/cam_width;
+        temp_point.x += centerX-cam_x_dist/2;
+        RpointList.push_back(temp_point);
+        temp_point.x = (value.coef[1].a*pow(i,2) + value.coef[1].b*i + value.coef[1].c)*cam_x_dist/cam_width;
+        temp_point.x += centerX-cam_x_dist/2;
+        LpointList.push_back(temp_point);
+        temp_point.x = (value.coef[2].a*pow(i,2) + value.coef[2].b*i + value.coef[2].c)*cam_x_dist/cam_width;
+        temp_point.x += centerX-cam_x_dist/2;
+        CpointList.push_back(temp_point);
+    }
+    const cv::Point* right_points_point = (const cv::Point*) cv::Mat(RpointList).data;
+    int right_points_number = cv::Mat(RpointList).rows;
+    const cv::Point* left_points_point = (const cv::Point*) cv::Mat(LpointList).data;
+    int left_points_number = cv::Mat(LpointList).rows;
+    const cv::Point* center_points_point = (const cv::Point*) cv::Mat(CpointList).data;
+    int center_points_number = cv::Mat(CpointList).rows;
+
+    cv::polylines(map_frame, &right_points_point, &right_points_number, 1, false, cv::Scalar::all(255), 2);
+    cv::polylines(map_frame, &left_points_point, &left_points_number, 1, false, cv::Scalar::all(255), 2);
+    cv::polylines(map_frame, &center_points_point, &center_points_number, 1, false, cv::Scalar(200,255,200), 2);
+
+    float r = value.cur_dist*100; // cm
+    float theta = value.cur_angle*M_PI/180; // rad
+    if(r < 250) {
+      int X = r*sin(theta)+centerX;
+      int Y = -r*cos(theta)+centerY;
+      cv::circle(map_frame,cv::Point(X,Y), 5, cv::Scalar(50,50,255), -1);
+    }
+
+    //cv::line(map_frame, cv::Point(width/2 - check_dist,124 + value.roi_dist*100/490),cv::Point(width/2 + check_dist,124+value.roi_dist*100/490), cv::Scalar(255,100,100),3);
+
+    cv::Mat swap_frame;
+    cv::cvtColor(map_frame, swap_frame, cv::COLOR_BGR2RGB);
+    return swap_frame;
+}
 
 
 void Controller::on_MVelSlider_valueChanged(int value)
