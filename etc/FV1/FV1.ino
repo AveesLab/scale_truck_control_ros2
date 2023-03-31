@@ -377,7 +377,7 @@ void setup() {
   allocator = rcl_get_default_allocator();
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
-  RCCHECK(rclc_node_init_default(&node, "opencr_node", "LV", &support)); // "": namespace
+  RCCHECK(rclc_node_init_default(&node, "opencr_node", "FV1", &support)); // "": namespace
   
   RCCHECK(rclc_subscription_init_default(
       &OcrSubscriber_,
