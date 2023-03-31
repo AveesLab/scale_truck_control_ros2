@@ -38,11 +38,33 @@ ScaleTruckController::~ScaleTruckController() {
 
   delete cmd_data_;
 
-  //RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] Stop.");
-  printf("[ScaleTruckController] Stop.");
+  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] Stop.");
+  //printf("[ScaleTruckController] Stop.");
 }
 
 bool ScaleTruckController::readParameters() {
+  /***********/
+  /* LV Index*/
+  /***********/
+  this->get_parameter_or("params/index", index_, 0);
+  this->get_parameter_or("params/xav_log_path", log_path_, std::string("/home/avees/ros2_ws/logfiles/"));
+
+  /*******************/
+  /* Velocity Option */
+  /*******************/
+  this->get_parameter_or("params/target_vel", TargetVel_, 0.0f); // m/s
+  this->get_parameter_or("params/safety_vel", SafetyVel_, 0.45f); // m/s
+  this->get_parameter_or("params/fv_max_vel", FVmaxVel_, 1.20f); // m/s
+  this->get_parameter_or("params/ref_vel", RefVel_, 0.0f); // m/s
+
+  /*******************/
+  /* Distance Option */
+  /*******************/
+  this->get_parameter_or("params/target_dist", TargetDist_, 0.8f); // m
+  this->get_parameter_or("params/safety_dist", SafetyDist_, 1.5f); // m
+  this->get_parameter_or("params/lv_stop_dist", LVstopDist_, 0.5f); // m
+  this->get_parameter_or("params/fv_stop_dist", FVstopDist_, 0.5f); // m
+
   /***************/
   /* View Option */
   /***************/
@@ -50,30 +72,13 @@ bool ScaleTruckController::readParameters() {
   this->get_parameter_or("image_view/wait_key_delay", waitKeyDelay_, 3);
   this->get_parameter_or("image_view/enable_console_output", enableConsoleOutput_, true);
 
-  /*******************/
-  /* Velocity Option */
-  /*******************/
-  this->get_parameter_or("params/index", index_, 0);
-  this->get_parameter_or("params/target_vel", TargetVel_, 0.5f); // m/s
-  this->get_parameter_or("params/safety_vel", SafetyVel_, 0.3f); // m/s
-  this->get_parameter_or("params/fv_max_vel", FVmaxVel_, 0.8f); // m/s
-  this->get_parameter_or("params/ref_vel", RefVel_, 0.0f); // m/s
-
-  /*******************/
-  /* Distance Option */
-  /*******************/
-  this->get_parameter_or("params/lv_stop_dist", LVstopDist_, 0.5f); // m
-  this->get_parameter_or("params/fv_stop_dist", FVstopDist_, 0.5f); // m
-  this->get_parameter_or("params/safety_dist", SafetyDist_, 1.5f); // m
-  this->get_parameter_or("params/target_dist", TargetDist_, 0.8f); // m
-
   return true;
 }
 
 void ScaleTruckController::init() 
 {
-  //RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] init()");
-  printf("[ScaleTruckController] init()");
+  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] init()");
+  //printf("[ScaleTruckController] init()");
 
   std::string imageTopicName;
   int imageQueueSize;
@@ -98,7 +103,7 @@ void ScaleTruckController::init()
 //  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
-  this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("cmd2xav_msg"));
+  this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
   this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
 
   /****************************/
@@ -106,7 +111,7 @@ void ScaleTruckController::init()
   /****************************/
   this->get_parameter_or("publishers/xavier_to_lrc/topic", LrcPubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("publishers/xavier_to_lrc/queue_size", LrcPubQueueSize, 1);
-  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("xav2cmd_msg"));
+  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("/xav2cmd_msg"));
   this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
 
   /************************/
@@ -344,6 +349,7 @@ void ScaleTruckController::spin()
     }    
 
     LrcPublisher_->publish(msg);   
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     if(!isNodeRunning_) {
       controlDone_ = true;
@@ -398,12 +404,11 @@ void ScaleTruckController::recordData(struct timeval startTime){
   double diff_time;
   std::ifstream read_file;
   std::ofstream write_file;
-  std::string log_path = "/home/jetson/catkin_ws/logfiles/";
   if(!flag){
     for(int i = 0; i < 100; i++){
       file_name[7] = i/10 + '0';  //ASCII
       file_name[8] = i%10 + '0';
-      sprintf(file, "%s%s", log_path.c_str(), file_name);
+      sprintf(file, "%s%s", log_path_.c_str(), file_name);
       read_file.open(file);
       if(read_file.fail()){  //Check if the file exists
         read_file.close();

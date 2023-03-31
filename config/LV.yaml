@@ -1,15 +1,17 @@
 /**/scale_truck_control_node:
   ros__parameters:
     params/index: 0
+
     params/target_vel: 0.00
     params/safety_vel: 0.45
     params/fv_max_vel: 1.20
-    params/rcm_vel: 0.6
-    params/lv_stop_dist: 0.5
-    params/fv_stop_dist: 0.3
-    params/safety_dist: 1.5
+    params/ref_vel: 0.00
+
     params/target_dist: 0.8
-    params/rcm_dist: 0.8
+    params/safety_dist: 1.5
+    params/lv_stop_dist: 0.5
+    params/fv_stop_dist: 0.5
+
     params/angle_degree: 0.0
     params/Kp_d: 2.0
     params/Ki_d: 0.2

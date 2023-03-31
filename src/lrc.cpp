@@ -35,33 +35,28 @@ void LocalRC::init(){
   std::string FVPubTopicName;
   int FVPubQueueSize;
 
-  this->get_parameter_or("params/truck_info", index_, 10);
-
+  this->get_parameter_or("LrcParams/lrc_index", index_, 10);
   this->get_parameter_or("LrcParams/lrc_log_path", log_path_, std::string("/home/jetson/catkin_ws/logfiles/"));
-  this->get_parameter_or("LrcParams/epsilon", epsilon_, 1.0f);
-  this->get_parameter_or("LrcParams/lu_ob_A", a_, 0.6817f);
-  this->get_parameter_or("LrcParams/lu_ob_B", b_, 0.3183f);
-  this->get_parameter_or("LrcParams/lu_ob_L", l_, 0.2817f);
   this->get_parameter_or("LrcParams/enable_console_output", EnableConsoleOutput_, true);
   /******************************/
   /* ROS Topic Subscribe Option */
   /******************************/
-  this->get_parameter_or("LrcSubPub/xavier_to_lrc/topic", XavSubTopicName, std::string("xav2lrc_msg"));
-  this->get_parameter_or("LrcSubPub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/ocr_to_lrc/topic", OcrSubTopicName, std::string("ocr2lrc_msg"));
-  this->get_parameter_or("LrcSubPub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/LV_to_FVs/topic", LVSubTopicName, std::string("/lv2fv_msg"));
-  this->get_parameter_or("LrcSubPub/LV_to_FVs/queue_size", LVSubQueueSize, 1);
+  this->get_parameter_or("LrcSub/xavier_to_lrc/topic", XavSubTopicName, std::string("xav2lrc_msg"));
+  this->get_parameter_or("LrcSub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
+  this->get_parameter_or("LrcSub/ocr_to_lrc/topic", OcrSubTopicName, std::string("ocr2lrc_msg"));
+  this->get_parameter_or("LrcSub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
+  this->get_parameter_or("LrcSub/lv_to_fv/topic", LVSubTopicName, std::string("/lv2fv_msg"));
+  this->get_parameter_or("LrcSub/lv_to_fv/queue_size", LVSubQueueSize, 1);
 
   /******************************/
   /* ROS Topic Publish Option */
   /******************************/
-  this->get_parameter_or("LrcSubPub/lrc_to_xavier/topic", XavPubTopicName, std::string("lrc2xav_msg"));
-  this->get_parameter_or("LrcSubPub/lrc_to_xavier/queue_size", XavPubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("lrc2ocr_msg"));
-  this->get_parameter_or("LrcSubPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
-  this->get_parameter_or("LrcSubPub/lv_to_fv/topic", FVPubTopicName, std::string("/lv2fv_msg"));
-  this->get_parameter_or("LrcSubPub/lv_to_fv/queue_size", FVPubQueueSize, 1);
+  this->get_parameter_or("LrcPub/lrc_to_xavier/topic", XavPubTopicName, std::string("lrc2xav_msg"));
+  this->get_parameter_or("LrcPub/lrc_to_xavier/queue_size", XavPubQueueSize, 1);
+  this->get_parameter_or("LrcPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("lrc2ocr_msg"));
+  this->get_parameter_or("LrcPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
+  this->get_parameter_or("LrcPub/lv_to_fv/topic", FVPubTopicName, std::string("/lv2fv_msg"));
+  this->get_parameter_or("LrcPub/lv_to_fv/queue_size", FVPubQueueSize, 1);
 
   /************************/
   /* ROS Topic Subscriber */
@@ -109,6 +104,7 @@ void LocalRC::radio()
       lv_data_.tar_vel = tar_vel_;
       lv_data_.tar_dist = tar_dist_;
     }
+
     FVPublisher_->publish(lv_data_); 
     
     std::this_thread::sleep_for(std::chrono::milliseconds(2));
@@ -177,7 +173,6 @@ void LocalRC::printStatus(){
     printf("\nCurrent Velocity:\t%.3f", cur_vel_);
     printf("\nTarget Distance:\t%.3f", tar_dist_);
     printf("\nCurrent Distance:\t%.3f", cur_dist_);
-    printf("\n");
   }
 }
 

@@ -77,6 +77,7 @@ private:
     bool isNodeRunning_ = true;
     bool controlDone_ = false;
     bool droi_ready_ = false;
+    std::string log_path_;
 
     //image
     bool viewImage_;

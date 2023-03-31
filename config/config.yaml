@@ -1,4 +1,4 @@
-/LV/scale_truck_control_node:
+/**/scale_truck_control_node:
   ros__parameters:    
     subscribers/camera_reading/topic: /usb_cam/image_raw
     subscribers/camera_reading/queue_size: 1
@@ -6,25 +6,53 @@
     subscribers/obstacle_reading/queue_size: 100
     subscribers/lrc_to_xavier/topic: lrc2xav_msg
     subscribers/lrc_to_xavier/queue_size: 1
+    subscribers/cmd_to_xavier/topic: /cmd2xav_msg
+    subscribers/cmd_to_xavier/queue_size: 1
 
     publishers/xavier_to_lrc/topic: xav2lrc_msg
     publishers/xavier_to_lrc/queue_size: 1
-
-    params/LdOffset: 0.0
-    params/LdOffset2: 0.0
-    params/Lw: 0.3400000035762787
-    params/fv_max_vel: 0.800000011920929
-    params/fv_stop_dist: 0.5
+    publishers/xavier_to_cmd/topic: /xav2cmd_msg
+    publishers/xavier_to_cmd/queue_size: 1
+    
     params/index: 0
-    params/lv_stop_dist: 0.5
-    params/rcm_dist: 0.800000011920929
-    params/rcm_vel: 0.6000000238418579
-    params/ref_vel: 0.0
+    params/xav_log_path: /home/avees/ros2_ws/logfiles/
+
+    params/target_vel: 0.00
+    params/safety_vel: 0.45
+    params/fv_max_vel: 1.20
+    params/ref_vel: 0.00
+
+    params/target_dist: 0.8
     params/safety_dist: 1.5
-    params/safety_vel: 0.30000001192092896
-    params/target_dist: 0.800000011920929
-    params/target_vel: 0.5
+    params/lv_stop_dist: 0.5
+    params/fv_stop_dist: 0.5
+
+    params/angle_degree: 0.0
+    params/Kp_d: 2.0
+    params/Ki_d: 0.2
 
     image_view/enable_console_output: true
     image_view/enable_opencv: true
-    image_view/wait_key_delay: 2
+    image_view/wait_key_delay: 3
+
+
+/**/LRC:
+  ros__parameters:
+    LrcSub/xavier_to_lrc/topic: xav2lrc_msg
+    LrcSub/xavier_to_lrc/queue_size: 1
+    LrcSub/ocr_to_lrc/topic: ocr2lrc_msg
+    LrcSub/ocr_to_lrc/queue_size: 1
+    LrcSub/lv_to_fv/topic: /lv2fv_msg
+    LrcSub/lv_to_fv/queue_size: 1
+
+    LrcPub/lrc_to_xavier/topic: lrc2xav_msg
+    LrcPub/lrc_to_xavier/queue_size: 1
+    LrcPub/lrc_to_ocr/topic: lrc2ocr_msg
+    LrcPub/lrc_to_ocr/queue_size: 1
+    LrcPub/lv_to_fv/topic: /lv2fv_msg
+    LrcPub/lv_to_fv/queue_size: 1
+
+    LrcParams/lrc_index: 10
+    LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
+    LrcParams/enable_console_output: true
+

@@ -16,43 +16,33 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
 {
     ui->setupUi(this);
 
-    std::string LrcSubTopicName;
-    int LrcSubQueueSize;
     std::string XavSubTopicName;
     int XavSubQueueSize;
 
-    std::string LrcPubTopicName;
-    int LrcPubQueueSize;
     std::string XavPubTopicName;
     int XavPubQueueSize;
 
     /******************************/
     /* Ros Topic Subscribe Option */
     /******************************/
-    ros2_node->get_parameter_or("subscribers/lrc_to_cmd/topic", LrcSubTopicName, std::string("/lrc2cmd_msg"));
-    ros2_node->get_parameter_or("subscribers/lrc_to_cmd/queue_size", LrcSubQueueSize, 1);
     ros2_node->get_parameter_or("subscribers/xavier_to_cmd/topic", XavSubTopicName, std::string("/xav2cmd_msg"));
     ros2_node->get_parameter_or("subscribers/xavier_to_cmd/queue_size", XavSubQueueSize, 1);
 
     /****************************/
     /* Ros Topic Publish Option */
     /****************************/
-    ros2_node->get_parameter_or("publishers/cmd_to_lrc/topic", LrcPubTopicName, std::string("/cmd2lrc_msg"));
-    ros2_node->get_parameter_or("publishers/cmd_to_lrc/queue_size", LrcPubQueueSize, 1);
     ros2_node->get_parameter_or("publishers/cmd_to_xavier/topic", XavPubTopicName, std::string("/cmd2xav_msg"));
     ros2_node->get_parameter_or("publishers/cmd_to_xav/queue_size", XavPubQueueSize, 1);
 
     /************************/
     /* Ros Topic Subscriber */
     /************************/
-    LrcSubscriber_ = ros2_node->create_subscription<CmdData>(LrcSubTopicName, LrcSubQueueSize, std::bind(&Controller::SubCallback, this, std::placeholders::_1));
-    XavSubscriber_ = ros2_node->create_subscription<CmdData>(XavSubTopicName, XavSubQueueSize, std::bind(&Controller::SubCallback, this, std::placeholders::_1));
+    XavSubscriber_ = ros2_node->create_subscription<CmdData>(XavSubTopicName, XavSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
 
 
     /***********************/
     /* Ros Topic Publisher */
     /***********************/
-    LrcPublisher_ = ros2_node->create_publisher<CmdData>(LrcPubTopicName, LrcPubQueueSize);
     XavPublisher_ = ros2_node->create_publisher<CmdData>(XavPubTopicName, XavPubQueueSize);
 
     /**********************************/
@@ -145,7 +135,7 @@ Controller::~Controller()
     delete ui;
 }
 
-void Controller::SubCallback(const CmdData &msg)
+void Controller::XavSubCallback(const CmdData &msg)
 {
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();

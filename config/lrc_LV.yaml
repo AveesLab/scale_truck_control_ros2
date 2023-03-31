@@ -1,13 +1,18 @@
 /**/LRC:
   ros__parameters:
-    LrcSubPub/xavier_to_lrc/topic: xav2lrc_msg
-    LrcSubPub/xavier_to_lrc/queue_size: 1
-    LrcSubPub/ocr_to_lrc/topic: ocr2lrc_msg
-    LrcSubPub/ocr_to_lrc/queue_size: 1
-    LrcSubPub/lrc_to_xavier/topic: lrc2xav_msg
-    LrcSubPub/lrc_to_xavier/queue_size: 1
-    LrcSubPub/lrc_to_ocr/topic: lrc2ocr_msg
-    LrcSubPub/lrc_to_ocr/queue_size: 1
+    LrcSub/xavier_to_lrc/topic: xav2lrc_msg
+    LrcSub/xavier_to_lrc/queue_size: 1
+    LrcSub/ocr_to_lrc/topic: ocr2lrc_msg
+    LrcSub/ocr_to_lrc/queue_size: 1
+    LrcSub/lv_to_fv/topic: /lv2fv_msg
+    LrcSub/lv_to_fv/queue_size: 1
+
+    LrcPub/lrc_to_xavier/topic: lrc2xav_msg
+    LrcPub/lrc_to_xavier/queue_size: 1
+    LrcPub/lrc_to_ocr/topic: lrc2ocr_msg
+    LrcPub/lrc_to_ocr/queue_size: 1
+    LrcPub/lv_to_fv/topic: /lv2fv_msg
+    LrcPub/lv_to_fv/queue_size: 1
 
     LrcParams/lrc_index: 10
     LrcParams/lrc_log_path: /home/avees/uros_ws/logfiles/
