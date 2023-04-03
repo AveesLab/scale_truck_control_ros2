@@ -122,7 +122,7 @@ void ScaleTruckController::init()
   CmdSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
   objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
-  laneSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
+  //laneSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
@@ -210,7 +210,7 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
 
 void ScaleTruckController::lanedetectInThread() 
 {
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 1init()");
+
 
 //  static int cnt = 10;
 //  Mat dst;
@@ -240,26 +240,31 @@ void ScaleTruckController::lanedetectInThread()
 }
 
 void ScaleTruckController::objectdetectInThread() {
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 2init()");
-//Obstacle_->coef.resize(18);
 
-  float distance, dist_tmp;
-      dist_tmp = 10.1f;
+  float dist, dist_tmp;
+  dist_tmp = 10.1f;
    {
 	std::scoped_lock lock(lane_mutex_, object_mutex_);         
 	ObjCircles_ = Obstacle_.data.size();    
    }   
-      for(int i=0; i < ObjCircles_; i+=3)
-      {
-//        if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
-//        {
-		distance = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
-		if(dist_tmp >= distance)
-		{
-		  dist_tmp = distance;
-		}
-//	}	
-      }
+   for(int i=0; i < ObjCircles_; i+=3)
+   {
+       if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
+       {
+           dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+           if(dist_tmp >= dist)
+           {
+               dist_tmp = dist;
+           }
+       }	
+   }
+   actDist_ = dist_tmp;
+////
+  if(ObjCircles_ != 0)
+  {
+    distance_ = dist_tmp;
+//    distAngle_ = angle_tmp;
+  }
 
 //  float dist, angle;
 //  float dist_tmp, angle_tmp;
@@ -286,13 +291,6 @@ void ScaleTruckController::objectdetectInThread() {
 ////      angle_tmp = angle;
 ////    }
 ////  }
-  actDist_ = dist_tmp;
-////
-  if(ObjCircles_ != 0)
-  {
-    distance_ = dist_tmp;
-//    distAngle_ = angle_tmp;
-  }
 //  /*****************************/
 //  /* Dynamic ROI Distance Data */
 //  /*****************************/
@@ -366,7 +364,7 @@ void ScaleTruckController::spin()
 
     lanedetect_thread = std::thread(&ScaleTruckController::lanedetectInThread, this);
     objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
-      RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 0init()");
+ 
     lanedetect_thread.join();
     objectdetect_thread.join();
 
@@ -375,8 +373,8 @@ void ScaleTruckController::spin()
       std::scoped_lock lock(dist_mutex_);
       //msg.steer_angle = AngleDegree_; // get from objectThread
       msg.steer_angle = 4.5; // get from objectThread
-      //msg.cur_dist = distance_;       // ''
-      msg.cur_dist = 7.543;       // ''
+      msg.cur_dist = distance_;       // ''
+      //msg.cur_dist = 7.543;       // ''
     }
     {
       std::scoped_lock lock(rep_mutex_);
@@ -466,24 +464,24 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-void ScaleTruckController::LaneSubCallback(const std_msgs::msg::Float32MultiArray & msg)
-{
+//void ScaleTruckController::LaneSubCallback(const std_msgs::msg::Float32MultiArray & msg)
+//{
 //  /* Callback from LaneDetetion Node   */
-  {
-    std::scoped_lock lock(lane_mutex_);
+ // {
+   // std::scoped_lock lock(lane_mutex_);
 //    lane_coef_ = msg->lane_coef;
 //    AngleDegree_ = msg->AngleDegree;
-  }
-}
+//  }
+//}
 
 void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray &msg) {
   /* Callback from ObjectDetetion Node   */
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 3init()");
+
   {
     std::scoped_lock lock(object_mutex_);
     Obstacle_ = msg;
   }
-  RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 4init()");
+
 
 }
 

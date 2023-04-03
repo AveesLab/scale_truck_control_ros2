@@ -56,14 +56,14 @@ private:
     rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr laneSubscriber_;
+    //rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr laneSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
     void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    void LaneSubCallback(const std_msgs::msg::Float32MultiArray &msg);
+    //void LaneSubCallback(const std_msgs::msg::Float32MultiArray &msg);
     
     void spin();
     bool getImageStatus(void);
