@@ -208,7 +208,7 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
 /* 카메라 오류 검출은 Lane Node에서 진행 */
 /* Angle값 받음. LRC에서 받아도 될듯? 일단 여기에서 진행 */
 
-void* ScaleTruckController::lanedetectInThread() 
+void ScaleTruckController::lanedetectInThread() 
 {
   RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 1init()");
 
@@ -239,7 +239,7 @@ void* ScaleTruckController::lanedetectInThread()
 //    AngleDegree_ = AngleDegree;
 }
 
-void* ScaleTruckController::objectdetectInThread() {
+void ScaleTruckController::objectdetectInThread() {
   RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] 2init()");
 //Obstacle_->coef.resize(18);
 

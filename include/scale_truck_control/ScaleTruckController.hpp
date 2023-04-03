@@ -111,27 +111,22 @@ private:
     float actDist_ = 0.8f;
     std_msgs::msg::Float32MultiArray Obstacle_;
 
-    void* lanedetectInThread();
-    void* objectdetectInThread();
+    void lanedetectInThread();
+    void objectdetectInThread();
     
     //Thread
     std::thread controlThread_;
     std::thread laneDetectThread_;
     std::thread objectDetectThread_;
     std::thread tcpThread_;
-    std::thread tcpImgReqThread_;
-    std::thread tcpImgRepThread_;
     
     //mutex
     std::mutex image_mutex_;
-    std::mutex rear_image_mutex_;
     std::mutex object_mutex_;
     std::mutex lane_mutex_;
     std::mutex vel_mutex_;
     std::mutex dist_mutex_;
     std::mutex rep_mutex_;
-    std::mutex mode_mutex_;
-    std::mutex bbox_mutex_;
 
     std::condition_variable cv_; // cv_.wait() 용도-> ROI거리 파악 후 Lane 그리기
 
