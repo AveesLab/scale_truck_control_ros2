@@ -54,5 +54,5 @@
 
     LrcParams/lrc_index: 10
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
-    LrcParams/enable_console_output: true
+    LrcParams/enable_console_output: false
 

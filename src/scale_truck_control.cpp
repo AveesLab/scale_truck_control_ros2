@@ -208,7 +208,7 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
 /* 카메라 오류 검출은 Lane Node에서 진행 */
 /* Angle값 받음. LRC에서 받아도 될듯? 일단 여기에서 진행 */
 
-void* ScaleTruckController::lanedetectInThread() 
+void ScaleTruckController::lanedetectInThread() 
 {
 //  static int cnt = 10;
 //  Mat dst;
@@ -237,7 +237,8 @@ void* ScaleTruckController::lanedetectInThread()
 //    AngleDegree_ = AngleDegree;
 }
 
-void* ScaleTruckController::objectdetectInThread() {
+void ScaleTruckController::objectdetectInThread() 
+{
 //  float dist, angle;
 //  float dist_tmp, angle_tmp;
 //
@@ -321,7 +322,7 @@ void ScaleTruckController::spin()
   double diff_time=0.0;
   int cnt = 0;
 
-//  const auto wait_duration = std::chrono::milliseconds(2000);
+  const auto wait_duration = std::chrono::milliseconds(2000);
 //  while(!getImageStatus()) {
 //    printf("Waiting for image.\n");
 //    if(!isNodeRunning_) {
@@ -334,8 +335,6 @@ void ScaleTruckController::spin()
   std::thread lanedetect_thread;
   std::thread objectdetect_thread;
 
-  const auto wait_image = std::chrono::milliseconds(20);
-
   while(!controlDone_ && rclcpp::ok()) {
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
@@ -343,8 +342,8 @@ void ScaleTruckController::spin()
     lanedetect_thread = std::thread(&ScaleTruckController::lanedetectInThread, this);
     objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
 
-    lanedetect_thread.join();
     objectdetect_thread.join();
+    lanedetect_thread.join();
 
     msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
     {
@@ -358,8 +357,8 @@ void ScaleTruckController::spin()
       std::scoped_lock lock(rep_mutex_);
       msg.tar_dist = TargetDist_; 
     }    
-
     LrcPublisher_->publish(msg);   
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     if(!isNodeRunning_) {
