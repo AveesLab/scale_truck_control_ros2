@@ -99,7 +99,7 @@ void ScaleTruckController::init()
   /******************************/
 //  this->get_parameter_or("subscribers/camera_reading/topic", imageTopicName, std::string("/usb_cam/image_raw"));
 //  this->get_parameter_or("subscribers/camera_reading/queue_size", imageQueueSize, 1);
-  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("/raw_obstacles"));
+  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("raw_obstacles"));
   this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
