@@ -68,11 +68,12 @@ set(msg_files
   "msg/Xav2lrc.msg"
   "msg/CmdData.msg"
   "msg/Lane.msg"
+  "msg/Obj2xav.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
  ${msg_files}
- DEPENDENCIES geometry_msgs
+ DEPENDENCIES geometry_msgs std_msgs
 )
 
 include_directories(
