@@ -41,3 +41,11 @@ source install/local_setup.bash
 sudo chmod 777 /dev/ttyACM0
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
+
+# ROS2 pkg vision_opencv install
+- cv_bridge, image_geometry 
+'''
+cd ~/ros2_ws/src
+git clone https://github.com/ros-perception/vision_opencv.git -b galactic
+cm
+'''
