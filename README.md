@@ -43,8 +43,7 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
 # ROS2 Packages Install
-- vision_opencv install
--- cv_bridge, image_geometry 
+- vision_opencv (cv_bridge, image_geometry)
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/ros-perception/vision_opencv.git -b galactic
