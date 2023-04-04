@@ -9,23 +9,76 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetE
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch.actions import LogInfo
+from launch.substitutions import PathJoinSubstitution
 
 def generate_launch_description():
-    ld = LaunchDescription()
 
-    '''
-    #같은 패키지에 속한 런치 파일을 불러올 경우
-    LogInfo(msg=['Execute three launch files!']),
-    IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [ThisLaunchFileDir(), '/xxxxx.launch.py']),
-    )
-    '''
+#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
+#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
+#    frame_id = LaunchConfiguration('frame_id', default='laser')
+#    inverted = LaunchConfiguration('inverted', default='false')
+#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
+#    scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
+
+    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
+    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
+    frame_id = LaunchConfiguration('frame_id', default='laser')
+    inverted = LaunchConfiguration('inverted', default='false')
+    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
+    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
+
+    ld = LaunchDescription()
 
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
             'config', 
-            'config.yaml')
+            'config.yaml')                 
+         
+#    rplidarS2_node=Node(
+#            package='rplidar_ros2',
+#            namespace='FV1',
+#            executable='rplidar_scan_publisher',
+#            name='rplidar_scan_publisher',
+#            parameters=[{'serial_port': serial_port, 
+#                         'serial_baudrate': serial_baudrate, 
+#                         'frame_id': frame_id,
+#                         'inverted': inverted, 
+#                         'angle_compensate': angle_compensate,
+#                         'scan_mode':scan_mode}],
+#            output='screen')         
+
+    rplidarA3_node=Node(
+            package='rplidar_ros2',
+            namespace='FV1',
+            executable='rplidar_scan_publisher',
+            name='rplidar_scan_publisher',
+            parameters=[{'serial_port': serial_port, 
+                         'serial_baudrate': serial_baudrate, 
+                         'frame_id': frame_id,
+                         'inverted': inverted, 
+                         'angle_compensate': angle_compensate, 
+                         'scan_mode': scan_mode}],
+            output='screen')
+                
+    laserfilter_node=Node(
+            package="laser_filters",
+            namespace='FV1',
+            executable="scan_to_scan_filter_chain",
+            parameters=[
+            	PathJoinSubstitution([
+            		get_package_share_directory("laser_filters"),
+            		"examples", "laserfilter_angle.yaml",
+            		])],
+            output='screen',)
+
+    object_node=Node(
+	    package='pcl_object_detection',
+	    namespace='FV1',	    
+	    executable='pcl_object_detection_node',
+	    output={
+	    	'stdout': 'screen',
+	    	'stderr': 'screen',
+	    	})
 
     control_node=Node(
             package='scale_truck_control_ros2', 
@@ -50,10 +103,14 @@ def generate_launch_description():
             executable='micro_ros_agent', 
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
-
-#    ld.add_action(control_node)
+#    ld.add_action(rplidarS2_node)
+    ld.add_action(rplidarA3_node)
+    ld.add_action(laserfilter_node)
+    ld.add_action(object_node)
+    ld.add_action(control_node)
     ld.add_action(lrc_node)
 #    ld.add_action(opencr_node)
 
     return ld
+
 

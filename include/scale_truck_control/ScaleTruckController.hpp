@@ -20,6 +20,8 @@
 #include "std_msgs/msg/int32.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "std_msgs/msg/float32_multi_array.hpp"
+#include "std_msgs/msg/float32.hpp"
 
 //custom msgs
 #include "scale_truck_control_ros2/msg/lrc2ocr.hpp"
@@ -27,6 +29,7 @@
 #include "scale_truck_control_ros2/msg/xav2lrc.hpp"
 #include "scale_truck_control_ros2/msg/lrc2xav.hpp"
 #include "scale_truck_control_ros2/msg/cmd_data.hpp"
+//#include "scale_truck_control_ros2/msg/obj2xav.hpp"
 
 using namespace std::chrono_literals;
 
@@ -52,13 +55,15 @@ private:
     //Subscriber 
     rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
-//    rclcpp::Subscription<scale_truck_control_ros2::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
+    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
+    //rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr laneSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
     void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
-//  void objectCallback(const obstacle_detector::Obstacles &msg);
+    void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
+    //void LaneSubCallback(const std_msgs::msg::Float32MultiArray &msg);
     
     void spin();
     bool getImageStatus(void);
@@ -104,8 +109,12 @@ private:
     uint32_t LdrErrMsg_;
     float Ld_offset_ = 0.0f;
     float actDist_ = 0.8f;
+    std_msgs::msg::Float32MultiArray Obstacle_;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8a63074c8b1689bb133ef5bfb3364cb18426b8f4
     void lanedetectInThread();
     void objectdetectInThread();
     

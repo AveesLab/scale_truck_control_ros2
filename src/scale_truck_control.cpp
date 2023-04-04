@@ -99,8 +99,8 @@ void ScaleTruckController::init()
   /******************************/
 //  this->get_parameter_or("subscribers/camera_reading/topic", imageTopicName, std::string("/usb_cam/image_raw"));
 //  this->get_parameter_or("subscribers/camera_reading/queue_size", imageQueueSize, 1);
-//  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("/raw_obstacles"));
-//  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
+  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("raw_obstacles"));
+  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
   this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
@@ -121,8 +121,8 @@ void ScaleTruckController::init()
 
   CmdSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
-  //objectSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Ocr2lrc>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
-//  laneSubscriber_ = nodeHandle_.subscribe(laneTopicName, laneQueueSize, &ScaleTruckController::LaneCallback, this);
+  objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
+  //laneSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
@@ -210,6 +210,8 @@ void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
 
 void ScaleTruckController::lanedetectInThread() 
 {
+
+
 //  static int cnt = 10;
 //  Mat dst;
 //  std::vector<Mat>channels;
@@ -237,8 +239,38 @@ void ScaleTruckController::lanedetectInThread()
 //    AngleDegree_ = AngleDegree;
 }
 
+<<<<<<< HEAD
 void ScaleTruckController::objectdetectInThread() 
 {
+=======
+void ScaleTruckController::objectdetectInThread() {
+
+  float dist, dist_tmp;
+  dist_tmp = 10.1f;
+   {
+	std::scoped_lock lock(lane_mutex_, object_mutex_);         
+	ObjCircles_ = Obstacle_.data.size();    
+   }   
+   for(int i=0; i < ObjCircles_; i+=3)
+   {
+       if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
+       {
+           dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+           if(dist_tmp >= dist)
+           {
+               dist_tmp = dist;
+           }
+       }	
+   }
+   actDist_ = dist_tmp;
+////
+  if(ObjCircles_ != 0)
+  {
+    distance_ = dist_tmp;
+//    distAngle_ = angle_tmp;
+  }
+
+>>>>>>> 8a63074c8b1689bb133ef5bfb3364cb18426b8f4
 //  float dist, angle;
 //  float dist_tmp, angle_tmp;
 //
@@ -246,6 +278,7 @@ void ScaleTruckController::objectdetectInThread()
 //  /**************/
 //  /* Lidar Data */
 //  /**************/
+
 ////  {
 ////    std::scoped_lock lock(lane_mutex_, object_mutex_);
 ////    ObjSegments_ = Obstacle_.segments.size();
@@ -262,13 +295,6 @@ void ScaleTruckController::objectdetectInThread()
 ////      dist_tmp = dist;
 ////      angle_tmp = angle;
 ////    }
-////  }
-////  actDist_ = dist_tmp;
-////
-////  if(ObjCircles_ != 0)
-////  {
-////    distance_ = dist_tmp;
-////    distAngle_ = angle_tmp;
 ////  }
 //  /*****************************/
 //  /* Dynamic ROI Distance Data */
@@ -341,7 +367,12 @@ void ScaleTruckController::spin()
 
     lanedetect_thread = std::thread(&ScaleTruckController::lanedetectInThread, this);
     objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
+<<<<<<< HEAD
 
+=======
+ 
+    lanedetect_thread.join();
+>>>>>>> 8a63074c8b1689bb133ef5bfb3364cb18426b8f4
     objectdetect_thread.join();
     lanedetect_thread.join();
 
@@ -350,8 +381,8 @@ void ScaleTruckController::spin()
       std::scoped_lock lock(dist_mutex_);
       //msg.steer_angle = AngleDegree_; // get from objectThread
       msg.steer_angle = 4.5; // get from objectThread
-      //msg.cur_dist = distance_;       // ''
-      msg.cur_dist = 7.543;       // ''
+      msg.cur_dist = distance_;       // ''
+      //msg.cur_dist = 7.543;       // ''
     }
     {
       std::scoped_lock lock(rep_mutex_);
@@ -441,23 +472,26 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-//void ScaleTruckController::LaneSubCallback(const scale_truck_control_ros2::msg::Lane2xav::SharedPtr msg)
+//void ScaleTruckController::LaneSubCallback(const std_msgs::msg::Float32MultiArray & msg)
 //{
 //  /* Callback from LaneDetetion Node   */
-//  {
-//    std::scoped_lock lock(lane_mutex_);
+ // {
+   // std::scoped_lock lock(lane_mutex_);
 //    lane_coef_ = msg->lane_coef;
 //    AngleDegree_ = msg->AngleDegree;
 //  }
 //}
 
-//void ScaleTruckController::objectCallback(const obstacle_detector::Obstacles &msg) {
-//  /* Callback from ObjectDetetion Node   */
-//  {
-//    std::scoped_lock lock(object_mutex_);
-//    Obstacle_ = msg;
-//  }
-//}
+void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray &msg) {
+  /* Callback from ObjectDetetion Node   */
+
+  {
+    std::scoped_lock lock(object_mutex_);
+    Obstacle_ = msg;
+  }
+
+
+}
 
 void ScaleTruckController::LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg)
 {
