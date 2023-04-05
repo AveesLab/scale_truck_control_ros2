@@ -65,7 +65,7 @@ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
 - laser_filter
 ```
 cd ~/ros2_ws/src
-git clone https://github.com/wonseokkkk/laser_angle_filter.git
+git clone https://github.com/wonseokkkk/laser_filters.git
 ```
 
 - object_detection
