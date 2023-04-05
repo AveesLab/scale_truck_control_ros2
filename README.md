@@ -78,7 +78,7 @@ git clone https://github.com/AveesLab/object_detection_ros2.git
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/lane_detection_ros2.git
 ```
-- lane_detection
+- scale_truck_control_ros2
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/scale_truck_control_ros2.git
