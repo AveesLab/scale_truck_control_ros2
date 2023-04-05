@@ -29,7 +29,7 @@
 #include "scale_truck_control_ros2/msg/xav2lrc.hpp"
 #include "scale_truck_control_ros2/msg/lrc2xav.hpp"
 #include "scale_truck_control_ros2/msg/cmd_data.hpp"
-//#include "scale_truck_control_ros2/msg/obj2xav.hpp"
+#include "scale_truck_control_ros2/msg/lane.hpp"
 
 using namespace std::chrono_literals;
 
@@ -51,19 +51,20 @@ private:
     //Publisher 
     rclcpp::Publisher<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr LrcPublisher_;
     rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdPublisher_;
+    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr LanePublisher_;
 
     //Subscriber 
     rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    //rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr laneSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LaneSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
     void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    //void LaneSubCallback(const std_msgs::msg::Float32MultiArray &msg);
+    void LaneSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
@@ -85,11 +86,9 @@ private:
     std::string log_path_;
 
     //image
-    bool viewImage_;
-    int waitKeyDelay_;
     bool enableConsoleOutput_;
-    int sync_flag_; // ?
     bool imageStatus_ = false;
+    scale_truck_control_ros2::msg::CmdData lane_coef;
 
     float AngleDegree_ = 0.0f; // -1 ~ 1  - Twist msg angular.z
     float TargetVel_ = 0.0f; // -1 ~ 1  - Twist msg linear.x
@@ -111,10 +110,6 @@ private:
     float actDist_ = 0.8f;
     std_msgs::msg::Float32MultiArray Obstacle_;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 8a63074c8b1689bb133ef5bfb3364cb18426b8f4
     void lanedetectInThread();
     void objectdetectInThread();
     

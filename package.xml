@@ -4,7 +4,7 @@
   <name>scale_truck_control_ros2</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="ipeach0424@naver.com">avees</maintainer>
+  <maintainer email="dksxodnr234@gmail.com">avees</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

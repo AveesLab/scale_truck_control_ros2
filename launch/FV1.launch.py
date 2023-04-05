@@ -34,6 +34,19 @@ def generate_launch_description():
             'config', 
             'config.yaml')                 
          
+    cam_param_file = os.path.join(
+            get_package_share_directory('usb_cam'), 
+            'config', 
+            'params.yaml')                 
+
+    usb_node=Node(
+            package='usb_cam', 
+            namespace='FV1', 
+            name='usb_cam', 
+            executable='usb_cam_node_exe', 
+            parameters = [cam_param_file],
+            output='screen')
+
 #    rplidarS2_node=Node(
 #            package='rplidar_ros2',
 #            namespace='FV1',
