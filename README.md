@@ -71,7 +71,7 @@ git clone https://github.com/wonseokkkk/laser_angle_filter.git
 - object_detection
 ```
 cd ~/ros2_ws/src
-git clone https://github.com/AveesLab/object-detection_ros2.git
+git clone https://github.com/AveesLab/object_detection_ros2.git
 ```
 - lane_detection
 ```
