@@ -58,13 +58,6 @@ git clone https://github.com/ros-drivers/usb_cam.git -b ros2
 cm
 ```
 
-
-- laser_filters
-```
-cd ~/ros2_ws/src
-git clone https://github.com/AveesLab/object-detection_ros2.git
-```
-
 - object_detection
 ```
 cd ~/ros2_ws/src
