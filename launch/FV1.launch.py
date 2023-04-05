@@ -13,6 +13,9 @@ from launch.substitutions import PathJoinSubstitution
 
 def generate_launch_description():
 
+    ###############
+    # Lidar param #
+    ###############
 #    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
 #    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
 #    frame_id = LaunchConfiguration('frame_id', default='laser')
@@ -27,6 +30,9 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
 
+    ###############
+    # image param #
+    ###############
     image_view = LaunchConfiguration('image_view/enable_opencv', default='true')
 
     ld = LaunchDescription()
