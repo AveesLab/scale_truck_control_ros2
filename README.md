@@ -47,7 +47,6 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/ros-perception/vision_opencv.git -b galactic
-cm
 ```
 
 - usb_cam
@@ -55,28 +54,22 @@ cm
 sudo apt-get install ros-galactic-usb-cam
 cd ~/ros2_ws/src
 git clone https://github.com/ros-drivers/usb_cam.git -b ros2
-cm
 ```
 
 - rplidar_ros2
 ```
 cd ~/ros2_ws/src
-git clone https://github.com/wonseokkkk/rplidar_ros.git
-cd rplidar_ros && git checkout ros2
-cm
+git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
 ```
 
 - laser_filter
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/wonseokkkk/laser_angle_filter.git
-cd laser_filters && git checkout main
-cm
 ```
 
 - object_detection
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/object-detection_ros2.git
-cm
 ```
