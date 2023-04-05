@@ -18,11 +18,6 @@ def generate_launch_description():
             'config', 
             'config.yaml')
     
-    cam_param_file = os.path.join(
-            get_package_share_directory('usb_cam'),
-            'config',
-            'params.yaml')
-
     usb_cam_node=Node(
             package='usb_cam',
             namespace='LV',
@@ -55,8 +50,8 @@ def generate_launch_description():
             namespace='LV', 
             name='scale_truck_control_node', 
             executable='control_node', 
-            parameters = [ros_param_file],
-            output='screen')
+#            output='screen',
+            parameters = [ros_param_file])
 
     lrc_node=Node(
             package='scale_truck_control_ros2', 
@@ -78,8 +73,8 @@ def generate_launch_description():
     ld.add_action(usb_cam_node)
     ld.add_action(lane_detection_node)
     ld.add_action(control_node)
-    ld.add_action(lrc_node)
-    ld.add_action(opencr_node)
+#    ld.add_action(lrc_node)
+#    ld.add_action(opencr_node)
 
     return ld
 

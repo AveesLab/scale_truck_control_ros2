@@ -1,4 +1,4 @@
-/**/scale_truck_control_node:
+/**/lane_detection_ros2:
   ros__parameters:
     params/index: 0
 
@@ -45,22 +45,6 @@
     Calibration/f_dist_coef/d: 0.
     Calibration/f_dist_coef/e: -0.032260115806245951
 
-    Calibration/r_matrix/a: 326.31389227574556
-    Calibration/r_matrix/b: 0.
-    Calibration/r_matrix/c: 320.
-    Calibration/r_matrix/d: 0.
-    Calibration/r_matrix/e: 326.31389227574556
-    Calibration/r_matrix/f: 240.
-    Calibration/r_matrix/g: 0.
-    Calibration/r_matrix/h: 0.
-    Calibration/r_matrix/i: 1.
-
-    Calibration/r_dist_coef/a: -0.33295846454356126
-    Calibration/r_dist_coef/b: 0.12386827336557986
-    Calibration/r_dist_coef/c: 0.
-    Calibration/r_dist_coef/d: 0.
-    Calibration/r_dist_coef/e: -0.022565312043601477
-
     ROI/front_cam/width: 640
     ROI/front_cam/height: 480
     ROI/front_cam/top_gap: 0.416
@@ -71,15 +55,3 @@
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
     
-    ROI/rear_cam/width: 640
-    ROI/rear_cam/height: 480
-    ROI/rear_cam/top_gap: 0.405
-    ROI/rear_cam/bot_gap: 0.17
-    ROI/rear_cam/top_height: 0.99
-    ROI/rear_cam/bot_height: 0.47
-    ROI/rear_cam/extra_f: 1
-    ROI/rear_cam/extra_b: 10
-    ROI/rear_cam/extra_up: 140
-    ROI/rear_cam/extra_down: 180
-
-    rear_camera_usage/use: true

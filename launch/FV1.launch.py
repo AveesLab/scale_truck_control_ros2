@@ -27,6 +27,8 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
 
+    image_view = LaunchConfiguration('image_view/enable_opencv', default='true')
+
     ld = LaunchDescription()
 
     ros_param_file = os.path.join(
@@ -34,17 +36,20 @@ def generate_launch_description():
             'config', 
             'config.yaml')                 
          
-    cam_param_file = os.path.join(
-            get_package_share_directory('usb_cam'), 
-            'config', 
-            'params.yaml')                 
-
-    usb_node=Node(
-            package='usb_cam', 
-            namespace='FV1', 
-            name='usb_cam', 
-            executable='usb_cam_node_exe', 
-            parameters = [cam_param_file],
+    usb_cam_node=Node(
+            package='usb_cam',
+            namespace='FV1',
+            name='usb_cam',
+            executable='usb_cam_node_exe',
+            parameters = [
+                {"video_device": "/dev/video0"},
+                {"framerate": 30.0},
+                {"io_method": "mmap"},
+                {"frame_id": "usb_cam"},
+                {"pixel_format": "yuyv"},
+                {"image_width": 640},
+                {"image_height": 480}
+            ],
             output='screen')
 
 #    rplidarS2_node=Node(
@@ -85,21 +90,31 @@ def generate_launch_description():
             output='screen',)
 
     object_node=Node(
-	    package='pcl_object_detection',
+	    package='object_detection_ros2',
 	    namespace='FV1',	    
-	    executable='pcl_object_detection_node',
+	    executable='object_detection_ros2_node',
 	    output={
 	    	'stdout': 'screen',
 	    	'stderr': 'screen',
 	    	})
+
+    lane_detection_node=Node(
+            package='lane_detection_ros2',
+            namespace='FV1',
+            name='LaneDetection',
+            executable='lane_detect_node',
+#            output='screen',
+            parameters = [{
+                'image_view/enable_opencv': image_view
+            }])
 
     control_node=Node(
             package='scale_truck_control_ros2', 
             namespace='FV1', 
             name='scale_truck_control_node', 
             executable='control_node', 
-            parameters = [ros_param_file],
-            output='screen')
+#            output='screen',
+            parameters = [ros_param_file])
 
     lrc_node=Node(
             package='scale_truck_control_ros2', 
@@ -116,7 +131,10 @@ def generate_launch_description():
             executable='micro_ros_agent', 
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
+
 #    ld.add_action(rplidarS2_node)
+    ld.add_action(usb_cam_node)
+    ld.add_action(lane_detection_node)
     ld.add_action(rplidarA3_node)
     ld.add_action(laserfilter_node)
     ld.add_action(object_node)

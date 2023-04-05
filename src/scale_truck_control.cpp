@@ -97,7 +97,7 @@ void ScaleTruckController::init()
   /******************************/
   /* Ros Topic Subscribe Option */
   /******************************/
-  this->get_parameter_or("subscribers/lane_to_xavier/topic", LaneTopicName, std::string("/lane2xav_msg"));
+  this->get_parameter_or("subscribers/lane_to_xavier/topic", LaneTopicName, std::string("lane2xav_msg"));
   this->get_parameter_or("subscribers/lane_to_xavier/queue_size", LaneQueueSize, 1);
   this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("raw_obstacles"));
   this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
@@ -113,7 +113,7 @@ void ScaleTruckController::init()
   this->get_parameter_or("publishers/xavier_to_lrc/queue_size", LrcPubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("/xav2cmd_msg"));
   this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
-  this->get_parameter_or("publishers/xavier_to_lane/topic", LanePubTopicName, std::string("/xav2lane_msg"));
+  this->get_parameter_or("publishers/xavier_to_lane/topic", LanePubTopicName, std::string("xav2lane_msg"));
   this->get_parameter_or("publishers/xavier_to_lane/queue_size", LanePubQueueSize, 1);
 
   /************************/

@@ -32,9 +32,6 @@
     params/Ki_d: 0.2
 
     image_view/enable_console_output: true
-    image_view/enable_opencv: true
-    image_view/wait_key_delay: 3
-
 
 /**/LRC:
   ros__parameters:
