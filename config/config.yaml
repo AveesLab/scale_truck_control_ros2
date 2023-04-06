@@ -27,10 +27,6 @@
     params/lv_stop_dist: 0.5
     params/fv_stop_dist: 0.5
 
-    params/angle_degree: 0.0
-    params/Kp_d: 2.0
-    params/Ki_d: 0.2
-
     image_view/enable_console_output: true
 
 /**/LRC:

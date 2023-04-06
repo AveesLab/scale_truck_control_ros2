@@ -8,7 +8,6 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch.actions import LogInfo
 from launch.substitutions import PathJoinSubstitution
 
 def generate_launch_description():
@@ -30,24 +29,24 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
 
-    ###############
-    # image param #
-    ###############
-    image_view = LaunchConfiguration('image_view/enable_opencv', default='true')
-
-    ld = LaunchDescription()
 
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
             'config', 
             'config.yaml')                 
-         
+    
+    lane_param_file = os.path.join(
+            get_package_share_directory('scale_truck_control_ros2'), 
+            'config', 
+            'FV1.yaml')                 
+
+    # Node #
     usb_cam_node=Node(
             package='usb_cam',
             namespace='FV1',
             name='usb_cam',
             executable='usb_cam_node_exe',
-            parameters = [
+            parameters = [ # default value 
                 {"video_device": "/dev/video0"},
                 {"framerate": 30.0},
                 {"io_method": "mmap"},
@@ -107,12 +106,10 @@ def generate_launch_description():
     lane_detection_node=Node(
             package='lane_detection_ros2',
             namespace='FV1',
-            name='LaneDetection',
+            name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
 #            output='screen',
-            parameters = [{
-                'image_view/enable_opencv': image_view
-            }])
+            parameters = [lane_param_file])
 
     control_node=Node(
             package='scale_truck_control_ros2', 
@@ -138,6 +135,8 @@ def generate_launch_description():
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
 
+    ld = LaunchDescription()
+    
 #    ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
     ld.add_action(lane_detection_node)
@@ -146,7 +145,7 @@ def generate_launch_description():
     ld.add_action(object_node)
     ld.add_action(control_node)
     ld.add_action(lrc_node)
-#    ld.add_action(opencr_node)
+    ld.add_action(opencr_node)
 
     return ld
 
