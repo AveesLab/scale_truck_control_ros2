@@ -111,7 +111,7 @@ void ScaleTruckController::init()
   /****************************/
   this->get_parameter_or("publishers/xavier_to_lrc/topic", LrcPubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("publishers/xavier_to_lrc/queue_size", LrcPubQueueSize, 1);
-  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("/xav2cmd_msg"));
+  this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("xav2cmd_msg"));
   this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_lane/topic", LanePubTopicName, std::string("xav2lane_msg"));
   this->get_parameter_or("publishers/xavier_to_lane/queue_size", LanePubQueueSize, 1);

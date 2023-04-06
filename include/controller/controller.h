@@ -105,7 +105,9 @@ private:
     rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr XavPublisher_;
 
     //Subscriber 
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr XavSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr FV1Subscriber_;
+    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr FV2Subscriber_;
 
     //Callback Func
     void XavSubCallback(const scale_truck_control_ros2::msg::CmdData &msg);
