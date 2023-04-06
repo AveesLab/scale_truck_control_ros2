@@ -110,14 +110,17 @@ void LrcCallback(const void *msgin) {
 /*
    SPEED to RPM
 */
-float Kp_dist_ = 1.0; // 2.0; //0.8;
-float Kd_dist_ = 0.05; //0.05;
-float Kp_ = 0.8; // 2.0; //0.8;
-float Ki_ = 2.0; // 0.4; //10.0;
-float Ka_ = 0.01;
-float Kf_ = 1.0;  // feed forward const.
+float Kp_dist_ = 0.9; //0.8;
+float Kd_dist_ = 0.08; //0.05;
+float Kp_ = 0.65; // 2.0; //0.8;
+float Ki_ = 1.9; // 0.4; //10.0;
+float Ka_ = 0.02;
+float Kf_ = 0.9;  // feed forward const.
 float dt_ = 0.1;
 float circ_ = WHEEL_DIM * M_PI;
+float a_ = -6.063e-06;
+float b_ = 0.0269;
+float c_ = -27.327;
 
 float setSPEED(float tar_vel, float current_vel) { 
   static float output, err, P_err, I_err;
@@ -177,7 +180,7 @@ float setSPEED(float tar_vel, float current_vel) {
       output = ZERO_PWM;
     }
     else{    // inverse function  
-      output = (-4.3253e-02 + sqrt(pow(4.3253e-02,2)-4*(-1.0444e-05)*(-42.3682-u_k)))/(2*(-1.0444e-05));
+      output = ((-1.0f)*b_ + sqrt(pow(b_,2)-4*a_*(c_-u_k)))/(2*a_);
     }
     //output = tx_throttle_;
   
