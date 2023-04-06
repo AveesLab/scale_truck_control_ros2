@@ -86,6 +86,7 @@ def generate_launch_description():
     laserfilter_node=Node(
             package="laser_filters",
             namespace='FV1',
+            name='scan_to_scan_filter_chain',
             executable="scan_to_scan_filter_chain",
             parameters=[
             	PathJoinSubstitution([

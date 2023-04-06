@@ -20,7 +20,7 @@ def generate_launch_description():
 
     controller_node=Node(
             package='scale_truck_control_ros2', 
-            namespace='Controller', 
+#            namespace='Controller', 
             name='Controller', 
             executable='controller', 
             output='screen')
