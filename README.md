@@ -84,3 +84,16 @@ git clone https://github.com/AveesLab/lane_detection_ros2.git
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/scale_truck_control_ros2.git
 ```
+
+# alias
+```
+sudo vim ~/.bashrc
+```
+```
+alias cw='cd ~/ros2_ws/src'
+alias cb='source ~/ros2_ws/install/setup.bash'
+alias sb='source ~/.bashrc'
+alias cm='cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash'
+#alias cm='cd ~/ros2_ws && colcon build --packages-select scale_truck_control_ros2  --symlink-install && . install/setup.bash'
+alias eb='sudo vim ~/.bashrc'
+```
