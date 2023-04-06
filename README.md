@@ -65,6 +65,7 @@ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
 
 - laser_filter
 ```
+sudo apt-get install os-galactic-filters
 cd ~/ros2_ws/src
 git clone https://github.com/wonseokkkk/laser_filters.git
 ```
