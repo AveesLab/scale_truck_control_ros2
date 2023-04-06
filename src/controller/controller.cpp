@@ -16,8 +16,12 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
 {
     ui->setupUi(this);
 
-    std::string XavSubTopicName;
-    int XavSubQueueSize;
+    std::string LVSubTopicName;
+    int LVSubQueueSize;
+    std::string FV1SubTopicName;
+    int FV1SubQueueSize;
+    std::string FV2SubTopicName;
+    int FV2SubQueueSize;
 
     std::string XavPubTopicName;
     int XavPubQueueSize;
@@ -25,8 +29,12 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
     /******************************/
     /* Ros Topic Subscribe Option */
     /******************************/
-    ros2_node->get_parameter_or("subscribers/xavier_to_cmd/topic", XavSubTopicName, std::string("/xav2cmd_msg"));
-    ros2_node->get_parameter_or("subscribers/xavier_to_cmd/queue_size", XavSubQueueSize, 1);
+    ros2_node->get_parameter_or("subscribers/lv_xavier_to_cmd/topic", LVSubTopicName, std::string("/LV/xav2cmd_msg"));
+    ros2_node->get_parameter_or("subscribers/lv_xavier_to_cmd/queue_size", LVSubQueueSize, 1);
+    ros2_node->get_parameter_or("subscribers/fv1_xavier_to_cmd/topic", FV1SubTopicName, std::string("/FV1/xav2cmd_msg"));
+    ros2_node->get_parameter_or("subscribers/fv1_xavier_to_cmd/queue_size", FV1SubQueueSize, 1);
+    ros2_node->get_parameter_or("subscribers/fv2_xavier_to_cmd/topic", FV2SubTopicName, std::string("/FV2/xav2cmd_msg"));
+    ros2_node->get_parameter_or("subscribers/fv2_xavier_to_cmd/queue_size", FV2SubQueueSize, 1);
 
     /****************************/
     /* Ros Topic Publish Option */
@@ -37,7 +45,9 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
     /************************/
     /* Ros Topic Subscriber */
     /************************/
-    XavSubscriber_ = ros2_node->create_subscription<CmdData>(XavSubTopicName, XavSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    LVSubscriber_ = ros2_node->create_subscription<CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    FV1Subscriber_ = ros2_node->create_subscription<CmdData>(FV1SubTopicName, FV1SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    FV2Subscriber_ = ros2_node->create_subscription<CmdData>(FV2SubTopicName, FV2SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
 
 
     /***********************/
