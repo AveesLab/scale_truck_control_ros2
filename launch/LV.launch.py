@@ -116,7 +116,7 @@ def generate_launch_description():
             namespace='LV', 
             name='scale_truck_control_node', 
             executable='control_node', 
-#            output='screen',
+            output='screen',
             parameters = [ros_param_file])
 
     lrc_node=Node(

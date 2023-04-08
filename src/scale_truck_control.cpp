@@ -62,8 +62,8 @@ bool ScaleTruckController::readParameters() {
   /*******************/
   this->get_parameter_or("params/target_dist", TargetDist_, 0.8f); // m
   this->get_parameter_or("params/safety_dist", SafetyDist_, 1.5f); // m
-  this->get_parameter_or("params/lv_stop_dist", LVstopDist_, 0.5f); // m
-  this->get_parameter_or("params/fv_stop_dist", FVstopDist_, 0.5f); // m
+  this->get_parameter_or("params/lv_stop_dist", LVstopDist_, 0.1f); // m
+  this->get_parameter_or("params/fv_stop_dist", FVstopDist_, 0.1f); // m
 
   /***************/
   /* View Option */
@@ -224,6 +224,8 @@ void ScaleTruckController::objectdetectInThread()
         }
     }	
   }
+  //actDist_ = dist_tmp;
+  dist_tmp = 0.8f;
   actDist_ = dist_tmp;
 
   if(ObjCircles_ != 0)
@@ -247,35 +249,35 @@ void ScaleTruckController::objectdetectInThread()
     Lane_.cur_vel = CurVel_;
     LanePublisher_->publish(Lane_);
   }
-  if(index_ == 0){  //LV
-    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-    if(distance_ <= LVstopDist_) {
-    // Emergency Brake
-      ResultVel_ = 0.0f;
-    }
-    else if (distance_ <= SafetyDist_){
-      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
-      if (TargetVel_ < TmpVel_){
-        ResultVel_ = TargetVel_;
-      }
-      else{
-        ResultVel_ = TmpVel_;
-      }
-    }
-    else{
-      ResultVel_ = TargetVel_;
-    }
-  }
-  else{  //FVs
-    std::scoped_lock lock(rep_mutex_, dist_mutex_);
-    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
-    // Emergency Brake
-      ResultVel_ = 0.0f;
-    }
-    else {
-      ResultVel_ = TargetVel_;
-    }
-  }
+//  if(index_ == 0){  //LV
+//    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+//    if(distance_ <= LVstopDist_) {
+//    // Emergency Brake
+//      ResultVel_ = 0.0f;
+//    }
+//    else if (distance_ <= SafetyDist_){
+//      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
+//      if (TargetVel_ < TmpVel_){
+//        ResultVel_ = TargetVel_;
+//      }
+//      else{
+//        ResultVel_ = TmpVel_;
+//      }
+//    }
+//    else{
+//      ResultVel_ = TargetVel_;
+//    }
+//  }
+//  else{  //FVs
+//    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+//    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
+//    // Emergency Brake
+//      ResultVel_ = 0.0f;
+//    }
+//    else {
+//      ResultVel_ = TargetVel_;
+//    }
+//  }
 }
 
 void ScaleTruckController::spin() 
@@ -293,7 +295,8 @@ void ScaleTruckController::spin()
     objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
     objectdetect_thread.join();
 
-    msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
+    //msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
+    msg.tar_vel = TargetVel_;
     {
       std::scoped_lock lock(dist_mutex_);
       msg.steer_angle = AngleDegree_; // get from objectThread
@@ -321,7 +324,6 @@ void ScaleTruckController::spin()
 
     CycleTime_ = diff_time / (double)cnt;
 
-    printf("cnt: %d\n", cnt);
     if (cnt > 3000){
             diff_time = 0.0;
             cnt = 0;
@@ -335,7 +337,8 @@ void ScaleTruckController::displayConsole() {
   printf("\033[1;1H");
   printf("Angle           : %2.3f degree\n", AngleDegree_);
   printf("Refer Vel       : %3.3f m/s\n", RefVel_);
-  printf("Send Vel        : %3.3f m/s\n", ResultVel_);
+  //printf("Send Vel        : %3.3f m/s\n", ResultVel_);
+  printf("Send Vel        : %3.3f m/s\n", TargetVel_);
   printf("Tar/Cur Vel     : %3.3f / %3.3f m/s\n", TargetVel_, CurVel_);
   printf("Tar/Cur Dist    : %3.3f / %3.3f m\n", TargetDist_, distance_);
 //  printf("\nK1/K2           : %3.3f / %3.3f", laneDetector_.K1_, laneDetector_.K2_);

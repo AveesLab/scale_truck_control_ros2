@@ -174,6 +174,8 @@ void LocalRC::printStatus(){
     printf("Current Velocity:\t%.3f\n", cur_vel_);
     printf("Target Distance:\t%.3f\n", tar_dist_);
     printf("Current Distance:\t%.3f\n", cur_dist_);
+    printf("ocr_vel:\t%.3f\n", ref_vel_);
+    printf("sat_vel:\t%.3f\n", sat_vel_);
 //    printf("Tar|Cur Vel     : %3.3f | %3.3f m/s\n", tar_vel_, cur_vel_);
 //    printf("Tar|Cur Dist    : %3.3f | %3.3f m\n", tar_dist_, cur_dist_);
 

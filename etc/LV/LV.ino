@@ -89,7 +89,7 @@ float output_;
 volatile int EN_pos_;
 volatile int CountT_;
 volatile int cumCountT_;
-char filename_[] = "LV1_00.TXT";
+char filename_[] = "LV_00.TXT";
 File logfile_;
 
 HardwareTimer Timer1(TIMER_CH1); // T Method
@@ -138,7 +138,7 @@ float setSPEED(float tar_vel, float current_vel) {
       dist_err = tx_dist_ - tx_tdist_;    
       P_dist_err = Kp_dist_ * dist_err;
       D_dist_err = (Kd_dist_ * ((dist_err - prev_dist_err) / dt_ )); 
-      u_dist = P_dist_err + D_dist_err + preceding_truck_vel_;
+      u_dist = P_dist_err + D_dist_err + tar_vel;
   
       // sat(u(k))  saturation start 
       if(u_dist > 1.2) u_dist_k = 1.2;

@@ -141,7 +141,7 @@ float setSPEED(float tar_vel, float current_vel) {
       dist_err = tx_dist_ - tx_tdist_;    
       P_dist_err = Kp_dist_ * dist_err;
       D_dist_err = (Kd_dist_ * ((dist_err - prev_dist_err) / dt_ )); 
-      u_dist = P_dist_err + D_dist_err + preceding_truck_vel_;
+      u_dist = P_dist_err + D_dist_err + tar_vel;
   
       // sat(u(k))  saturation start 
       if(u_dist > 1.2) u_dist_k = 1.2;
