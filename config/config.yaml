@@ -22,8 +22,8 @@
 
     params/target_dist: 0.8
     params/safety_dist: 1.5
-    params/lv_stop_dist: 0.1
-    params/fv_stop_dist: 0.1
+    params/lv_stop_dist: 0.5
+    params/fv_stop_dist: 0.3
 
     image_view/enable_console_output: false
 
@@ -45,5 +45,5 @@
 
     LrcParams/lrc_index: 10
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
-    LrcParams/enable_console_output: true
+    LrcParams/enable_console_output: false
 
