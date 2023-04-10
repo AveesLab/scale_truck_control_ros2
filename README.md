@@ -66,12 +66,16 @@ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
 - laser_filter
 ```
 sudo apt-get install ros-galactic-filters
+sudo apt-get install ros-galactic-angles
+sudo apt-get install ros-galactic-laser-geometry
+sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
 cd ~/ros2_ws/src
 git clone https://github.com/wonseokkkk/laser_filters.git
 ```
 
 - object_detection
 ```
+sudo apt-get install ros-galactic-perception-pcl
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/object_detection_ros2.git
 ```
