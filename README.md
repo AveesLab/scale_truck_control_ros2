@@ -5,9 +5,9 @@ scale_truck_control ros2 version
 # Install Micro-ros-Aruduino
 - 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
 ```
-source /opt/ros/$ROS_DISTRO/setup.bash
+source /opt/ros/galactic/setup.bash
 cd ~/ros2_ws/src 
-git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git
+git clone https://github.com/micro-ROS/micro_ros_setup.git -b galactic
 ```
 
 - rosdep으로 의존 패키지 업데이트
