@@ -36,9 +36,9 @@
 #include "controller/fv1thread.h"
 #include "controller/fv2thread.h"
 #include "controller/ros2node.hpp"
-#include "scale_truck_control_ros2/msg/cmd_data.hpp"
+#include "ros2_msg/msg/cmd_data.hpp"
 
-typedef scale_truck_control_ros2::msg::CmdData CmdData;
+typedef ros2_msg::msg::CmdData CmdData;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Controller; }
@@ -102,15 +102,15 @@ private:
     const std::shared_ptr<Ros2Node> ros2_node;
 
     //Publisher 
-    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr XavPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr XavPublisher_;
 
     //Subscriber 
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LVSubscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr FV1Subscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr FV2Subscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr FV1Subscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr FV2Subscriber_;
 
     //Callback Func
-    void XavSubCallback(const scale_truck_control_ros2::msg::CmdData &msg);
+    void XavSubCallback(const ros2_msg::msg::CmdData &msg);
 
     cv::Mat display_Map(CmdData cmd_data);
     LVThread* lv_thread_;

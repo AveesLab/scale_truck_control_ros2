@@ -22,11 +22,11 @@
 #include "sensor_msgs/msg/image.hpp"
 
 //custom msgs
-#include "scale_truck_control_ros2/msg/lrc2ocr.hpp"
-#include "scale_truck_control_ros2/msg/ocr2lrc.hpp"
-#include "scale_truck_control_ros2/msg/xav2lrc.hpp"
-#include "scale_truck_control_ros2/msg/lrc2xav.hpp"
-#include "scale_truck_control_ros2/msg/cmd_data.hpp"
+#include "ros2_msg/msg/lrc2ocr.hpp"
+#include "ros2_msg/msg/ocr2lrc.hpp"
+#include "ros2_msg/msg/xav2lrc.hpp"
+#include "ros2_msg/msg/lrc2xav.hpp"
+#include "ros2_msg/msg/cmd_data.hpp"
 
 using namespace std::chrono_literals;
 
@@ -43,21 +43,21 @@ private:
     void init();
 
     //Subscriber
-    rclcpp::Subscription<scale_truck_control_ros2::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr XavSubscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Xav2lrc>::SharedPtr XavSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LVSubscriber_;
 
     //Publisher
-    rclcpp::Publisher<scale_truck_control_ros2::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
-    rclcpp::Publisher<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr XavPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Lrc2xav>::SharedPtr XavPublisher_;
     rclcpp::TimerBase::SharedPtr OcrPublishTimer_;
-    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr FVPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr FVPublisher_;
 
     //Callback
     void Lrc2ocrCallback(void);
-    void OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPtr msg);
-    void XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPtr msg);
-    void LVCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);
+    void OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg);
+    void XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg);
+    void LVCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
 
     bool isNodeRunning();
     void rosPub();

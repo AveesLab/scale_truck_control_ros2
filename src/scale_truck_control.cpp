@@ -20,7 +20,7 @@ ScaleTruckController::ScaleTruckController()
 ScaleTruckController::~ScaleTruckController() {
   isNodeRunning_ = false;
 
-  scale_truck_control_ros2::msg::Xav2lrc msg;
+  ros2_msg::msg::Xav2lrc msg;
   msg.tar_vel = ResultVel_;
   {
     std::scoped_lock lock(dist_mutex_);
@@ -119,20 +119,20 @@ void ScaleTruckController::init()
   /************************/
   /* Ros Topic Subscriber */
   /************************/
-  LrcSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
+  LrcSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
 
-  CmdSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
+  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
   objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
-  LaneSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
+  LaneSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
-  LrcPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
-  CmdPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::CmdData>(CmdPubTopicName, CmdPubQueueSize);  
-  LanePublisher_ = this->create_publisher<scale_truck_control_ros2::msg::CmdData>(LanePubTopicName, LanePubQueueSize);  
+  LrcPublisher_ = this->create_publisher<ros2_msg::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
+  CmdPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(CmdPubTopicName, CmdPubQueueSize);  
+  LanePublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(LanePubTopicName, LanePubQueueSize);  
 
   /**********************/
   /* Safety Start Setup */
@@ -145,7 +145,7 @@ void ScaleTruckController::init()
   /************/
   /* CMD Data */
   /************/
-  cmd_data_ = new scale_truck_control_ros2::msg::CmdData;
+  cmd_data_ = new ros2_msg::msg::CmdData;
   cmd_data_->src_index = index_;
   cmd_data_->tar_index = 20;  //Control center
 
@@ -159,7 +159,7 @@ void ScaleTruckController::init()
 /***************/
 /* cmd publish */
 /***************/
-void ScaleTruckController::reply(scale_truck_control_ros2::msg::CmdData* cmd)
+void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
 {
   while(isNodeRunning_){
     {
@@ -205,7 +205,7 @@ void ScaleTruckController::objectdetectInThread()
 {
   float dist, dist_tmp;
   dist_tmp = 10.1f;
-  scale_truck_control_ros2::msg::CmdData Lane_;
+  ros2_msg::msg::CmdData Lane_;
   /**************/
   /* Lidar Data */
   /**************/
@@ -283,7 +283,7 @@ void ScaleTruckController::spin()
   double diff_time=0.0;
   int cnt = 0;
 
-  scale_truck_control_ros2::msg::Xav2lrc msg;
+  ros2_msg::msg::Xav2lrc msg;
   std::thread objectdetect_thread;
 
   while(!controlDone_ && rclcpp::ok()) {
@@ -385,7 +385,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-void ScaleTruckController::LaneSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg)
+void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
 {
   {
     std::scoped_lock lock(lane_mutex_);
@@ -402,7 +402,7 @@ void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray
   }
 }
 
-void ScaleTruckController::LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg)
+void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg)
 {
   {
     std::scoped_lock lock(vel_mutex_);
@@ -410,7 +410,7 @@ void ScaleTruckController::LrcSubCallback(const scale_truck_control_ros2::msg::L
   }
 }
 
-void ScaleTruckController::CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg)
+void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
 {
   {
     std::scoped_lock lock(rep_mutex_);

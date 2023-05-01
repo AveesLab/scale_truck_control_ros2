@@ -3,8 +3,8 @@
 
 #include <QThread>
 
-#include "scale_truck_control_ros2/msg/cmd_data.hpp"
-typedef scale_truck_control_ros2::msg::CmdData CmdData;
+#include "ros2_msg/msg/cmd_data.hpp"
+typedef ros2_msg::msg::CmdData CmdData;
 
 class Controller;
 
