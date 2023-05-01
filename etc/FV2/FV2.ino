@@ -7,8 +7,8 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 #include <std_msgs/msg/int32.h>
-#include <scale_truck_control_ros2/msg/ocr2lrc.h>
-#include <scale_truck_control_ros2/msg/lrc2ocr.h>
+#include <ros2_msg/msg/ocr2lrc.h>
+#include <ros2_msg/msg/lrc2ocr.h>
 
 // OpenCR, ros 1 library
 #include <stdio.h>
@@ -58,14 +58,14 @@ rcl_allocator_t allocator;
 
 // publisher 
 rcl_publisher_t OcrPublisher_;
-scale_truck_control_ros2__msg__Ocr2lrc pub_msg_;
+ros2_msg__msg__Ocr2lrc pub_msg_;
 std_msgs__msg__Int32 test_msg_; // test_msg_.data = 10;
 rclc_executor_t executor_pub_;
 rcl_timer_t timer;
 
 // subscriber 
 rcl_subscription_t OcrSubscriber_;
-scale_truck_control_ros2__msg__Lrc2ocr sub_msg_;
+ros2_msg__msg__Lrc2ocr sub_msg_;
 rclc_executor_t executor_sub_;
 
 sensor_msgs::Imu imu_msg_;
@@ -98,7 +98,7 @@ HardwareTimer Timer3(TIMER_CH3); // Angle
    ros Subscribe Callback Function
 */
 void LrcCallback(const void *msgin) {
-  const scale_truck_control_ros2__msg__Lrc2ocr *msg = (const scale_truck_control_ros2__msg__Lrc2ocr *)msgin;
+  const ros2_msg__msg__Lrc2ocr *msg = (const ros2_msg__msg__Lrc2ocr *)msgin;
   Index_ = msg->index;
   tx_steer_ = msg->steer_angle;  // float32
   tx_dist_ = msg->cur_dist;
@@ -380,13 +380,13 @@ void setup() {
   RCCHECK(rclc_subscription_init_default(
       &OcrSubscriber_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Lrc2ocr),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Lrc2ocr),
       "lrc2ocr_msg"));
       
   RCCHECK(rclc_publisher_init_default(
       &OcrPublisher_,
       &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(scale_truck_control_ros2, msg, Ocr2lrc),
+      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Ocr2lrc),
       "ocr2lrc_msg"));
       
   RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
