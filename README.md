@@ -79,6 +79,13 @@ sudo apt-get install ros-galactic-perception-pcl
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/object_detection_ros2.git
 ```
+
+- ros2_msg
+```
+cd ~/ros2_ws/src
+git clone https://github.com/AveesLab/ros2_msg.git
+```
+
 - lane_detection
 ```
 cd ~/ros2_ws/src
