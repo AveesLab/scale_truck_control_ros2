@@ -61,21 +61,21 @@ void LocalRC::init(){
   /************************/
   /* ROS Topic Subscriber */
   /************************/
-  OcrSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Ocr2lrc>(OcrSubTopicName, OcrSubQueueSize, std::bind(&LocalRC::OcrCallback, this, std::placeholders::_1));
+  OcrSubscriber_ = this->create_subscription<ros2_msg::msg::Ocr2lrc>(OcrSubTopicName, OcrSubQueueSize, std::bind(&LocalRC::OcrCallback, this, std::placeholders::_1));
 
-  XavSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
+  XavSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
 
   if (index_ == 11 || index_ == 12){
-    LVSubscriber_ = this->create_subscription<scale_truck_control_ros2::msg::CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
+    LVSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
   }
 
   /************************/
   /* ROS Topic Publisher */
   /************************/
-  XavPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Lrc2xav>(XavPubTopicName, XavPubQueueSize);  
-  OcrPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::Lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
+  XavPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2xav>(XavPubTopicName, XavPubQueueSize);  
+  OcrPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
   if (index_ == 10) {
-    FVPublisher_ = this->create_publisher<scale_truck_control_ros2::msg::CmdData>(FVPubTopicName, FVPubQueueSize);
+    FVPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(FVPubTopicName, FVPubQueueSize);
   }
 
   /*********************/
@@ -97,7 +97,7 @@ bool LocalRC::isNodeRunning(){
 /****************/
 void LocalRC::radio()
 {
-  scale_truck_control_ros2::msg::CmdData lv_data_;
+  ros2_msg::msg::CmdData lv_data_;
   while(isNodeRunning()){
     {
       std::scoped_lock lock(data_mutex_);
@@ -112,8 +112,8 @@ void LocalRC::radio()
 }
 
 void LocalRC::rosPub(){
-  scale_truck_control_ros2::msg::Lrc2xav xav;
-  scale_truck_control_ros2::msg::Lrc2ocr ocr;
+  ros2_msg::msg::Lrc2xav xav;
+  ros2_msg::msg::Lrc2ocr ocr;
   { 
     std::scoped_lock lock(data_mutex_);
     xav.cur_vel = cur_vel_;
@@ -199,7 +199,7 @@ void LocalRC::communicate(){
   }
 }
 
-void LocalRC::XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPtr msg)
+void LocalRC::XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   angle_degree_ = msg->steer_angle;
@@ -210,7 +210,7 @@ void LocalRC::XavCallback(const scale_truck_control_ros2::msg::Xav2lrc::SharedPt
   }
 }
 
-void LocalRC::OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPtr msg)   
+void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)   
 {
   std::scoped_lock lock(data_mutex_);
   ref_vel_ = msg->ref_vel;
@@ -221,7 +221,7 @@ void LocalRC::OcrCallback(const scale_truck_control_ros2::msg::Ocr2lrc::SharedPt
 /***************/
 /* FVs from LV */
 /***************/
-void LocalRC::LVCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg)
+void LocalRC::LVCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   tar_vel_ = msg->tar_vel;

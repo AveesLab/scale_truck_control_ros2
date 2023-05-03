@@ -5,9 +5,9 @@ scale_truck_control ros2 version
 # Install Micro-ros-Aruduino
 - 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
 ```
-source /opt/ros/$ROS_DISTRO/setup.bash
+source /opt/ros/galactic/setup.bash
 cd ~/ros2_ws/src 
-git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git
+git clone https://github.com/micro-ROS/micro_ros_setup.git -b galactic
 ```
 
 - rosdep으로 의존 패키지 업데이트
@@ -44,10 +44,11 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
 # ROS2 Packages Install
-- vision_opencv (cv_bridge, image_geometry)
+- ros2_msg
 ```
 cd ~/ros2_ws/src
-git clone https://github.com/ros-perception/vision_opencv.git -b galactic
+git clone https://github.com/AveesLab/ros2_msg.git
+cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
 - usb_cam
@@ -66,15 +67,20 @@ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
 - laser_filter
 ```
 sudo apt-get install ros-galactic-filters
+sudo apt-get install ros-galactic-angles
+sudo apt-get install ros-galactic-laser-geometry
+sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
 cd ~/ros2_ws/src
 git clone https://github.com/wonseokkkk/laser_filters.git
 ```
 
 - object_detection
 ```
+sudo apt-get install ros-galactic-perception-pcl
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/object_detection_ros2.git
 ```
+
 - lane_detection
 ```
 cd ~/ros2_ws/src

@@ -24,12 +24,12 @@
 #include "std_msgs/msg/float32.hpp"
 
 //custom msgs
-#include "scale_truck_control_ros2/msg/lrc2ocr.hpp"
-#include "scale_truck_control_ros2/msg/ocr2lrc.hpp"
-#include "scale_truck_control_ros2/msg/xav2lrc.hpp"
-#include "scale_truck_control_ros2/msg/lrc2xav.hpp"
-#include "scale_truck_control_ros2/msg/cmd_data.hpp"
-#include "scale_truck_control_ros2/msg/lane.hpp"
+#include "ros2_msg/msg/lrc2ocr.hpp"
+#include "ros2_msg/msg/ocr2lrc.hpp"
+#include "ros2_msg/msg/xav2lrc.hpp"
+#include "ros2_msg/msg/lrc2xav.hpp"
+#include "ros2_msg/msg/cmd_data.hpp"
+#include "ros2_msg/msg/lane.hpp"
 
 using namespace std::chrono_literals;
 
@@ -49,31 +49,31 @@ private:
     void init();
  
     //Publisher 
-    rclcpp::Publisher<scale_truck_control_ros2::msg::Xav2lrc>::SharedPtr LrcPublisher_;
-    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdPublisher_;
-    rclcpp::Publisher<scale_truck_control_ros2::msg::CmdData>::SharedPtr LanePublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr CmdPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr LanePublisher_;
 
     //Subscriber 
-    rclcpp::Subscription<scale_truck_control_ros2::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr CmdSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<scale_truck_control_ros2::msg::CmdData>::SharedPtr LaneSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LaneSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
-    void LrcSubCallback(const scale_truck_control_ros2::msg::Lrc2xav::SharedPtr msg);  
-    void CmdSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);  
+    void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
+    void CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    void LaneSubCallback(const scale_truck_control_ros2::msg::CmdData::SharedPtr msg);
+    void LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
     void displayConsole();
     void recordData(struct timeval startTime);
-    void reply(scale_truck_control_ros2::msg::CmdData* cmd);
+    void reply(ros2_msg::msg::CmdData* cmd);
 
     //CmdData
-    scale_truck_control_ros2::msg::CmdData* cmd_data_;
+    ros2_msg::msg::CmdData* cmd_data_;
 
     //.cpp config
     double CycleTime_ = 0.0;
@@ -88,7 +88,7 @@ private:
     //image
     bool enableConsoleOutput_;
     bool imageStatus_ = false;
-    scale_truck_control_ros2::msg::CmdData lane_coef;
+    ros2_msg::msg::CmdData lane_coef;
 
     float AngleDegree_ = 0.0f; // -1 ~ 1  - Twist msg angular.z
     float TargetVel_ = 0.0f; // -1 ~ 1  - Twist msg linear.x
