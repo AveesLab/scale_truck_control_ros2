@@ -44,10 +44,11 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
 # ROS2 Packages Install
-- vision_opencv (cv_bridge, image_geometry)
+- ros2_msg
 ```
 cd ~/ros2_ws/src
-git clone https://github.com/ros-perception/vision_opencv.git -b galactic
+git clone https://github.com/AveesLab/ros2_msg.git
+cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
 - usb_cam
@@ -78,12 +79,6 @@ git clone https://github.com/wonseokkkk/laser_filters.git
 sudo apt-get install ros-galactic-perception-pcl
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/object_detection_ros2.git
-```
-
-- ros2_msg
-```
-cd ~/ros2_ws/src
-git clone https://github.com/AveesLab/ros2_msg.git
 ```
 
 - lane_detection
