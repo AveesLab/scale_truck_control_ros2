@@ -14,20 +14,20 @@ def generate_launch_description():
 
     ###############
     # Lidar param #
-    ###############
-#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
-#    frame_id = LaunchConfiguration('frame_id', default='laser')
-#    inverted = LaunchConfiguration('inverted', default='false')
-#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-#    scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
-
+    ##############
     serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
+    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
     frame_id = LaunchConfiguration('frame_id', default='laser')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
+    scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
+
+#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
+#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
+#    frame_id = LaunchConfiguration('frame_id', default='laser')
+#    inverted = LaunchConfiguration('inverted', default='false')
+#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
+#    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
 
 
     ros_param_file = os.path.join(
@@ -57,20 +57,7 @@ def generate_launch_description():
             ],
             output='screen')
 
-#    rplidarS2_node=Node(
-#            package='rplidar_ros2',
-#            namespace='FV1',
-#            executable='rplidar_scan_publisher',
-#            name='rplidar_scan_publisher',
-#            parameters=[{'serial_port': serial_port, 
-#                         'serial_baudrate': serial_baudrate, 
-#                         'frame_id': frame_id,
-#                         'inverted': inverted, 
-#                         'angle_compensate': angle_compensate,
-#                         'scan_mode':scan_mode}],
-#            output='screen')         
-
-    rplidarA3_node=Node(
+    rplidarS2_node=Node(
             package='rplidar_ros2',
             namespace='FV1',
             executable='rplidar_scan_publisher',
@@ -79,9 +66,22 @@ def generate_launch_description():
                          'serial_baudrate': serial_baudrate, 
                          'frame_id': frame_id,
                          'inverted': inverted, 
-                         'angle_compensate': angle_compensate, 
-                         'scan_mode': scan_mode}],
-            output='screen')
+                         'angle_compensate': angle_compensate,
+                         'scan_mode':scan_mode}],
+            output='screen')         
+
+#    rplidarA3_node=Node(
+#            package='rplidar_ros2',
+#            namespace='FV1',
+#            executable='rplidar_scan_publisher',
+#            name='rplidar_scan_publisher',
+#            parameters=[{'serial_port': serial_port, 
+#                         'serial_baudrate': serial_baudrate, 
+#                         'frame_id': frame_id,
+#                         'inverted': inverted, 
+#                         'angle_compensate': angle_compensate, 
+#                         'scan_mode': scan_mode}],
+#            output='screen')
                 
     laserfilter_node=Node(
             package="laser_filters",
@@ -137,11 +137,11 @@ def generate_launch_description():
             )
 
     ld = LaunchDescription()
-    
-#    ld.add_action(rplidarS2_node)
+   
+    ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
     ld.add_action(lane_detection_node)
-    ld.add_action(rplidarA3_node)
+#    ld.add_action(rplidarA3_node)
     ld.add_action(laserfilter_node)
     ld.add_action(object_node)
     ld.add_action(control_node)
