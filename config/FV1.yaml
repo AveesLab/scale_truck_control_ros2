@@ -24,29 +24,30 @@
     Calibration/f_dist_coef/d: 0.
     Calibration/f_dist_coef/e: -0.037408338000060472
 
+    ROI/mode: false
     ROI/dynamic_roi: true
-    ROI/threshold: 128
+    ROI/threshold: 180
     ROI/canny/thresh1: 100
     ROI/canny/thresh2: 200
 
     ROI/width: 640
     ROI/height: 480
 
-    ROI/front_cam/top_gap: 0.390 # 0.413 0.390
-    ROI/front_cam/bot_gap: 0.185 # 0.185
+    ROI/front_cam/top_gap: 0.320 # 0.413 0.390
+    ROI/front_cam/bot_gap: 0.100 # 0.185
     ROI/front_cam/top_height: 0.99
     ROI/front_cam/bot_height: 0.47
-    ROI/front_cam/extra_f: 0.00
-    ROI/front_cam/extra_b: 0.00
+    ROI/front_cam/extra_f: 30.00
+    ROI/front_cam/extra_b: 30.00
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
-    ROI/lc_mode/top_gap: 0.390
-    ROI/lc_mode/bot_gap: 0.390
-    ROI/lc_mode/top_height: 0.57
+    ROI/lc_mode/top_gap: 0.320
+    ROI/lc_mode/bot_gap: 0.100
+    ROI/lc_mode/top_height: 0.99
     ROI/lc_mode/bot_height: 0.47
-    ROI/lc_mode/extra_f: 100.00
-    ROI/lc_mode/extra_b: 150.00
+    ROI/lc_mode/extra_f: 30.00
+    ROI/lc_mode/extra_b: 30.00
     ROI/lc_mode/extra_up: 140
     ROI/lc_mode/extra_down: 180
 
@@ -54,6 +55,9 @@
     crop/y: 0
     crop/width: 440
     crop/height: 380
+
+    threshold/box_size: 55 # 51
+    threshold/box_offset: 50 # 50
 
     params/K: 0.15
     params/a/a: 0.

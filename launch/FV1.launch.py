@@ -21,16 +21,6 @@ def generate_launch_description():
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
-<<<<<<< HEAD
-
-#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
-#    frame_id = LaunchConfiguration('frame_id', default='laser')
-#    inverted = LaunchConfiguration('inverted', default='false')
-#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-#    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
-=======
->>>>>>> 6fd89c6bf4f74e63d12834d9d6141e1a0a04ffb2
 
 #    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
 #    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
@@ -119,7 +109,7 @@ def generate_launch_description():
             namespace='FV1',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
-#            output='screen',
+            output='screen',
             parameters = [lane_param_file])
 
     control_node=Node(
@@ -147,11 +137,7 @@ def generate_launch_description():
             )
 
     ld = LaunchDescription()
-<<<<<<< HEAD
-   
-=======
-    
->>>>>>> 6fd89c6bf4f74e63d12834d9d6141e1a0a04ffb2
+
     ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
     ld.add_action(lane_detection_node)
