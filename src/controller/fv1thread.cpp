@@ -1,5 +1,5 @@
-#include "controller/fv1thread.h"
-#include "controller/controller.h"
+#include "fv1thread.h"
+#include "controller.h"
 
 FV1Thread::FV1Thread(QObject *parent) : QThread(parent)
 {

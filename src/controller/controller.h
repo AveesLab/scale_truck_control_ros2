@@ -32,10 +32,10 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "controller/lvthread.h"
-#include "controller/fv1thread.h"
-#include "controller/fv2thread.h"
-#include "controller/ros2node.hpp"
+#include "lvthread.h"
+#include "fv1thread.h"
+#include "fv2thread.h"
+#include "ros2node.hpp"
 #include "ros2_msg/msg/cmd_data.hpp"
 
 typedef ros2_msg::msg::CmdData CmdData;
@@ -92,6 +92,18 @@ private slots:
     void on_FV2Box_activated(int index);
 
     void on_Send_clicked();
+
+    void on_FV2_Left_LC_toggled(bool checked);
+
+    void on_FV2_Right_LC_toggled(bool checked);
+
+    void on_FV1_Right_LC_toggled(bool checked);
+
+    void on_FV1_Left_LC_toggled(bool checked);
+
+    void on_LV_Right_LC_toggled(bool checked);
+
+    void on_LV_Left_LC_toggled(bool checked);
 
 signals:
     void send(CmdData cmd_data);

@@ -55,10 +55,9 @@ public:
     QComboBox *FV1Box;
     QProgressBar *FV1VelBar;
     QLabel *FV1TarVel;
-    QHBoxLayout *FV1SensorFailure;
-    QPushButton *FV1_alpha;
-    QPushButton *FV1_beta;
-    QPushButton *FV1_gamma;
+    QHBoxLayout *FV1LaneChange;
+    QPushButton *FV1_Left_LC;
+    QPushButton *FV1_Right_LC;
     QGroupBox *LVGBOX;
     QGridLayout *gridLayout_3;
     QLabel *LVCurDist;
@@ -79,10 +78,9 @@ public:
     QProgressBar *LVDistBar;
     QSlider *LVVelSlider;
     QLabel *label_22;
-    QHBoxLayout *LVSensorFailure;
-    QPushButton *LV_alpha;
-    QPushButton *LV_beta;
-    QPushButton *LV_gamma;
+    QHBoxLayout *LVLaneChange;
+    QPushButton *LV_Left_LC;
+    QPushButton *LV_Right_LC;
     QGroupBox *MGBOX;
     QGridLayout *gridLayout;
     QLineEdit *MTarVel;
@@ -118,10 +116,9 @@ public:
     QLabel *label_32;
     QProgressBar *FV2VelBar;
     QLabel *label_6;
-    QHBoxLayout *FV2SensorFailure;
-    QPushButton *FV2_alpha;
-    QPushButton *FV2_beta;
-    QPushButton *FV2_gamma;
+    QHBoxLayout *FV2LaneChange;
+    QPushButton *FV2_Left_LC;
+    QPushButton *FV2_Right_LC;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -261,28 +258,22 @@ public:
 
         gridLayout_4->addWidget(FV1TarVel, 2, 2, 1, 1);
 
-        FV1SensorFailure = new QHBoxLayout();
-        FV1SensorFailure->setObjectName(QStringLiteral("FV1SensorFailure"));
-        FV1_alpha = new QPushButton(FV1GBOX);
-        FV1_alpha->setObjectName(QStringLiteral("FV1_alpha"));
-        FV1_alpha->setCheckable(true);
+        FV1LaneChange = new QHBoxLayout();
+        FV1LaneChange->setObjectName(QStringLiteral("FV1LaneChange"));
+        FV1_Left_LC = new QPushButton(FV1GBOX);
+        FV1_Left_LC->setObjectName(QStringLiteral("FV1_Left_LC"));
+        FV1_Left_LC->setCheckable(true);
 
-        FV1SensorFailure->addWidget(FV1_alpha);
+        FV1LaneChange->addWidget(FV1_Left_LC);
 
-        FV1_beta = new QPushButton(FV1GBOX);
-        FV1_beta->setObjectName(QStringLiteral("FV1_beta"));
-        FV1_beta->setCheckable(true);
+        FV1_Right_LC = new QPushButton(FV1GBOX);
+        FV1_Right_LC->setObjectName(QStringLiteral("FV1_Right_LC"));
+        FV1_Right_LC->setCheckable(true);
 
-        FV1SensorFailure->addWidget(FV1_beta);
-
-        FV1_gamma = new QPushButton(FV1GBOX);
-        FV1_gamma->setObjectName(QStringLiteral("FV1_gamma"));
-        FV1_gamma->setCheckable(true);
-
-        FV1SensorFailure->addWidget(FV1_gamma);
+        FV1LaneChange->addWidget(FV1_Right_LC);
 
 
-        gridLayout_4->addLayout(FV1SensorFailure, 8, 0, 1, 4);
+        gridLayout_4->addLayout(FV1LaneChange, 8, 0, 1, 4);
 
 
         gridLayout_2->addWidget(FV1GBOX, 2, 1, 1, 1);
@@ -411,26 +402,22 @@ public:
 
         gridLayout_3->addWidget(label_22, 4, 3, 1, 1);
 
-        LVSensorFailure = new QHBoxLayout();
-        LVSensorFailure->setObjectName(QStringLiteral("LVSensorFailure"));
-        LV_alpha = new QPushButton(LVGBOX);
-        LV_alpha->setObjectName(QStringLiteral("LV_alpha"));
-        LV_alpha->setCheckable(true);
+        LVLaneChange = new QHBoxLayout();
+        LVLaneChange->setObjectName(QStringLiteral("LVLaneChange"));
+        LV_Left_LC = new QPushButton(LVGBOX);
+        LV_Left_LC->setObjectName(QStringLiteral("LV_Left_LC"));
+        LV_Left_LC->setCheckable(true);
 
-        LVSensorFailure->addWidget(LV_alpha);
+        LVLaneChange->addWidget(LV_Left_LC);
 
-        LV_beta = new QPushButton(LVGBOX);
-        LV_beta->setObjectName(QStringLiteral("LV_beta"));
+        LV_Right_LC = new QPushButton(LVGBOX);
+        LV_Right_LC->setObjectName(QStringLiteral("LV_Right_LC"));
+        LV_Right_LC->setCheckable(true);
 
-        LVSensorFailure->addWidget(LV_beta);
-
-        LV_gamma = new QPushButton(LVGBOX);
-        LV_gamma->setObjectName(QStringLiteral("LV_gamma"));
-
-        LVSensorFailure->addWidget(LV_gamma);
+        LVLaneChange->addWidget(LV_Right_LC);
 
 
-        gridLayout_3->addLayout(LVSensorFailure, 5, 0, 1, 4);
+        gridLayout_3->addLayout(LVLaneChange, 5, 0, 1, 4);
 
 
         gridLayout_2->addWidget(LVGBOX, 2, 0, 1, 1);
@@ -650,29 +637,22 @@ public:
 
         gridLayout_5->addWidget(label_6, 3, 0, 1, 1);
 
-        FV2SensorFailure = new QHBoxLayout();
-        FV2SensorFailure->setObjectName(QStringLiteral("FV2SensorFailure"));
-        FV2_alpha = new QPushButton(FV2GBOX);
-        FV2_alpha->setObjectName(QStringLiteral("FV2_alpha"));
-        FV2_alpha->setCheckable(true);
+        FV2LaneChange = new QHBoxLayout();
+        FV2LaneChange->setObjectName(QStringLiteral("FV2LaneChange"));
+        FV2_Left_LC = new QPushButton(FV2GBOX);
+        FV2_Left_LC->setObjectName(QStringLiteral("FV2_Left_LC"));
+        FV2_Left_LC->setCheckable(true);
 
-        FV2SensorFailure->addWidget(FV2_alpha);
+        FV2LaneChange->addWidget(FV2_Left_LC);
 
-        FV2_beta = new QPushButton(FV2GBOX);
-        FV2_beta->setObjectName(QStringLiteral("FV2_beta"));
-        FV2_beta->setCheckable(true);
-        FV2_beta->setChecked(false);
+        FV2_Right_LC = new QPushButton(FV2GBOX);
+        FV2_Right_LC->setObjectName(QStringLiteral("FV2_Right_LC"));
+        FV2_Right_LC->setCheckable(true);
 
-        FV2SensorFailure->addWidget(FV2_beta);
-
-        FV2_gamma = new QPushButton(FV2GBOX);
-        FV2_gamma->setObjectName(QStringLiteral("FV2_gamma"));
-        FV2_gamma->setCheckable(true);
-
-        FV2SensorFailure->addWidget(FV2_gamma);
+        FV2LaneChange->addWidget(FV2_Right_LC);
 
 
-        gridLayout_5->addLayout(FV2SensorFailure, 5, 0, 1, 4);
+        gridLayout_5->addLayout(FV2LaneChange, 5, 0, 1, 4);
 
 
         gridLayout_2->addWidget(FV2GBOX, 2, 3, 1, 1);
@@ -720,9 +700,8 @@ public:
          << QApplication::translate("Controller", "FV2", Q_NULLPTR)
         );
         FV1TarVel->setText(QApplication::translate("Controller", "0", Q_NULLPTR));
-        FV1_alpha->setText(QApplication::translate("Controller", "Vel Failure", Q_NULLPTR));
-        FV1_beta->setText(QApplication::translate("Controller", "Cam Failure", Q_NULLPTR));
-        FV1_gamma->setText(QApplication::translate("Controller", "Lidar Failure", Q_NULLPTR));
+        FV1_Left_LC->setText(QApplication::translate("Controller", "Left LC", Q_NULLPTR));
+        FV1_Right_LC->setText(QApplication::translate("Controller", "Right LC", Q_NULLPTR));
         LVGBOX->setTitle(QApplication::translate("Controller", "LV", Q_NULLPTR));
         LVCurDist->setText(QApplication::translate("Controller", "0", Q_NULLPTR));
         label_13->setText(QApplication::translate("Controller", "Target Distance", Q_NULLPTR));
@@ -744,9 +723,8 @@ public:
         LVTarVel->setText(QApplication::translate("Controller", "0", Q_NULLPTR));
         label_34->setText(QApplication::translate("Controller", "m", Q_NULLPTR));
         label_22->setText(QApplication::translate("Controller", "m", Q_NULLPTR));
-        LV_alpha->setText(QApplication::translate("Controller", "Vel Failure", Q_NULLPTR));
-        LV_beta->setText(QApplication::translate("Controller", "Cam Failure", Q_NULLPTR));
-        LV_gamma->setText(QApplication::translate("Controller", "Lidar Failure", Q_NULLPTR));
+        LV_Left_LC->setText(QApplication::translate("Controller", "Left LC", Q_NULLPTR));
+        LV_Right_LC->setText(QApplication::translate("Controller", "Right LC", Q_NULLPTR));
         MGBOX->setTitle(QApplication::translate("Controller", "Master", Q_NULLPTR));
         MTarVel->setText(QApplication::translate("Controller", "0", Q_NULLPTR));
         label_39->setText(QApplication::translate("Controller", "m/s", Q_NULLPTR));
@@ -780,9 +758,8 @@ public:
         label_25->setText(QApplication::translate("Controller", "m/s", Q_NULLPTR));
         label_32->setText(QApplication::translate("Controller", "m", Q_NULLPTR));
         label_6->setText(QApplication::translate("Controller", "Target Distance", Q_NULLPTR));
-        FV2_alpha->setText(QApplication::translate("Controller", "Vel Failure", Q_NULLPTR));
-        FV2_beta->setText(QApplication::translate("Controller", "Cam Failure", Q_NULLPTR));
-        FV2_gamma->setText(QApplication::translate("Controller", "Lidar Failure", Q_NULLPTR));
+        FV2_Left_LC->setText(QApplication::translate("Controller", "Left LC", Q_NULLPTR));
+        FV2_Right_LC->setText(QApplication::translate("Controller", "Right LC", Q_NULLPTR));
     } // retranslateUi
 
 };

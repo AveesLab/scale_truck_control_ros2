@@ -34,7 +34,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(PROJECT_SOURCES
+set(QT_PROJECT_SOURCES
+  # src	
   src/controller/main.cpp
   src/controller/controller.cpp
   src/controller/ros2node.cpp
@@ -42,15 +43,16 @@ set(PROJECT_SOURCES
   src/controller/lvthread.cpp
   src/controller/fv1thread.cpp
   src/controller/fv2thread.cpp
-  
-  include/controller/controller.h
-  include/controller/ros2node.hpp
-  include/controller/lvthread.h
-  include/controller/fv1thread.h
-  include/controller/fv2thread.h
+ 
+  # include
+  src/controller/controller.h
+  src/controller/ros2node.hpp
+  src/controller/lvthread.h
+  src/controller/fv1thread.h
+  src/controller/fv2thread.h
 )
 
-set(PROJECT_SOURCES_DEPENDENCIES
+set(QT_PROJECT_SOURCES_DEPENDENCIES
   rclcpp 
   std_msgs 
   Qt5Core 
@@ -65,8 +67,8 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 ) 
 
-add_executable(controller ${PROJECT_SOURCES})
-ament_target_dependencies(controller ${PROJECT_SOURCES_DEPENDENCIES})
+add_executable(controller ${QT_PROJECT_SOURCES})
+ament_target_dependencies(controller ${QT_PROJECT_SOURCES_DEPENDENCIES})
 
 add_executable(lrc_node src/lrc.cpp)
 ament_target_dependencies(lrc_node rclcpp std_msgs ros2_msg)

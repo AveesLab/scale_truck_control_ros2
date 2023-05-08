@@ -1,5 +1,5 @@
-#include "controller/lvthread.h"
-#include "controller/controller.h"
+#include "lvthread.h"
+#include "controller.h"
 
 LVThread::LVThread(QObject *parent) : QThread(parent)
 {

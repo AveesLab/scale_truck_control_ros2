@@ -1,5 +1,5 @@
-#include "controller/controller.h"
-#include "controller/ui_controller.h"
+#include "controller.h"
+#include "ui_controller.h"
 
 QMutex Controller::lv_mutex_;
 QMutex Controller::fv1_mutex_;
@@ -142,6 +142,9 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
 
 Controller::~Controller()
 {
+    delete lv_thread_;
+    delete fv1_thread_;
+    delete fv2_thread_;
     delete ui;
 }
 
@@ -534,5 +537,37 @@ void Controller::on_Send_clicked()
     cmd_data.tar_dist = tar_dist;
 
     requestData(cmd_data);
+}
+
+void Controller::on_FV2_Left_LC_toggled(bool checked)
+{
+    printf("left lane change start!\n");
+}
+
+
+void Controller::on_FV2_Right_LC_toggled(bool checked)
+{
+    printf("right lane change start!\n");
+}
+
+void Controller::on_FV1_Right_LC_toggled(bool checked)
+{
+    printf("FV1_right!\n");
+}
+
+void Controller::on_FV1_Left_LC_toggled(bool checked)
+{
+    printf("FV1_left!\n");
+}
+
+
+void Controller::on_LV_Right_LC_toggled(bool checked)
+{
+    printf("LV_right!\n");
+}
+
+void Controller::on_LV_Left_LC_toggled(bool checked)
+{
+    printf("LV_left!\n");
 }
 

@@ -279,11 +279,11 @@
         </widget>
        </item>
        <item row="8" column="0" colspan="4">
-        <layout class="QHBoxLayout" name="FV1SensorFailure">
+        <layout class="QHBoxLayout" name="FV1LaneChange">
          <item>
-          <widget class="QPushButton" name="FV1_alpha">
+          <widget class="QPushButton" name="FV1_Left_LC">
            <property name="text">
-            <string>Vel Failure</string>
+            <string>Left LC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -291,19 +291,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="FV1_beta">
+          <widget class="QPushButton" name="FV1_Right_LC">
            <property name="text">
-            <string>Cam Failure</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="FV1_gamma">
-           <property name="text">
-            <string>Lidar Failure</string>
+            <string>Right LC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -570,11 +560,11 @@
         </widget>
        </item>
        <item row="5" column="0" colspan="4">
-        <layout class="QHBoxLayout" name="LVSensorFailure">
+        <layout class="QHBoxLayout" name="LVLaneChange">
          <item>
-          <widget class="QPushButton" name="LV_alpha">
+          <widget class="QPushButton" name="LV_Left_LC">
            <property name="text">
-            <string>Vel Failure</string>
+            <string>Left LC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -582,16 +572,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="LV_beta">
+          <widget class="QPushButton" name="LV_Right_LC">
            <property name="text">
-            <string>Cam Failure</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="LV_gamma">
-           <property name="text">
-            <string>Lidar Failure</string>
+            <string>Right LC</string>
            </property>
           </widget>
          </item>
@@ -1003,11 +986,11 @@
         </widget>
        </item>
        <item row="5" column="0" colspan="4">
-        <layout class="QHBoxLayout" name="FV2SensorFailure">
+        <layout class="QHBoxLayout" name="FV2LaneChange">
          <item>
-          <widget class="QPushButton" name="FV2_alpha">
+          <widget class="QPushButton" name="FV2_Left_LC">
            <property name="text">
-            <string>Vel Failure</string>
+            <string>Left LC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -1015,22 +998,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="FV2_beta">
+          <widget class="QPushButton" name="FV2_Right_LC">
            <property name="text">
-            <string>Cam Failure</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="FV2_gamma">
-           <property name="text">
-            <string>Lidar Failure</string>
+            <string>Right LC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>

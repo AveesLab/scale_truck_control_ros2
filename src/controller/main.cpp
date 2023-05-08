@@ -1,5 +1,5 @@
-#include "controller/controller.h"
-#include "controller/ros2node.hpp"
+#include "controller.h"
+#include "ros2node.hpp"
 
 #include <QApplication>
 #include <QLocale>
