@@ -539,15 +539,14 @@ void Controller::on_Send_clicked()
     requestData(cmd_data);
 }
 
-void Controller::on_FV2_Left_LC_toggled(bool checked)
+void Controller::on_LV_Right_LC_toggled(bool checked)
 {
-    printf("left lane change start!\n");
+    printf("LV_right!\n");
 }
 
-
-void Controller::on_FV2_Right_LC_toggled(bool checked)
+void Controller::on_LV_Left_LC_toggled(bool checked)
 {
-    printf("right lane change start!\n");
+    printf("LV_left!\n");
 }
 
 void Controller::on_FV1_Right_LC_toggled(bool checked)
@@ -560,14 +559,56 @@ void Controller::on_FV1_Left_LC_toggled(bool checked)
     printf("FV1_left!\n");
 }
 
-
-void Controller::on_LV_Right_LC_toggled(bool checked)
+void Controller::on_FV2_Left_LC_toggled(bool checked)
 {
-    printf("LV_right!\n");
+    printf("left lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
+
+    int value_vel = ui->FV2VelSlider->value();
+    int value_dist = ui->FV2DistSlider->value();
+    bool FV2_lc_left = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 2;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.fv2_lc_left = FV2_lc_left;
+
+    requestData(cmd_data);
 }
 
-void Controller::on_LV_Left_LC_toggled(bool checked)
+void Controller::on_FV2_Right_LC_toggled(bool checked)
 {
-    printf("LV_left!\n");
-}
+    printf("right lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
 
+    int value_vel = ui->FV2VelSlider->value();
+    int value_dist = ui->FV2DistSlider->value();
+    bool FV2_lc_right = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 2;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.fv2_lc_right = FV2_lc_right;
+
+    requestData(cmd_data);
+}
