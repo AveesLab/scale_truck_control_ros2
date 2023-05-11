@@ -206,6 +206,13 @@ void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
       cmd->coef[2].b = lane_coef_.coef[2].b;
       cmd->coef[2].c = lane_coef_.coef[2].c;
    }
+   {
+     std::scoped_lock lock(rep_mutex_);
+     cmd->lv_lc_right = lv_lc_right_;
+     cmd->fv1_lc_right = fv1_lc_right_;
+     cmd->fv2_lc_right = fv2_lc_right_;
+   }
+
    CmdPublisher_->publish(*cmd);
 
    std::this_thread::sleep_for(std::chrono::milliseconds(2));

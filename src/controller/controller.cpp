@@ -153,16 +153,19 @@ void Controller::XavSubCallback(const CmdData &msg)
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();
      lv_data_ = msg;
+     if(msg.lv_lc_right == false) ui->LV_Right_LC->toggle();
      lv_mutex_.unlock();
   }
-  else if(msg.src_index == 1){  //LV 
+  else if(msg.src_index == 1){  //FV1 
      fv1_mutex_.lock();
      fv1_data_ = msg;
+     if(msg.fv1_lc_right == false) ui->FV1_Right_LC->toggle();
      fv1_mutex_.unlock();
   }
-  else if(msg.src_index == 2){  //LV 
+  else if(msg.src_index == 2){  //FV2 
      fv2_mutex_.lock();
      fv2_data_ = msg;
+     if(msg.fv2_lc_right == false) ui->FV2_Right_LC->toggle();
      fv2_mutex_.unlock();
   }
 }
@@ -609,6 +612,8 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.fv2_lc_right = FV2_lc_right;
+    printf("%d\n", FV2_lc_right);
+
 
     requestData(cmd_data);
 }
