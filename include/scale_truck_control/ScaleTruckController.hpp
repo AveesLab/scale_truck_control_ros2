@@ -52,12 +52,14 @@ private:
     rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
     rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr CmdPublisher_;
     rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr LanePublisher_;
+    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr TruckPublisher_;
 
     //Subscriber 
     rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LaneSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr TruckSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
@@ -65,6 +67,7 @@ private:
     void CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
     void LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
+    void TruckSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
@@ -85,13 +88,33 @@ private:
     bool droi_ready_ = false;
     std::string log_path_;
 
+    //LaneChange  
+    float laneChange();
+    bool lc_right_ = false;
+    bool lc_left_ = false;
+    bool lv_lc_right_ = false;
+    bool fv1_lc_right_ = false;
+    bool fv2_lc_right_ = false;
+    bool lv_lc_complete_ = false;
+    bool fv1_lc_complete_ = false;
+    bool fv2_lc_complete_ = false;
+    
+    //Pure Puresuit
+    float purePuresuit(float tx_, float ty_);
+    float Lw_ = 0.0f;
+    float Ld_offset_ = 0.0f;
+
     //image
     bool enableConsoleOutput_;
     bool imageStatus_ = false;
-    ros2_msg::msg::CmdData lane_coef;
+    ros2_msg::msg::CmdData lane_coef_;
+    ros2_msg::msg::CmdData prev_lane_coef_;
 
-    float AngleDegree_ = 0.0f; // -1 ~ 1  - Twist msg angular.z
-    float TargetVel_ = 0.0f; // -1 ~ 1  - Twist msg linear.x
+    float AngleDegree_ = 0.0f; 
+    float AngleDegree = 0.0f; 
+    float ppAngle_ = 0.0f; 
+    int center_select_ = 0; 
+    float TargetVel_ = 0.0f; 
     float SafetyVel_;
     float ResultVel_;
     float FVmaxVel_;
@@ -105,9 +128,6 @@ private:
     float FVstopDist_;
     float TargetDist_;
     float SafetyDist_;
-    uint32_t LdrErrMsg_;
-    float Ld_offset_ = 0.0f;
-    float actDist_ = 0.8f;
     std_msgs::msg::Float32MultiArray Obstacle_;
 
     void lanedetectInThread();
