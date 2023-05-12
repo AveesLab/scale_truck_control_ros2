@@ -25,7 +25,7 @@
     params/lv_stop_dist: 0.5
     params/fv_stop_dist: 0.3
 
-    image_view/enable_console_output: true
+    image_view/enable_console_output: false
 
 /**/LRC:
   ros__parameters:

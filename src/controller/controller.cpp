@@ -153,19 +153,33 @@ void Controller::XavSubCallback(const CmdData &msg)
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();
      lv_data_ = msg;
-     if(msg.lv_lc_right == false) ui->LV_Right_LC->toggle();
+     if(LV_lc_right == true) {
+       if(msg.lv_lc_right == false) {
+         ui->LV_Right_LC->toggle();
+       }
+     }
      lv_mutex_.unlock();
   }
   else if(msg.src_index == 1){  //FV1 
      fv1_mutex_.lock();
      fv1_data_ = msg;
-     if(msg.fv1_lc_right == false) ui->FV1_Right_LC->toggle();
+     if(FV1_lc_right == true) {
+       if(msg.fv1_lc_right == false) {
+         ui->FV1_Right_LC->toggle();
+         ui->LV_Right_LC->toggle(); // LV lc start
+       } 
+     }
      fv1_mutex_.unlock();
   }
   else if(msg.src_index == 2){  //FV2 
      fv2_mutex_.lock();
      fv2_data_ = msg;
-     if(msg.fv2_lc_right == false) ui->FV2_Right_LC->toggle();
+     if(FV2_lc_right == true) {
+       if(msg.fv2_lc_right == false) {
+         ui->FV2_Right_LC->toggle();
+         ui->FV1_Right_LC->toggle(); // FV1 lc start
+       } 
+     }
      fv2_mutex_.unlock();
   }
 }
@@ -545,6 +559,7 @@ void Controller::on_Send_clicked()
 void Controller::on_LV_Right_LC_toggled(bool checked)
 {
     printf("LV_right!\n");
+    LV_lc_right = checked;
 }
 
 void Controller::on_LV_Left_LC_toggled(bool checked)
@@ -555,6 +570,7 @@ void Controller::on_LV_Left_LC_toggled(bool checked)
 void Controller::on_FV1_Right_LC_toggled(bool checked)
 {
     printf("FV1_right!\n");
+    FV1_lc_right = checked;
 }
 
 void Controller::on_FV1_Left_LC_toggled(bool checked)
@@ -570,7 +586,7 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
 
     int value_vel = ui->FV2VelSlider->value();
     int value_dist = ui->FV2DistSlider->value();
-    bool FV2_lc_left = checked;
+    FV2_lc_left = checked;
 
     if(value_vel >= 10) {
       tar_vel = value_vel/100.0f;
@@ -597,7 +613,7 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
 
     int value_vel = ui->FV2VelSlider->value();
     int value_dist = ui->FV2DistSlider->value();
-    bool FV2_lc_right = checked;
+    FV2_lc_right = checked;
 
     if(value_vel >= 10) {
       tar_vel = value_vel/100.0f;

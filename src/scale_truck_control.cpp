@@ -229,13 +229,13 @@ float ScaleTruckController::laneChange()
 
   {
     std::scoped_lock lock(lane_mutex_);
-    if (fv2_lc_right_){
+    if(fv2_lc_right_){
       ppAngle_ = purePuresuit(tx_, ty_);
       lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
 
-      if (abs(lane_diff) < 30 && abs(lane_diff) > 0) {
+      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
 	cnt -= 1;
-	if (cnt == 0) {
+	if(cnt == 0) {
           fv2_lc_right_ = false;
 	  lc_right_ = false;
           msg.fv1_lc_right = true;  
@@ -245,13 +245,13 @@ float ScaleTruckController::laneChange()
       else
         cnt = 10;
     }
-    else if (fv1_lc_right_){
+    else if(fv1_lc_right_){
       ppAngle_ = purePuresuit(tx_, ty_);
       lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
 
-      if (abs(lane_diff) < 30 && abs(lane_diff) > 0) {
+      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
 	cnt -= 1;
-	if (cnt == 0) {
+	if(cnt == 0) {
           fv1_lc_right_ = false;
 	  lc_right_ = false;
           msg.lv_lc_right = true;  
@@ -261,13 +261,13 @@ float ScaleTruckController::laneChange()
       else
         cnt = 10;
     }
-    else if (lv_lc_right_){
+    else if(lv_lc_right_){
       ppAngle_ = purePuresuit(tx_, ty_);
       lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
 
-      if (abs(lane_diff) < 30 && abs(lane_diff) > 0) {
+      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
 	cnt -= 1;
-	if (cnt == 0) {
+	if(cnt == 0) {
           lv_lc_right_ = false;
 	  lc_right_ = false;
 	}
@@ -275,6 +275,8 @@ float ScaleTruckController::laneChange()
       else
         cnt = 10;
     }
+    else 
+      printf("Not find what vehicle go to lane change"); 
   }
 
   return ppAngle_;
@@ -385,11 +387,11 @@ void ScaleTruckController::spin()
     objectdetect_thread.join();
     {
       std::scoped_lock lock(rep_mutex_);
-      if (!lc_right_ || !lc_left_) {
-        AngleDegree_ = AngleDegree;
-      }
-      else { // lane change
+      if(lc_right_ || lc_left_) { // lane change
         AngleDegree_ = laneChange();
+      }
+      else{ 
+        AngleDegree_ = AngleDegree;
       }
     }
     msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
