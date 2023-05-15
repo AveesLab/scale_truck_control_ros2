@@ -1,7 +1,7 @@
 /**/LaneDetector:
   ros__parameters:
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
 
     params/angle_degree: 0.0
@@ -25,18 +25,18 @@
     Calibration/f_dist_coef/e: -0.022529125535951176
 
     ROI/dynamic_roi: true
-    ROI/threshold: 128
+    ROI/threshold: 200
     ROI/canny/thresh1: 100
     ROI/canny/thresh2: 200
 
     ROI/front_cam/width: 640
     ROI/front_cam/height: 480
-    ROI/front_cam/top_gap: 0.41
-    ROI/front_cam/bot_gap: 0.17
+    ROI/front_cam/top_gap: 0.35 # 0.41 
+    ROI/front_cam/bot_gap: 0.10 # 0.17
     ROI/front_cam/top_height: 0.99
-    ROI/front_cam/bot_height: 0.47
-    ROI/front_cam/extra_f: 16.00
-    ROI/front_cam/extra_b: 8.00
+    ROI/front_cam/bot_height: 0.48 # 0.47
+    ROI/front_cam/extra_f: 30.00 # 16.0
+    ROI/front_cam/extra_b: 30.00 # 8.0
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 

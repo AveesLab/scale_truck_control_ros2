@@ -27,8 +27,15 @@ def generate_launch_description():
     frame_id = LaunchConfiguration('frame_id', default='laser')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
+    scan_mode = LaunchConfiguration('scan_mode', default='Stability')
 
+    video_device = LaunchConfiguration('video_device', default='/dev/video0')
+    framerate = LaunchConfiguration('framrate', default='30.0') 
+    io_method = LaunchConfiguration('io_method', default='mmap')
+    frame_id = LaunchConfiguration('frame_id', default='usb_cam')
+    pixel_format = LaunchConfiguration('pixel_format', default='yuyv')
+    image_width = LaunchConfiguration('image_width', default='640')
+    image_height = LaunchConfiguration('image_height', default='480')
 
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
@@ -46,15 +53,11 @@ def generate_launch_description():
             namespace='FV2',
             name='usb_cam',
             executable='usb_cam_node_exe',
-            parameters = [ # default value 
-                {"video_device": "/dev/video0"},
-                {"framerate": 30.0},
-                {"io_method": "mmap"},
-                {"frame_id": "usb_cam"},
-                {"pixel_format": "yuyv"},
-                {"image_width": 640},
-                {"image_height": 480}
-            ],
+            parameters=[
+            	PathJoinSubstitution([
+            		get_package_share_directory('scale_truck_control_ros2'),
+            		'config', 'camera_params.yaml',
+            		])],
             output='screen')
 
 #    rplidarS2_node=Node(
@@ -84,13 +87,13 @@ def generate_launch_description():
             output='screen')
                 
     laserfilter_node=Node(
-            package="laser_filters",
+            package='laser_filters',
             namespace='FV2',
-            executable="scan_to_scan_filter_chain",
+            executable='scan_to_scan_filter_chain',
             parameters=[
             	PathJoinSubstitution([
-            		get_package_share_directory("laser_filters"),
-            		"examples", "laserfilter_angle.yaml",
+            		get_package_share_directory('scale_truck_control_ros2'),
+            		'config', 'laserfilter_angle.yaml',
             		])],
             output='screen',)
 
