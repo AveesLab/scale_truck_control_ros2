@@ -54,19 +54,6 @@ def generate_launch_description():
             remappings=[('image_raw', 'usb_cam/image_raw')],
             output='screen')
 
-    rear_cam_node=Node(
-            package='usb_cam',
-            namespace='FV1',
-            name='rear_cam',
-            executable='usb_cam_node_exe',
-            parameters=[
-                PathJoinSubstitution([
-                        get_package_share_directory('scale_truck_control_ros2'),
-                        'config', 'rear_cam_params.yaml',
-                        ])],
-            remappings=[('image_raw', 'rear_cam/image_raw')],
-            output='screen')
-
     rplidarS2_node=Node(
             package='rplidar_ros2',
             namespace='FV1',
@@ -148,10 +135,9 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
-    ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
-    ld.add_action(rear_cam_node)
     ld.add_action(lane_detection_node)
+    ld.add_action(rplidarS2_node)
 #    ld.add_action(rplidarA3_node)
     ld.add_action(laserfilter_node)
     ld.add_action(object_node)

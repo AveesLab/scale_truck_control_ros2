@@ -1,5 +1,6 @@
 /**/scale_truck_control_node:
   ros__parameters:    
+    subscribers/image_to_lane/topic: usb_cam/image_raw
     subscribers/obstacle_reading/topic: raw_obstacles
     subscribers/obstacle_reading/queue_size: 100
     subscribers/lrc_to_xavier/topic: lrc2xav_msg

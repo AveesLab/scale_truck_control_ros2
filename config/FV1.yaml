@@ -1,7 +1,7 @@
 /**/LaneDetector:
   ros__parameters:
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
 
     params/angle_degree: 0.0
@@ -24,7 +24,6 @@
     Calibration/f_dist_coef/d: 0.
     Calibration/f_dist_coef/e: -0.037408338000060472
 
-    ROI/mode: false
     ROI/dynamic_roi: true
     ROI/threshold: 180
     ROI/canny/thresh1: 100

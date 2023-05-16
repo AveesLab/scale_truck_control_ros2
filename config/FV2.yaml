@@ -34,7 +34,7 @@
     ROI/front_cam/top_gap: 0.35 # 0.41 
     ROI/front_cam/bot_gap: 0.10 # 0.17
     ROI/front_cam/top_height: 0.99
-    ROI/front_cam/bot_height: 0.48 # 0.47
+    ROI/front_cam/bot_height: 0.47 # 0.47
     ROI/front_cam/extra_f: 30.00 # 16.0
     ROI/front_cam/extra_b: 30.00 # 8.0
     ROI/front_cam/extra_up: 140

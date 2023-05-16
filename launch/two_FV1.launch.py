@@ -14,28 +14,21 @@ def generate_launch_description():
 
     ###############
     # Lidar param #
-    ###############
-#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
-#    frame_id = LaunchConfiguration('frame_id', default='laser')
-#    inverted = LaunchConfiguration('inverted', default='false')
-#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-#    scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
-
+    ##############
     serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
-    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
+    serial_baudrate = LaunchConfiguration('serial_baudrate', default='1000000') 
     frame_id = LaunchConfiguration('frame_id', default='laser')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-    scan_mode = LaunchConfiguration('scan_mode', default='Stability')
+    scan_mode=LaunchConfiguration('scan_mode', default='DenseBoost')#Standard,DenseBoost
 
-    video_device = LaunchConfiguration('video_device', default='/dev/video0')
-    framerate = LaunchConfiguration('framrate', default='30.0') 
-    io_method = LaunchConfiguration('io_method', default='mmap')
-    frame_id = LaunchConfiguration('frame_id', default='usb_cam')
-    pixel_format = LaunchConfiguration('pixel_format', default='yuyv')
-    image_width = LaunchConfiguration('image_width', default='640')
-    image_height = LaunchConfiguration('image_height', default='480')
+#    serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
+#    serial_baudrate = LaunchConfiguration('serial_baudrate', default='256000') #for A3 is 256000
+#    frame_id = LaunchConfiguration('frame_id', default='laser')
+#    inverted = LaunchConfiguration('inverted', default='false')
+#    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
+#    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
+#
 
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
@@ -45,62 +38,76 @@ def generate_launch_description():
     lane_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
             'config', 
-            'FV2.yaml')                 
+            'FV1.yaml')                 
 
     # Node #
     usb_cam_node=Node(
             package='usb_cam',
-            namespace='FV2',
+            namespace='FV1',
             name='usb_cam',
             executable='usb_cam_node_exe',
             parameters=[
-            	PathJoinSubstitution([
-            		get_package_share_directory('scale_truck_control_ros2'),
-            		'config', 'camera_params.yaml',
-            		])],
+                PathJoinSubstitution([
+                        get_package_share_directory('scale_truck_control_ros2'),
+                        'config', 'camera_params.yaml',
+                        ])],
             remappings=[('image_raw', 'usb_cam/image_raw')],
             output='screen')
 
-#    rplidarS2_node=Node(
-#            package='rplidar_ros2',
-#            namespace='FV2',
-#            executable='rplidar_scan_publisher',
-#            name='rplidar_scan_publisher',
-#            parameters=[{'serial_port': serial_port, 
-#                         'serial_baudrate': serial_baudrate, 
-#                         'frame_id': frame_id,
-#                         'inverted': inverted, 
-#                         'angle_compensate': angle_compensate,
-#                         'scan_mode':scan_mode}],
-#            output='screen')         
+    rear_cam_node=Node(
+            package='usb_cam',
+            namespace='FV1',
+            name='rear_cam',
+            executable='usb_cam_node_exe',
+            parameters=[
+                PathJoinSubstitution([
+                        get_package_share_directory('scale_truck_control_ros2'),
+                        'config', 'rear_cam_params.yaml',
+                        ])],
+            remappings=[('image_raw', 'rear_cam/image_raw')],
+            output='screen')
 
-    rplidarA3_node=Node(
+    rplidarS2_node=Node(
             package='rplidar_ros2',
-            namespace='FV2',
+            namespace='FV1',
             executable='rplidar_scan_publisher',
             name='rplidar_scan_publisher',
             parameters=[{'serial_port': serial_port, 
                          'serial_baudrate': serial_baudrate, 
                          'frame_id': frame_id,
                          'inverted': inverted, 
-                         'angle_compensate': angle_compensate, 
-                         'scan_mode': scan_mode}],
-            output='screen')
+                         'angle_compensate': angle_compensate,
+                         'scan_mode':scan_mode}],
+            output='screen')         
+
+#    rplidarA3_node=Node(
+#            package='rplidar_ros2',
+#            namespace='FV1',
+#            executable='rplidar_scan_publisher',
+#            name='rplidar_scan_publisher',
+#            parameters=[{'serial_port': serial_port, 
+#                         'serial_baudrate': serial_baudrate, 
+#                         'frame_id': frame_id,
+#                         'inverted': inverted, 
+#                         'angle_compensate': angle_compensate, 
+#                         'scan_mode': scan_mode}],
+#            output='screen')
                 
     laserfilter_node=Node(
-            package='laser_filters',
-            namespace='FV2',
-            executable='scan_to_scan_filter_chain',
+            package="laser_filters",
+            namespace='FV1',
+            name='scan_to_scan_filter_chain',
+            executable="scan_to_scan_filter_chain",
             parameters=[
             	PathJoinSubstitution([
-            		get_package_share_directory('scale_truck_control_ros2'),
-            		'config', 'laserfilter_angle.yaml',
+            		get_package_share_directory("laser_filters"),
+            		"examples", "laserfilter_angle.yaml",
             		])],
             output='screen',)
 
     object_node=Node(
 	    package='object_detection_ros2',
-	    namespace='FV2',	    
+	    namespace='FV1',	    
 	    executable='object_detection_ros2_node',
 	    output={
 	    	'stdout': 'screen',
@@ -109,7 +116,7 @@ def generate_launch_description():
 
     lane_detection_node=Node(
             package='lane_detection_ros2',
-            namespace='FV2',
+            namespace='FV1',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
 #            output='screen',
@@ -117,7 +124,7 @@ def generate_launch_description():
 
     control_node=Node(
             package='scale_truck_control_ros2', 
-            namespace='FV2', 
+            namespace='FV1', 
             name='scale_truck_control_node', 
             executable='control_node', 
 #            output='screen',
@@ -125,7 +132,7 @@ def generate_launch_description():
 
     lrc_node=Node(
             package='scale_truck_control_ros2', 
-            namespace='FV2', 
+            namespace='FV1', 
             name='LRC', 
             executable='lrc_node', 
             parameters = [ros_param_file],
@@ -134,17 +141,18 @@ def generate_launch_description():
     opencr_node=Node(
             package='micro_ros_agent', 
             name='opencr', 
-            namespace='FV2', 
+            namespace='FV1', 
             executable='micro_ros_agent', 
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
 
     ld = LaunchDescription()
-    
+
     ld.add_action(usb_cam_node)
+    ld.add_action(rear_cam_node)
     ld.add_action(lane_detection_node)
-    ld.add_action(rplidarA3_node)
-#    ld.add_action(rplidarS2_node)
+    ld.add_action(rplidarS2_node)
+#    ld.add_action(rplidarA3_node)
     ld.add_action(laserfilter_node)
     ld.add_action(object_node)
     ld.add_action(control_node)

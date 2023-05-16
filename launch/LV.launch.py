@@ -46,15 +46,12 @@ def generate_launch_description():
             namespace='LV',
             name='usb_cam',
             executable='usb_cam_node_exe',
-            parameters = [ # default value 
-                {"video_device": "/dev/video0"},
-                {"framerate": 30.0},
-                {"io_method": "mmap"},
-                {"frame_id": "usb_cam"},
-                {"pixel_format": "yuyv"},
-                {"image_width": 640},
-                {"image_height": 480}
-            ],
+                        parameters=[
+                PathJoinSubstitution([
+                        get_package_share_directory('scale_truck_control_ros2'),
+                        'config', 'camera_params.yaml',
+                        ])],
+            remappings=[('image_raw', 'usb_cam/image_raw')],
             output='screen')
 
 #    rplidarS2_node=Node(
