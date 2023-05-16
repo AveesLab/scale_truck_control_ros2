@@ -90,8 +90,7 @@ private:
 
     //LaneChange  
     float laneChange();
-    bool lc_right_ = false;
-    bool lc_left_ = false;
+    bool lc_flag_ = false;
     bool lv_lc_right_ = false;
     bool fv1_lc_right_ = false;
     bool fv2_lc_right_ = false;
@@ -103,6 +102,9 @@ private:
     float purePuresuit(float tx_, float ty_);
     float Lw_ = 0.0f;
     float Ld_offset_ = 0.0f;
+    float target_x_ = 0.0f;
+    float target_y_ = 0.0f;
+
 
     //image
     bool enableConsoleOutput_;
@@ -112,6 +114,7 @@ private:
 
     float AngleDegree_ = 0.0f; 
     float AngleDegree = 0.0f; 
+    float AngleDegree2 = 0.0f; 
     float ppAngle_ = 0.0f; 
     int center_select_ = 0; 
     float TargetVel_ = 0.0f; 

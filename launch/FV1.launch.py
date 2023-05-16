@@ -46,15 +46,25 @@ def generate_launch_description():
             namespace='FV1',
             name='usb_cam',
             executable='usb_cam_node_exe',
-            parameters = [ # default value 
-                {"video_device": "/dev/video0"},
-                {"framerate": 30.0},
-                {"io_method": "mmap"},
-                {"frame_id": "usb_cam"},
-                {"pixel_format": "yuyv"},
-                {"image_width": 640},
-                {"image_height": 480}
-            ],
+            parameters=[
+                PathJoinSubstitution([
+                        get_package_share_directory('scale_truck_control_ros2'),
+                        'config', 'camera_params.yaml',
+                        ])],
+            remappings=[('image_raw', 'usb_cam/image_raw')],
+            output='screen')
+
+    rear_cam_node=Node(
+            package='usb_cam',
+            namespace='FV1',
+            name='rear_cam',
+            executable='usb_cam_node_exe',
+            parameters=[
+                PathJoinSubstitution([
+                        get_package_share_directory('scale_truck_control_ros2'),
+                        'config', 'rear_cam_params.yaml',
+                        ])],
+            remappings=[('image_raw', 'rear_cam/image_raw')],
             output='screen')
 
     rplidarS2_node=Node(
@@ -109,7 +119,7 @@ def generate_launch_description():
             namespace='FV1',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
-            output='screen',
+#            output='screen',
             parameters = [lane_param_file])
 
     control_node=Node(
@@ -140,6 +150,7 @@ def generate_launch_description():
 
     ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
+    ld.add_action(rear_cam_node)
     ld.add_action(lane_detection_node)
 #    ld.add_action(rplidarA3_node)
     ld.add_action(laserfilter_node)
