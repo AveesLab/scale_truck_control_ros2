@@ -105,7 +105,7 @@ def generate_launch_description():
             namespace='FV1',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
-#            output='screen',
+            output='screen',
             parameters = [lane_param_file])
 
     control_node=Node(

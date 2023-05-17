@@ -29,14 +29,6 @@ def generate_launch_description():
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
     scan_mode = LaunchConfiguration('scan_mode', default='Stability')
 
-    video_device = LaunchConfiguration('video_device', default='/dev/video0')
-    framerate = LaunchConfiguration('framrate', default='30.0') 
-    io_method = LaunchConfiguration('io_method', default='mmap')
-    frame_id = LaunchConfiguration('frame_id', default='usb_cam')
-    pixel_format = LaunchConfiguration('pixel_format', default='yuyv')
-    image_width = LaunchConfiguration('image_width', default='640')
-    image_height = LaunchConfiguration('image_height', default='480')
-
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
             'config', 
@@ -112,7 +104,7 @@ def generate_launch_description():
             namespace='FV2',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
-#            output='screen',
+            output='screen',
             parameters = [lane_param_file])
 
     control_node=Node(
@@ -120,7 +112,7 @@ def generate_launch_description():
             namespace='FV2', 
             name='scale_truck_control_node', 
             executable='control_node', 
-#            output='screen',
+            output='screen',
             parameters = [ros_param_file])
 
     lrc_node=Node(

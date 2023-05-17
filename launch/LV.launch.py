@@ -105,7 +105,7 @@ def generate_launch_description():
             namespace='LV',
             name='LaneDetector', # .yaml에 명시.
             executable='lane_detect_node',
-#            output='screen',
+            output='screen',
             parameters = [lane_param_file])
 
     control_node=Node(
@@ -134,10 +134,10 @@ def generate_launch_description():
 
     ld = LaunchDescription()
     
-#    ld.add_action(rplidarS2_node)
     ld.add_action(usb_cam_node)
     ld.add_action(lane_detection_node)
     ld.add_action(rplidarA3_node)
+#    ld.add_action(rplidarS2_node)
     ld.add_action(laserfilter_node)
     ld.add_action(object_node)
     ld.add_action(control_node)

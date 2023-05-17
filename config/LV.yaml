@@ -1,7 +1,9 @@
 /**/LaneDetector:
   ros__parameters:
+    subscribers/image_to_lane/topic: usb_cam/image_raw
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
+    rear_image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     params/angle_degree: 0.0
@@ -44,6 +46,9 @@
     crop/y: 0
     crop/width: 440
     crop/height: 380
+
+    threshold/box_size: 51 # 51
+    threshold/box_offset: 50 # 50
 
     params/K: 0.15
     params/a/a: 0.
