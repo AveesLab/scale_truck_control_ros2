@@ -28,7 +28,6 @@ def generate_launch_description():
 #    inverted = LaunchConfiguration('inverted', default='false')
 #    angle_compensate = LaunchConfiguration('angle_compensate', default='true')
 #    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
-#
 
     ros_param_file = os.path.join(
             get_package_share_directory('scale_truck_control_ros2'), 
@@ -114,7 +113,7 @@ def generate_launch_description():
             namespace='FV1', 
             name='scale_truck_control_node', 
             executable='control_node', 
-#            output='screen',
+            output='screen',
             parameters = [ros_param_file])
 
     lrc_node=Node(
