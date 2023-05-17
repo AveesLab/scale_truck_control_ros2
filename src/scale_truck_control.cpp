@@ -448,14 +448,6 @@ void ScaleTruckController::displayConsole() {
   printf("Send Vel        : %3.3f m/s\n", ResultVel_);
   printf("Tar/Cur Vel     : %3.3f / %3.3f m/s\n", TargetVel_, CurVel_);
   printf("Tar/Cur Dist    : %3.3f / %3.3f m\n", TargetDist_, distance_);
-//  printf("\nK1/K2           : %3.3f / %3.3f", laneDetector_.K1_, laneDetector_.K2_);
-//  if(ObjCircles_ > 0) {
-//    printf("\nCirs            : %d", ObjCircles_);
-//    printf("\nDistAng         : %2.3f degree", distAngle_);
-//  }
-//  if(ObjSegments_ > 0) {
-//    printf("\nSegs            : %d", ObjSegments_);
-//  }
   printf("Cycle Time      : %3.3f ms\n", CycleTime_);
 }
 
