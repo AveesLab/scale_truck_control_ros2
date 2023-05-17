@@ -31,15 +31,18 @@
 
     ROI/front_cam/width: 640
     ROI/front_cam/height: 480
-    ROI/front_cam/top_gap: 0.400
-    ROI/front_cam/bot_gap: 0.185
+    ROI/front_cam/top_gap: 0.32
+    ROI/front_cam/bot_gap: 0.10
     ROI/front_cam/top_height: 0.99
     ROI/front_cam/bot_height: 0.47
-    ROI/front_cam/extra_f: 35.00
-    ROI/front_cam/extra_b: 25.00
+    ROI/front_cam/extra_f: 30.00
+    ROI/front_cam/extra_b: 30.00
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
-    
+
+    threshold/box_size: 51
+    threshold/box_offset: -50
+
     crop/x: 100
     crop/y: 0
     crop/width: 440
