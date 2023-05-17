@@ -13,11 +13,7 @@
     publishers/xavier_to_cmd/topic: xav2cmd_msg
     publishers/xavier_to_cmd/queue_size: 1
     
-<<<<<<< HEAD
     params/index: 0 
-=======
-    params/index: 1
->>>>>>> 6121dada94b14a266d8a3ce3c87d4a1f56e83868
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
@@ -48,11 +44,7 @@
     LrcPub/lv_to_fv/topic: /lv2fv_msg
     LrcPub/lv_to_fv/queue_size: 1
 
-<<<<<<< HEAD
     LrcParams/lrc_index: 10
-=======
-    LrcParams/lrc_index: 11
->>>>>>> 6121dada94b14a266d8a3ce3c87d4a1f56e83868
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 
