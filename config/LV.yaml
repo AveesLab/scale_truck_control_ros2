@@ -2,9 +2,14 @@
   ros__parameters:
     subscribers/image_to_lane/topic: usb_cam/image_raw
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     rear_image_view/enable_opencv: false
     image_view/wait_key_delay: 1
+    
+    image_view/enable_adthreshold: true
+    threshold/box_size: 51
+    threshold/box_offset: 50
+    ROI/threshold: 128
 
     params/angle_degree: 0.0
     params/Kp_d: 2.0
@@ -27,7 +32,6 @@
     Calibration/f_dist_coef/e: -0.032260115806245951
 
     ROI/dynamic_roi: true
-    ROI/threshold: 128
     ROI/canny/thresh1: 100
     ROI/canny/thresh2: 200
 
@@ -42,16 +46,10 @@
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
-    threshold/box_size: 51
-    threshold/box_offset: -50
-
     crop/x: 100
     crop/y: 0
     crop/width: 440
     crop/height: 380
-
-    threshold/box_size: 51 # 51
-    threshold/box_offset: 50 # 50
 
     params/K: 0.15
     params/a/a: 0.

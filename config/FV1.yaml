@@ -6,6 +6,11 @@
     rear_image_view/enable_opencv: false 
     image_view/wait_key_delay: 1
 
+    image_view/enable_adthreshold: true
+    threshold/box_size: 51
+    threshold/box_offset: 50
+    ROI/threshold: 128
+
     params/angle_degree: 0.0
     params/Kp_d: 2.0
     params/Ki_d: 0.2
@@ -27,7 +32,6 @@
     Calibration/f_dist_coef/e: -0.037408338000060472
 
     ROI/dynamic_roi: true
-    ROI/threshold: 180
     ROI/canny/thresh1: 100
     ROI/canny/thresh2: 200
 
@@ -47,9 +51,6 @@
     crop/y: 0
     crop/width: 440
     crop/height: 380
-
-    threshold/box_size: 51 # 51
-    threshold/box_offset: 50 # 50
 
     params/K: 0.15
     params/a/a: 0.
