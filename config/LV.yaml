@@ -2,7 +2,7 @@
   ros__parameters:
     subscribers/image_to_lane/topic: usb_cam/image_raw
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     rear_image_view/enable_opencv: false
     image_view/wait_key_delay: 1
     
@@ -37,12 +37,12 @@
 
     ROI/front_cam/width: 640
     ROI/front_cam/height: 480
-    ROI/front_cam/top_gap: 0.32
-    ROI/front_cam/bot_gap: 0.10
+    ROI/front_cam/top_gap: 0.416 # 0.28
+    ROI/front_cam/bot_gap: 0.185 # 0.0
     ROI/front_cam/top_height: 0.99
     ROI/front_cam/bot_height: 0.47
-    ROI/front_cam/extra_f: 30.00
-    ROI/front_cam/extra_b: 30.00
+    ROI/front_cam/extra_f: 0.00 # 0
+    ROI/front_cam/extra_b: 0.00 # 0
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
