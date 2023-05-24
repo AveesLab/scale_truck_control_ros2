@@ -432,15 +432,25 @@ void ScaleTruckController::displayConsole() {
   fflush(stdout);
   printf("\033[2J");
   printf("\033[1;1H");
-  printf("Angle           : %2.3f degree\n", AngleDegree);
-  printf("lcAngle         : %2.3f degree\n", AngleDegree2);
-  printf("center_select   : %d\n", center_select_);
-  printf("E2/E1 lc_flag   : %d / %d\n", lc_left_flag_, lc_right_flag_);
-  printf("Refer Vel       : %3.3f m/s\n", RefVel_);
-  printf("Send Vel        : %3.3f m/s\n", ResultVel_);
-  printf("Tar/Cur Vel     : %3.3f / %3.3f m/s\n", TargetVel_, CurVel_);
-  printf("Tar/Cur Dist    : %3.3f / %3.3f m\n", TargetDist_, distance_);
-  printf("Cycle Time      : %3.3f ms\n", CycleTime_);
+  printf("Index           : %d", index_);
+  printf("\033[2;1H");
+  printf("Angle           : %2.3f degree", AngleDegree);
+  printf("\033[3;1H");
+  printf("lcAngle         : %2.3f degree", AngleDegree2);
+  printf("\033[4;1H");
+  printf("center_select   : %d", center_select_);
+  printf("\033[5;1H");
+  printf("E2/E1 lc_flag   : %d / %d", lc_left_flag_, lc_right_flag_);
+  printf("\033[6;1H");
+  printf("Refer Vel       : %3.3f m/s", RefVel_);
+  printf("\033[7;1H");
+  printf("Send Vel        : %3.3f m/s", ResultVel_);
+  printf("\033[8;1H");
+  printf("Tar/Cur Vel     : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
+  printf("\033[9;1H");
+  printf("Tar/Cur Dist    : %3.3f / %3.3f m", TargetDist_, distance_);
+  printf("\033[10;1H");
+  printf("Cycle Time     : %3.3f ms\n", CycleTime_);
 }
 
 void ScaleTruckController::recordData(struct timeval startTime){

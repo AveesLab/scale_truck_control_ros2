@@ -209,14 +209,34 @@ void Controller::requestData(CmdData cmd_data)
     CmdData send_data = cmd_data;
     struct timeval startTime, endTime;
 
-    if (send_data.tar_index == 0){
+    if (send_data.tar_index == 0){ // LV
         lv_mutex_.lock();
-        qDebug() << send_data.tar_vel; /* check */
+        qDebug() << send_data.tar_vel; //printf 
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
         req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
         lv_mutex_.unlock();
+        //recordData(&startTime_);
+    }
+    else if (send_data.tar_index == 1){ // FV1
+        fv1_mutex_.lock();
+        qDebug() << send_data.tar_vel; //printf
+        gettimeofday(&startTime, NULL);
+        XavPublisher_->publish(send_data);
+        gettimeofday(&endTime, NULL);
+        req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
+        fv1_mutex_.unlock();
+        //recordData(&startTime_);
+    }
+    else if (send_data.tar_index == 2){ // FV2
+        fv2_mutex_.lock();
+        qDebug() << "fv2_lc_right: " << send_data.fv2_lc_right;
+        gettimeofday(&startTime, NULL);
+        XavPublisher_->publish(send_data);
+        gettimeofday(&endTime, NULL);
+        req_time_ = ((endTime.tv_sec - startTime.tv_sec)* 1000.0) + ((endTime.tv_usec - startTime.tv_usec)/1000.0);
+        fv2_mutex_.unlock();
         //recordData(&startTime_);
     }
 }
