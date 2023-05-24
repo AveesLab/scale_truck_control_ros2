@@ -69,12 +69,12 @@ public:
     int MaxVel;
     int MinDist;
     int MaxDist;
-    bool LV_lc_right;
-    bool LV_lc_left;
-    bool FV1_lc_right;
-    bool FV1_lc_left;
-    bool FV2_lc_right;
-    bool FV2_lc_left;
+    bool LV_lc_right = false;
+    bool LV_lc_left = false;
+    bool FV1_lc_right = false;
+    bool FV1_lc_left = false;
+    bool FV2_lc_right = false;
+    bool FV2_lc_left = false;
 
 private slots:
     void requestData(CmdData cmd_data);

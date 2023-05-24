@@ -69,6 +69,8 @@ bool ScaleTruckController::readParameters() {
   /* View Option */
   /***************/
   this->get_parameter_or("image_view/enable_console_output", enableConsoleOutput_, true);
+  this->get_parameter_or("image_view/lane_change_right", lc_right_flag_, false); // cmd
+  this->get_parameter_or("image_view/lane_change_left", lc_left_flag_, false); // cmd
 
   /*****************/
   /* Pure Puresuit */
@@ -92,8 +94,6 @@ void ScaleTruckController::init()
   int LrcSubQueueSize;
   std::string CmdSubTopicName;
   int CmdSubQueueSize;
-  std::string TruckSubTopicName;
-  int TruckSubQueueSize;
 
   std::string LrcPubTopicName;
   int LrcPubQueueSize;
@@ -101,8 +101,6 @@ void ScaleTruckController::init()
   int CmdPubQueueSize;
   std::string LanePubTopicName;
   int LanePubQueueSize;
-  std::string TruckPubTopicName;
-  int TruckPubQueueSize;
 
   /******************************/
   /* Ros Topic Subscribe Option */
@@ -115,8 +113,6 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
   this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
   this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
-  this->get_parameter_or("subscribers/truck_to_truck/topic", TruckSubTopicName, std::string("/truck2truck_msg"));
-  this->get_parameter_or("subscribers/truck_to_truck/queue_size", TruckSubQueueSize, 1);
 
   /****************************/
   /* Ros Topic Publish Option */
@@ -127,8 +123,6 @@ void ScaleTruckController::init()
   this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_lane/topic", LanePubTopicName, std::string("xav2lane_msg"));
   this->get_parameter_or("publishers/xavier_to_lane/queue_size", LanePubQueueSize, 1);
-  this->get_parameter_or("publishers/each_truck/topic", TruckPubTopicName, std::string("/truck2truck_msg"));
-  this->get_parameter_or("publishers/each_truck/queue_size", TruckPubQueueSize, 1);
 
   /************************/
   /* Ros Topic Subscriber */
@@ -141,20 +135,12 @@ void ScaleTruckController::init()
 
   LaneSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
 
-  if(index_ == 0 || index_ == 1){
-    TruckSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(TruckSubTopicName, TruckSubQueueSize, std::bind(&ScaleTruckController::TruckSubCallback, this, std::placeholders::_1));
-  }
-
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
   LrcPublisher_ = this->create_publisher<ros2_msg::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
   CmdPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(CmdPubTopicName, CmdPubQueueSize);  
-  LanePublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(LanePubTopicName, LanePubQueueSize);  
-  if(index_ == 1 || index_ == 2){
-    TruckPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(TruckPubTopicName, TruckPubQueueSize);  
-  }
-
+  LanePublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(LanePubTopicName,LanePubQueueSize);  
   /**********************/
   /* Safety Start Setup */
   /**********************/
@@ -162,6 +148,7 @@ void ScaleTruckController::init()
   distAngle_ = 0;
 
   lane_coef_.coef.resize(3);
+  prev_lane_coef_.coef.resize(3);
 
   /************/
   /* CMD Data */
@@ -208,9 +195,8 @@ void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
    }
    {
      std::scoped_lock lock(rep_mutex_);
-//     cmd->lv_lc_right = lv_lc_right_;
-//     cmd->fv1_lc_right = fv1_lc_right_;
-//     cmd->fv2_lc_right = fv2_lc_right_;
+     cmd->lc_right_flag = lc_right_flag_;
+     cmd->lc_left_flag = lc_left_flag_;
    }
 
    CmdPublisher_->publish(*cmd);
@@ -219,69 +205,74 @@ void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
  }
 }
 
+void ScaleTruckController::checkState() {
+  int i = 480; //height
+  static int cnt = 100;
+  double lane_diff = 999.0; 
+  
+  ros2_msg::msg::CmdData msg;
+  {
+    std::scoped_lock lock(lane_mutex_);
+    if(sizeof(prev_lane_coef_.coef) != 0 && sizeof(lane_coef_.coef) != 0) 
+    {
+      double prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
+      double cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
+      lane_diff = abs(cur_center_base - prev_center_base); 
+    }
+
+    if(lane_diff <= 30 && lane_diff >= 0) {
+      cnt -= 1;
+      if(cnt <= 0) {
+	cnt = 100;
+
+        /* right lane change */
+	if(lc_right_flag_ == true) {
+          if(fv2_lc_right_ == true) {
+            fv2_lc_right_ = false;
+            lc_right_flag_ = false;
+          }
+          else if (fv1_lc_right_ == true) {
+            fv1_lc_right_ = false;
+            lc_right_flag_ = false;
+          }
+          else {
+            lv_lc_right_ = false;
+            lc_right_flag_ = false;
+ 	  }
+	}
+        /* left lane change */
+	else if(lc_left_flag_ == true) {
+          if(fv2_lc_left_ == true) {
+            fv2_lc_left_ = false;
+            lc_left_flag_ = false;
+          }
+          else if (fv1_lc_left_ == true) {
+            fv1_lc_left_ = false;
+            lc_left_flag_ = false;
+          }
+          else {
+            lv_lc_left_ = false;
+            lc_left_flag_ = false;
+ 	  }
+	}
+      }
+    }
+  }  
+
+  RCLCPP_INFO(this->get_logger(), "lane_diff, state cnt: %.3f, %d\n", lane_diff, cnt);
+}
+
 float ScaleTruckController::laneChange()
 {
   float tx_ = 0.0f, ty_ = 0.0f;
-  int i = 480, lane_diff = 0; //height
-  static int cnt = 10;
-  ros2_msg::msg::CmdData msg;
-  ros2_msg::msg::Xav2lrc lv_data;
-
   {
     std::scoped_lock lock(lane_mutex_);
-    tx_ = target_x_;
-    ty_ = target_y_;
-
-    if(fv2_lc_right_){
-      ppAngle_ = purePuresuit(tx_, ty_);
-      lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
-
-      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
-	cnt -= 1;
-	if(cnt == 0) {
-          fv2_lc_right_ = false;
-	  lc_flag_ = false;
-          msg.fv1_lc_right = true;  
-	  TruckPublisher_->publish(msg);
-	}
-      }
-      else
-        cnt = 10;
+    if (target_x_ != 0 && target_y_ != 0) {
+      tx_ = target_x_;
+      ty_ = target_y_;
     }
-    else if(fv1_lc_right_){
-      ppAngle_ = purePuresuit(tx_, ty_);
-      lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
-
-      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
-	cnt -= 1;
-	if(cnt == 0) {
-          fv1_lc_right_ = false;
-	  lc_flag_ = false;
-          msg.lv_lc_right = true;  
-	  TruckPublisher_->publish(msg);
-	}
-      }
-      else
-        cnt = 10;
-    }
-    else if(lv_lc_right_){
-      ppAngle_ = purePuresuit(tx_, ty_);
-      lane_diff = ((prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c) - ((lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c);
-
-      if(abs(lane_diff) < 30 && abs(lane_diff) > 0) {
-	cnt -= 1;
-	if(cnt == 0) {
-          lv_lc_right_ = false;
-	  lc_flag_ = false;
-	}
-      }
-      else
-        cnt = 10;
-    }
-    else 
-      printf("Not find what vehicle go to lane change"); 
+    ppAngle_ = purePuresuit(tx_, ty_);
   }
-
   return ppAngle_;
 }
 
@@ -340,41 +331,39 @@ void ScaleTruckController::objectdetectInThread()
     }
     // xav -> lane (dist, vel)
     Lane_.cur_vel = CurVel_;
+    Lane_.lc_right_flag = lc_right_flag_;
+    Lane_.lc_left_flag = lc_left_flag_;
     LanePublisher_->publish(Lane_);
   }
-  if(!lc_flag_){
-    if(index_ == 0){  //LV
-      std::scoped_lock lock(rep_mutex_, dist_mutex_);
-      if(distance_ <= LVstopDist_) {
-      // Emergency Brake
-        ResultVel_ = 0.0f;
-      }
-      else if (distance_ <= SafetyDist_){
-        float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
-        if (TargetVel_ < TmpVel_){
-          ResultVel_ = TargetVel_;
-        }
-        else{
-          ResultVel_ = TmpVel_;
-        }
+
+  if(index_ == 0){  //LV
+    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+    if(distance_ <= LVstopDist_) {
+    // Emergency Brake
+      ResultVel_ = 0.0f;
+    }
+    else if (distance_ <= SafetyDist_){
+      float TmpVel_ = (ResultVel_-SafetyVel_)*((distance_-LVstopDist_)/(SafetyDist_-LVstopDist_))+SafetyVel_;
+      if (TargetVel_ < TmpVel_){
+        ResultVel_ = TargetVel_;
       }
       else{
-        ResultVel_ = TargetVel_;
+        ResultVel_ = TmpVel_;
       }
     }
-    else{  //FVs
-      std::scoped_lock lock(rep_mutex_, dist_mutex_);
-      if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
-      // Emergency Brake
-        ResultVel_ = 0.0f;
-      }
-      else {
-        ResultVel_ = TargetVel_;
-      }
+    else{
+      ResultVel_ = TargetVel_;
     }
-  } 
-  else {
-    ResultVel_ = TargetVel_;
+  }
+  else{  //FVs
+    std::scoped_lock lock(rep_mutex_, dist_mutex_);
+    if ((distance_ <= FVstopDist_) || (TargetVel_ <= 0.1f)){
+    // Emergency Brake
+      ResultVel_ = 0.0f;
+    }
+    else {
+      ResultVel_ = TargetVel_;
+    }
   }
 }
 
@@ -394,9 +383,10 @@ void ScaleTruckController::spin()
     objectdetect_thread.join();
     {
       std::scoped_lock lock(rep_mutex_);
-      if(lc_flag_) { // lane change
-        AngleDegree_ = laneChange();
-//        AngleDegree_ = AngleDegree2;
+      if((AngleDegree2 != 0) && (lc_right_flag_ || lc_left_flag_)) { 
+//        AngleDegree_ = laneChange();
+        AngleDegree_ = AngleDegree2;
+	checkState(); // lane change complete ?
       }
       else{ 
         AngleDegree_ = AngleDegree;
@@ -405,7 +395,7 @@ void ScaleTruckController::spin()
     msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
     {
       std::scoped_lock lock(dist_mutex_);
-      msg.steer_angle = AngleDegree_; // get from objectThread
+      msg.steer_angle = AngleDegree_; 
       msg.cur_dist = distance_;       
     }
     {
@@ -439,11 +429,13 @@ void ScaleTruckController::spin()
 }
 
 void ScaleTruckController::displayConsole() {
+  fflush(stdout);
   printf("\033[2J");
   printf("\033[1;1H");
-  printf("Angle           : %2.3f degree\n", AngleDegree_);
-  printf("ppAngle         : %2.3f degree\n", ppAngle_);
+  printf("Angle           : %2.3f degree\n", AngleDegree);
+  printf("lcAngle         : %2.3f degree\n", AngleDegree2);
   printf("center_select   : %d\n", center_select_);
+  printf("E2/E1 lc_flag   : %d / %d\n", lc_left_flag_, lc_right_flag_);
   printf("Refer Vel       : %3.3f m/s\n", RefVel_);
   printf("Send Vel        : %3.3f m/s\n", ResultVel_);
   printf("Tar/Cur Vel     : %3.3f / %3.3f m/s\n", TargetVel_, CurVel_);
@@ -488,27 +480,6 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-void ScaleTruckController::TruckSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
-{
-  {
-    std::scoped_lock lock(rep_mutex_);
-    if(index_ == 0) {
-      lv_lc_right_ = msg->lv_lc_right;
-      if(lv_lc_right_){
-        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
-        lc_flag_ = true;
-      }
-    }    
-    else if(index_ == 1) {
-      fv1_lc_right_ = msg->fv1_lc_right;
-      if(fv1_lc_right_){
-        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
-        lc_flag_ = true;
-      }
-    }  
-  }
-}
-
 void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
 {
   {
@@ -542,15 +513,62 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
 {
   {
     std::scoped_lock lock(rep_mutex_);
-    if(msg->tar_index == 0){  // LV 
+    /******/
+    /* LV */
+    /******/
+    if(msg->tar_index == 0){   
       TargetVel_ = msg->tar_vel;
       TargetDist_ = msg->tar_dist;
-    }
-    else if(msg->tar_index == 2){ // FV2
-      fv2_lc_right_ = msg->fv2_lc_right;
-      if(fv2_lc_right_){
+
+      lv_lc_right_ = msg->lv_lc_right; 
+      if(lv_lc_right_){
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
-        lc_flag_ = true;
+        lc_right_flag_ = true;
+      } else {
+        lc_right_flag_ = false;
+      }
+      
+      lv_lc_left_ = msg->lv_lc_left;
+      if(lv_lc_left_) {
+        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
+        lc_left_flag_ = true;
+      } else {
+        lc_left_flag_ = false;
+      }
+    }
+    /*******/
+    /* FV1 */
+    /*******/
+    else if(msg->tar_index == 1){   
+      fv1_lc_right_ = msg->fv1_lc_right; 
+      if(fv1_lc_right_){
+        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
+        lc_right_flag_ = true;
+      } else {
+        lc_right_flag_ = false;
+      }
+      
+      fv1_lc_left_ = msg->fv1_lc_left;
+      if(fv1_lc_left_) {
+        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
+        lc_left_flag_ = true;
+      } else {
+        lc_left_flag_ = false;
+      }
+    }
+    /*******/
+    /* FV2 */
+    /*******/
+    else if(msg->tar_index == 2){ 
+      fv2_lc_right_ = msg->fv2_lc_right;
+      if(fv2_lc_right_) {
+        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
+        lc_right_flag_ = true;
+      }
+      fv2_lc_left_ = msg->fv2_lc_left;
+      if(fv2_lc_left_) {
+        prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
+        lc_left_flag_ = true;
       }
     }
   }

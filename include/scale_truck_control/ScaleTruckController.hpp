@@ -52,14 +52,12 @@ private:
     rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
     rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr CmdPublisher_;
     rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr LanePublisher_;
-    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr TruckPublisher_;
 
     //Subscriber 
     rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LaneSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr TruckSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
@@ -67,7 +65,6 @@ private:
     void CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
     void LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
-    void TruckSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
@@ -90,13 +87,16 @@ private:
 
     //LaneChange  
     float laneChange();
-    bool lc_flag_ = false;
+    void checkState();
+    bool lc_right_flag_ = false;
     bool lv_lc_right_ = false;
     bool fv1_lc_right_ = false;
     bool fv2_lc_right_ = false;
-    bool lv_lc_complete_ = false;
-    bool fv1_lc_complete_ = false;
-    bool fv2_lc_complete_ = false;
+
+    bool lc_left_flag_ = false;
+    bool lv_lc_left_ = false;
+    bool fv1_lc_left_ = false;
+    bool fv2_lc_left_ = false;
     
     //Pure Puresuit
     float purePuresuit(float tx_, float ty_);

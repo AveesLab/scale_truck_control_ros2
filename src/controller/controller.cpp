@@ -153,33 +153,16 @@ void Controller::XavSubCallback(const CmdData &msg)
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();
      lv_data_ = msg;
-     if(LV_lc_right == true) {
-       if(msg.lv_lc_right == false) {
-         ui->LV_Right_LC->toggle();
-       }
-     }
      lv_mutex_.unlock();
   }
   else if(msg.src_index == 1){  //FV1 
      fv1_mutex_.lock();
      fv1_data_ = msg;
-     if(FV1_lc_right == true) {
-       if(msg.fv1_lc_right == false) {
-         ui->FV1_Right_LC->toggle();
-         ui->LV_Right_LC->toggle(); // LV lc start
-       } 
-     }
      fv1_mutex_.unlock();
   }
   else if(msg.src_index == 2){  //FV2 
      fv2_mutex_.lock();
      fv2_data_ = msg;
-     if(FV2_lc_right == true) {
-       if(msg.fv2_lc_right == false) {
-         ui->FV2_Right_LC->toggle();
-         ui->FV1_Right_LC->toggle(); // FV1 lc start
-       } 
-     }
      fv2_mutex_.unlock();
   }
 }
@@ -263,6 +246,17 @@ void Controller::updateData(CmdData cmd_data)
           cv::Mat frame;
           display_Map(tmp).copyTo(frame);
           ui->LV_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+
+         if(LV_lc_right == true) {
+           if(tmp.lc_right_flag == false) {
+             ui->LV_Right_LC->toggle(); 
+           } 
+         }
+         if(LV_lc_left == true) {
+           if(tmp.lc_left_flag == false) {
+             ui->LV_Left_LC->toggle(); 
+           } 
+         }
       }
       else if (tmp.src_index == 1)
       {
@@ -279,6 +273,19 @@ void Controller::updateData(CmdData cmd_data)
           cv::Mat frame;
           display_Map(tmp).copyTo(frame);
           ui->FV1_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+
+         if(FV1_lc_right == true) {
+           if(tmp.lc_right_flag == false) {
+             ui->FV1_Right_LC->toggle(); 
+             ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
+           } 
+         }
+         if(FV1_lc_left == true) {
+           if(tmp.lc_left_flag == false) {
+             ui->FV1_Left_LC->toggle(); 
+             ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
+           } 
+         }
       }
       else if (tmp.src_index == 2)
       {
@@ -295,6 +302,19 @@ void Controller::updateData(CmdData cmd_data)
           cv::Mat frame;
           display_Map(tmp).copyTo(frame);
           ui->FV2_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
+
+         if(FV2_lc_right == true) {
+           if(tmp.lc_right_flag == false) {
+             ui->FV2_Right_LC->toggle(); 
+             ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 
+           } 
+         }
+         if(FV2_lc_left == true) {
+           if(tmp.lc_left_flag == false) {
+             ui->FV2_Left_LC->toggle(); 
+             ui->FV1_Left_LC->toggle(); // FV2 -> FV1 flag on
+           } 
+         }
       }
     }
 }
@@ -558,24 +578,110 @@ void Controller::on_Send_clicked()
 
 void Controller::on_LV_Right_LC_toggled(bool checked)
 {
-    printf("LV_right!\n");
+    printf("right lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
+
+    int value_vel = ui->LVVelSlider->value();
+    int value_dist = ui->LVDistSlider->value();
     LV_lc_right = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 0;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.lv_lc_right = LV_lc_right;
+
+    requestData(cmd_data);
 }
 
 void Controller::on_LV_Left_LC_toggled(bool checked)
 {
-    printf("LV_left!\n");
+    printf("left lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
+
+    int value_vel = ui->LVVelSlider->value();
+    int value_dist = ui->LVDistSlider->value();
+    LV_lc_left = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 0;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.lv_lc_left = LV_lc_left;
+
+    requestData(cmd_data);
 }
 
 void Controller::on_FV1_Right_LC_toggled(bool checked)
 {
-    printf("FV1_right!\n");
+    printf("right lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
+
+    int value_vel = ui->FV1VelSlider->value();
+    int value_dist = ui->FV1DistSlider->value();
     FV1_lc_right = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 1;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.fv1_lc_right = FV1_lc_right;
+
+    requestData(cmd_data);
 }
 
 void Controller::on_FV1_Left_LC_toggled(bool checked)
 {
-    printf("FV1_left!\n");
+    printf("left lane change start!\n");
+    CmdData cmd_data;
+    float tar_vel, tar_dist;
+
+    int value_vel = ui->FV1VelSlider->value();
+    int value_dist = ui->FV1DistSlider->value();
+    FV1_lc_left = checked;
+
+    if(value_vel >= 10) {
+      tar_vel = value_vel/100.0f;
+    }
+    else {
+      tar_vel = 0;
+    }
+    tar_dist = value_dist/100.0f;
+
+    cmd_data.src_index = 20;
+    cmd_data.tar_index = 1;
+    cmd_data.tar_vel = tar_vel;
+    cmd_data.tar_dist = tar_dist;
+    cmd_data.fv1_lc_left = FV1_lc_left;
+
+    requestData(cmd_data);
 }
 
 void Controller::on_FV2_Left_LC_toggled(bool checked)
