@@ -526,7 +526,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
     /******/
     /* LV */
     /******/
-    if(msg->tar_index == 0){   
+    if(index_ == 0){   
       TargetVel_ = msg->tar_vel;
       TargetDist_ = msg->tar_dist;
 
@@ -549,7 +549,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
     /*******/
     /* FV1 */
     /*******/
-    else if(msg->tar_index == 1){   
+    else if(index_ == 1){   
       fv1_lc_right_ = msg->fv1_lc_right; 
       if(fv1_lc_right_){
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
@@ -569,7 +569,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
     /*******/
     /* FV2 */
     /*******/
-    else if(msg->tar_index == 2){ 
+    else if(index_ == 2){ 
       fv2_lc_right_ = msg->fv2_lc_right;
       if(fv2_lc_right_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
