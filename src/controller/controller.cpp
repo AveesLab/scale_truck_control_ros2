@@ -303,7 +303,7 @@ void Controller::updateData(CmdData cmd_data)
          if(FV1_lc_left == true) {
            if(tmp.lc_left_flag == false) {
              ui->FV1_Left_LC->toggle(); 
-             ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
+             ui->LV_Left_LC->toggle(); // FV1 -> LV flag on 
            } 
          }
       }
