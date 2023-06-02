@@ -206,24 +206,27 @@ void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
 }
 
 void ScaleTruckController::checkState() {
+    struct timeval start_time, end_time;
+    gettimeofday(&start_time, NULL);
   int i = 480; //height
-  static int cnt = 100;
+  static int cnt = 500;
   double lane_diff = 999.0; 
+  double prev_center_base = 0, cur_center_base = 0;
   
   ros2_msg::msg::CmdData msg;
   {
     std::scoped_lock lock(lane_mutex_);
     if(sizeof(prev_lane_coef_.coef) != 0 && sizeof(lane_coef_.coef) != 0) 
     {
-      double prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
-      double cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
+      prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
+      cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
       lane_diff = abs(cur_center_base - prev_center_base); 
     }
 
-    if(lane_diff <= 30 && lane_diff >= 0) {
+    if(lane_diff <= 10 && lane_diff >= 0) {
       cnt -= 1;
       if(cnt <= 0) {
-	cnt = 100;
+	cnt = 500;
 
         /* right lane change */
 	if(lc_right_flag_ == true) {
@@ -324,7 +327,10 @@ void ScaleTruckController::objectdetectInThread()
     std::scoped_lock lock(rep_mutex_, lane_mutex_, vel_mutex_);
     if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
     {
-      Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+20;
+      Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
+      if(lc_right_flag_ == true || lc_left_flag_ == true) {
+        Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+60;
+      }
     }
     else {
       Lane_.cur_dist = 0;

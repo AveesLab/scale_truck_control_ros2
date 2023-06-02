@@ -2,7 +2,7 @@
   ros__parameters:
     subscribers/image_to_lane/topic: usb_cam/image_raw
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     rear_image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
