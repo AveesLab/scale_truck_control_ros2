@@ -4,6 +4,6 @@
       name: angle_filter
       type: laser_filters/LaserScanAngularBoundsFilterInPlace
       params:
-        lower_angle: -2.62
-        upper_angle: 2.62
+        lower_angle: -2.3
+        upper_angle: 2.3
 

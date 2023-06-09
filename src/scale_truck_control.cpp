@@ -209,7 +209,7 @@ void ScaleTruckController::checkState() {
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
   int i = 480; //height
-  static int cnt = 500;
+  static int cnt = 300;
   double lane_diff = 999.0; 
   double prev_center_base = 0, cur_center_base = 0;
   
@@ -226,7 +226,7 @@ void ScaleTruckController::checkState() {
     if(lane_diff <= 10 && lane_diff >= 0) {
       cnt -= 1;
       if(cnt <= 0) {
-	cnt = 500;
+	cnt = 300;
 
         /* right lane change */
 	if(lc_right_flag_ == true) {
@@ -307,7 +307,8 @@ void ScaleTruckController::objectdetectInThread()
   {
     if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
     {
-        dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+        //dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+        dist = sqrt(pow(Obstacle_.data[i], 2));
         if(dist_tmp >= dist)
         {
            dist_tmp = dist;
@@ -329,7 +330,7 @@ void ScaleTruckController::objectdetectInThread()
     {
       Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
       if(lc_right_flag_ == true || lc_left_flag_ == true) {
-        Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+60;
+        Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+80;
       }
     }
     else {
