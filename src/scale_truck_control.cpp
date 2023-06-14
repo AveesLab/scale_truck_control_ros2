@@ -209,7 +209,6 @@ void ScaleTruckController::checkState() {
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
   int i = 480; //height
-  static int cnt = 300;
   double lane_diff = 999.0; 
   double prev_center_base = 0, cur_center_base = 0;
   
@@ -224,9 +223,9 @@ void ScaleTruckController::checkState() {
     }
 
     if(lane_diff <= 10 && lane_diff >= 0) {
-      cnt -= 1;
-      if(cnt <= 0) {
-	cnt = 300;
+      lane_diff_cnt_ -= 1;
+      if(lane_diff_cnt_ <= 0) {
+	lane_diff_cnt_ = 150;
 
         /* right lane change */
 	if(lc_right_flag_ == true) {
@@ -262,7 +261,6 @@ void ScaleTruckController::checkState() {
     }
   }  
 
-  RCLCPP_INFO(this->get_logger(), "lane_diff, state cnt: %.3f, %d\n", lane_diff, cnt);
 }
 
 float ScaleTruckController::laneChange()
@@ -329,9 +327,6 @@ void ScaleTruckController::objectdetectInThread()
     if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
     {
       Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
-      if(lc_right_flag_ == true || lc_left_flag_ == true) {
-        Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+80;
-      }
     }
     else {
       Lane_.cur_dist = 0;
@@ -457,7 +452,9 @@ void ScaleTruckController::displayConsole() {
   printf("\033[9;1H");
   printf("Tar/Cur Dist    : %3.3f / %3.3f m", TargetDist_, distance_);
   printf("\033[10;1H");
-  printf("Cycle Time     : %3.3f ms\n", CycleTime_);
+  printf("Cycle Time      : %3.3f ms", CycleTime_);
+  printf("\033[11;1H");
+  printf("lane diff cnt   : %d\n", lane_diff_cnt_);
 }
 
 void ScaleTruckController::recordData(struct timeval startTime){

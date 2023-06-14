@@ -89,14 +89,14 @@ private:
     float laneChange();
     void checkState();
     bool lc_right_flag_ = false;
-    bool lv_lc_right_ = false;
-    bool fv1_lc_right_ = false;
-    bool fv2_lc_right_ = false;
-
     bool lc_left_flag_ = false;
+    bool lv_lc_right_ = false;
     bool lv_lc_left_ = false;
+    bool fv1_lc_right_ = false;
     bool fv1_lc_left_ = false;
+    bool fv2_lc_right_ = false;
     bool fv2_lc_left_ = false;
+    int lane_diff_cnt_ = 150;
     
     //Pure Puresuit
     float purePuresuit(float tx_, float ty_);
