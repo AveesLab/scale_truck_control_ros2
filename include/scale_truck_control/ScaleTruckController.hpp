@@ -84,6 +84,7 @@ private:
     bool controlDone_ = false;
     bool droi_ready_ = false;
     std::string log_path_;
+    struct timeval init_;
 
     //LaneChange  
     float laneChange();

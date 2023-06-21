@@ -84,7 +84,7 @@ bool ScaleTruckController::readParameters() {
 void ScaleTruckController::init() 
 {
   RCLCPP_INFO(this->get_logger(), "[ScaleTruckController] init()");
-  //printf("[ScaleTruckController] init()");
+  gettimeofday(&init_, NULL);
 
   std::string LaneTopicName;
   int LaneQueueSize;
@@ -413,6 +413,8 @@ void ScaleTruckController::spin()
       rclcpp::shutdown();
     }
 
+    recordData(init_);
+
     if(enableConsoleOutput_)
       displayConsole();
 
@@ -479,15 +481,14 @@ void ScaleTruckController::recordData(struct timeval startTime){
       }
       read_file.close();
     }
-    //write_file << "time,tar_vel,act_dist,est_dist" << endl; //seconds
-    write_file << "time,tar_vel,angle,beta" << std::endl; //seconds
+    write_file << "time,tar_vel,cur_vel,tar_dist,cur_dist,normal_angle,lc_angle,lc_right_flag,lc_left_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
     std::scoped_lock lock(dist_mutex_);
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
-    sprintf(buf, "%.10e,%.3f,%.3f", diff_time, TargetVel_, AngleDegree_);
+    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d", diff_time, TargetVel_, CurVel_, TargetDist_, distance_, AngleDegree_, AngleDegree2, lc_right_flag_, lc_left_flag_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }

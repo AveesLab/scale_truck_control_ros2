@@ -8,14 +8,3 @@
       image_width: 640
       image_height: 480
       camera_name: "usb_cam"
-      brightness: -1
-      contrast: -1
-      saturation: -1
-      sharpness: -1
-      gain: -1
-      auto_white_balance: true
-      white_balance: 4000
-      autoexposure: true
-      exposure: 100
-      autofocus: false
-      focus: -1
