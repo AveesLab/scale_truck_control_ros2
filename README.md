@@ -89,6 +89,7 @@ jetson_release
 # Set cv_bridge
 - Install vision_opencv
 ```
+cd ~/ros2_ws
 git clone -b galactic https://github.com/ros-perception/vision_opencv.git
 ```
 - cv_bridge Setup
