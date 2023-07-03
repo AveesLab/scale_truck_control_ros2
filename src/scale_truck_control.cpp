@@ -519,8 +519,10 @@ void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray
 void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg)
 {
   {
-    std::scoped_lock lock(vel_mutex_);
+    std::scoped_lock lock(vel_mutex_, rep_mutex_);
     CurVel_ = msg->cur_vel;
+    TargetVel_ = msg->tar_vel;
+    TargetDist_ = msg->tar_dist;
   }
 }
 
@@ -541,6 +543,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
         lc_right_flag_ = true;
       } else {
         lc_right_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
       
       lv_lc_left_ = msg->lv_lc_left;
@@ -549,6 +552,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
         lc_left_flag_ = true;
       } else {
         lc_left_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
     }
     /*******/
@@ -561,6 +565,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
         lc_right_flag_ = true;
       } else {
         lc_right_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
       
       fv1_lc_left_ = msg->fv1_lc_left;
@@ -569,6 +574,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
         lc_left_flag_ = true;
       } else {
         lc_left_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
     }
     /*******/
@@ -579,11 +585,18 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
       if(fv2_lc_right_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_right_flag_ = true;
+      } else {
+        lc_right_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
+
       fv2_lc_left_ = msg->fv2_lc_left;
       if(fv2_lc_left_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_left_flag_ = true;
+      } else {
+        lc_left_flag_ = false;
+	lane_diff_cnt_ = 150;
       }
     }
   }

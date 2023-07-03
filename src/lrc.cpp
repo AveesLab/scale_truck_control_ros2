@@ -117,8 +117,8 @@ void LocalRC::rosPub(){
   { 
     std::scoped_lock lock(data_mutex_);
     xav.cur_vel = cur_vel_;
-    xav.tar_vel = tar_vel_; // xav에 목표 속도,간격 왜 날리지?
-    xav.tar_dist = tar_dist_; // FV는 LV LRC에서 전달 받기 때문.
+    xav.tar_vel = tar_vel_; // xav에 목표 속도,간격 보내는 이유: 
+    xav.tar_dist = tar_dist_; // FV는 LV LRC에서 전달 받기 때문
     ocr.index = index_;
     ocr.steer_angle = angle_degree_;
     ocr.cur_dist = cur_dist_;
