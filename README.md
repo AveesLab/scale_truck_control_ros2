@@ -94,7 +94,8 @@ git clone -b galactic https://github.com/ros-perception/vision_opencv.git
 ```
 - cv_bridge Setup
 ```
-vim ~/ros2_ws/src/vision_opencv/cv_bridge/CMakelist.txt
+cd /vision_opencv/cv_bridge
+vim CMakelist.txt
 ```
 ```
 --find_package(OpenCV 4 QUIET
