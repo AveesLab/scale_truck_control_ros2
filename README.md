@@ -105,10 +105,6 @@ vim CMakelist.txt
 cd ~/ros2_ws
 colcon build --packages-select vision_opencv
 ```
-```
-cd ~/ros2_ws/src
-mv vision_opencv ~/
-```
 
 # Install Micro-ros-Aruduino
 - 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
@@ -198,6 +194,11 @@ git clone https://github.com/AveesLab/lane_detection_ros2.git
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/scale_truck_control_ros2.git
+```
+- move vision_opencv
+```
+cd ~/ros2_ws/src
+mv vision_opencv ~/
 ```
 
 # alias
