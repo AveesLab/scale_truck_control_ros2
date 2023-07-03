@@ -102,7 +102,7 @@ vim ~/ros2_ws/src/vision_opencv/cv_bridge/CMakelist.txt
 ```
 ```
 cd ~/ros2_ws
-colcon build --symlink-install
+colcon build --packages-select vision_opencv
 ```
 ```
 cd ~/ros2_ws/src
