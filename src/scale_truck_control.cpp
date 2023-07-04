@@ -541,16 +541,12 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
       if(lv_lc_right_){
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_right_flag_ = true;
-      } else {
-        lc_right_flag_ = false;
       }
       
       lv_lc_left_ = msg->lv_lc_left;
       if(lv_lc_left_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_left_flag_ = true;
-      } else {
-        lc_left_flag_ = false;
       }
     }
     /*******/
@@ -561,16 +557,12 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
       if(fv1_lc_right_){
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_right_flag_ = true;
-      } else {
-        lc_right_flag_ = false;
       }
       
       fv1_lc_left_ = msg->fv1_lc_left;
       if(fv1_lc_left_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_left_flag_ = true;
-      } else {
-        lc_left_flag_ = false;
       }
     }
     /*******/
@@ -581,16 +573,12 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPt
       if(fv2_lc_right_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_right_flag_ = true;
-      } else {
-        lc_right_flag_ = false;
       }
 
       fv2_lc_left_ = msg->fv2_lc_left;
       if(fv2_lc_left_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_left_flag_ = true;
-      } else {
-        lc_left_flag_ = false;
       }
     }
   }
