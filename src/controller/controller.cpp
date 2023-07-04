@@ -211,7 +211,6 @@ void Controller::requestData(CmdData cmd_data)
 
     if (send_data.tar_index == 0){ // LV
         lv_mutex_.lock();
-        qDebug() << send_data.tar_vel; //printf 
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
@@ -221,7 +220,6 @@ void Controller::requestData(CmdData cmd_data)
     }
     else if (send_data.tar_index == 1){ // FV1
         fv1_mutex_.lock();
-        qDebug() << send_data.tar_vel; //printf
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
@@ -231,7 +229,6 @@ void Controller::requestData(CmdData cmd_data)
     }
     else if (send_data.tar_index == 2){ // FV2
         fv2_mutex_.lock();
-        qDebug() << "fv2_lc_right: " << send_data.fv2_lc_right;
         gettimeofday(&startTime, NULL);
         XavPublisher_->publish(send_data);
         gettimeofday(&endTime, NULL);
@@ -613,13 +610,13 @@ void Controller::on_Send_clicked()
     cmd_data.tar_index = 0;
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
+    qDebug() << "Send button";
 
     requestData(cmd_data);
 }
 
 void Controller::on_LV_Right_LC_toggled(bool checked)
 {
-    printf("right lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -640,13 +637,13 @@ void Controller::on_LV_Right_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.lv_lc_right = LV_lc_right;
+    qDebug() << "LV_lc_right: " << LV_lc_right;
 
     requestData(cmd_data);
 }
 
 void Controller::on_LV_Left_LC_toggled(bool checked)
 {
-    printf("left lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -667,13 +664,13 @@ void Controller::on_LV_Left_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.lv_lc_left = LV_lc_left;
+    qDebug() << "LV_lc_left: " << LV_lc_left;
 
     requestData(cmd_data);
 }
 
 void Controller::on_FV1_Right_LC_toggled(bool checked)
 {
-    printf("right lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -694,13 +691,13 @@ void Controller::on_FV1_Right_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.fv1_lc_right = FV1_lc_right;
+    qDebug() << "FV1_lc_right: " << FV1_lc_right;
 
     requestData(cmd_data);
 }
 
 void Controller::on_FV1_Left_LC_toggled(bool checked)
 {
-    printf("left lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -721,13 +718,13 @@ void Controller::on_FV1_Left_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.fv1_lc_left = FV1_lc_left;
+    qDebug() << "FV1_lc_left: " << FV1_lc_left;
 
     requestData(cmd_data);
 }
 
 void Controller::on_FV2_Left_LC_toggled(bool checked)
 {
-    printf("left lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -748,13 +745,13 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.fv2_lc_left = FV2_lc_left;
+    qDebug() << "FV2_lc_left: " << FV2_lc_left;
 
     requestData(cmd_data);
 }
 
 void Controller::on_FV2_Right_LC_toggled(bool checked)
 {
-    printf("right lane change start!\n");
     CmdData cmd_data;
     float tar_vel, tar_dist;
 
@@ -775,8 +772,7 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
     cmd_data.tar_vel = tar_vel;
     cmd_data.tar_dist = tar_dist;
     cmd_data.fv2_lc_right = FV2_lc_right;
-    printf("%d\n", FV2_lc_right);
-
+    qDebug() << "FV2_lc_right: " << FV2_lc_right;
 
     requestData(cmd_data);
 }
