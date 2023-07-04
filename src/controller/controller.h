@@ -69,6 +69,8 @@ public:
     int MaxVel;
     int MinDist;
     int MaxDist;
+
+    bool wait_flag = false;
     bool LV_lc_right = false;
     bool LV_lc_left = false;
     bool FV1_lc_right = false;
