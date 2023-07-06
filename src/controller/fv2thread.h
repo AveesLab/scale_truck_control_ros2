@@ -3,8 +3,9 @@
 
 #include <QThread>
 
-#include "ros2_msg/msg/cmd_data.hpp"
-typedef ros2_msg::msg::CmdData CmdData;
+#include "ros2_msg/msg/xav2cmd.hpp"
+
+typedef ros2_msg::msg::Xav2cmd CmdData;
 
 class Controller;
 

@@ -129,18 +129,18 @@ void ScaleTruckController::init()
   /************************/
   LrcSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
 
-  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
+  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
   objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
-  LaneSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
+  LaneSubscriber_ = this->create_subscription<ros2_msg::msg::Lane2xav>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
   LrcPublisher_ = this->create_publisher<ros2_msg::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
-  CmdPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(CmdPubTopicName, CmdPubQueueSize);  
-  LanePublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(LanePubTopicName,LanePubQueueSize);  
+  CmdPublisher_ = this->create_publisher<ros2_msg::msg::Xav2cmd>(CmdPubTopicName, CmdPubQueueSize);  
+  LanePublisher_ = this->create_publisher<ros2_msg::msg::Xav2lane>(LanePubTopicName,LanePubQueueSize);  
   /**********************/
   /* Safety Start Setup */
   /**********************/
@@ -153,7 +153,7 @@ void ScaleTruckController::init()
   /************/
   /* CMD Data */
   /************/
-  cmd_data_ = new ros2_msg::msg::CmdData;
+  cmd_data_ = new ros2_msg::msg::Xav2cmd;
   cmd_data_->src_index = index_;
   cmd_data_->tar_index = 20;  //Control center
 
@@ -167,7 +167,7 @@ void ScaleTruckController::init()
 /***************/
 /* cmd publish */
 /***************/
-void ScaleTruckController::reply(ros2_msg::msg::CmdData* cmd)
+void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
 {
   while(isNodeRunning_){
     {
@@ -212,7 +212,6 @@ void ScaleTruckController::checkState() {
   double lane_diff = 999.0; 
   double prev_center_base = 0, cur_center_base = 0;
   
-  ros2_msg::msg::CmdData msg;
   {
     std::scoped_lock lock(lane_mutex_);
     if(sizeof(prev_lane_coef_.coef) != 0 && sizeof(lane_coef_.coef) != 0) 
@@ -293,7 +292,7 @@ void ScaleTruckController::objectdetectInThread()
 {
   float dist, dist_tmp;
   dist_tmp = 10.1f;
-  ros2_msg::msg::CmdData Lane_;
+  ros2_msg::msg::Xav2lane Lane_;
   /**************/
   /* Lidar Data */
   /**************/
@@ -495,7 +494,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
   write_file.close();
 }
 
-void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
+void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg)
 {
   {
     std::scoped_lock lock(lane_mutex_);
@@ -526,7 +525,7 @@ void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPt
   }
 }
 
-void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
+void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg)
 {
   {
     std::scoped_lock lock(rep_mutex_);

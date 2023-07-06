@@ -45,15 +45,15 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
     /************************/
     /* Ros Topic Subscriber */
     /************************/
-    LVSubscriber_ = ros2_node->create_subscription<CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
-    FV1Subscriber_ = ros2_node->create_subscription<CmdData>(FV1SubTopicName, FV1SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
-    FV2Subscriber_ = ros2_node->create_subscription<CmdData>(FV2SubTopicName, FV2SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    LVSubscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(LVSubTopicName, LVSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    FV1Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV1SubTopicName, FV1SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+    FV2Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV2SubTopicName, FV2SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
 
 
     /***********************/
     /* Ros Topic Publisher */
     /***********************/
-    XavPublisher_ = ros2_node->create_publisher<CmdData>(XavPubTopicName, XavPubQueueSize);
+    XavPublisher_ = ros2_node->create_publisher<ros2_msg::msg::Cmd2xav>(XavPubTopicName, XavPubQueueSize);
 
     /**********************************/
     /* Control & Communication Thread */
@@ -131,7 +131,7 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
     ui->FV1Box->setCurrentIndex(2);
     ui->FV2Box->setCurrentIndex(3);
 
-    CmdData default_data;
+    ros2_msg::msg::Cmd2xav default_data;
     float default_dist = DefaultDist/100.0f;
     default_data.src_index = 20;
     default_data.tar_index = 0;
@@ -148,7 +148,7 @@ Controller::~Controller()
     delete ui;
 }
 
-void Controller::XavSubCallback(const CmdData &msg)
+void Controller::XavSubCallback(const ros2_msg::msg::Xav2cmd &msg)
 {
   if(msg.src_index == 0){  //LV 
      lv_mutex_.lock();
@@ -204,9 +204,9 @@ void Controller::recordData(struct timeval *startTime){
   write_file.close();
 }
 
-void Controller::requestData(CmdData cmd_data)
+void Controller::requestData(ros2_msg::msg::Cmd2xav cmd_data)
 {
-    CmdData send_data = cmd_data;
+    ros2_msg::msg::Cmd2xav send_data = cmd_data;
     struct timeval startTime, endTime;
 
     if (send_data.tar_index == 0){ // LV
@@ -437,23 +437,9 @@ void Controller::on_LVVelSlider_valueChanged(int value)
 {
     int value_vel, value_dist;
     float tar_vel = 0.0f, tar_dist = 0.0f;
-    CmdData cmd_data;
 
     value_vel = value;
     value_dist = ui->LVDistSlider->value();
-
-//    if(value_vel >= 10) {
-//      tar_vel = value_vel/100.0f;
-//    }
-//    else {
-//      tar_vel = 0;
-//    }
-//    tar_dist = value_dist/100.0f;
-//    cmd_data.src_index = 20;
-//    cmd_data.tar_index = 0;
-//    cmd_data.tar_vel = tar_vel;
-//    cmd_data.tar_dist = tar_dist;
-//    requestData(cmd_data);
 
     ui->LVVelSlider->setValue(value_vel);
     ui->FV1VelSlider->setValue(value_vel);
@@ -467,23 +453,9 @@ void Controller::on_LVDistSlider_valueChanged(int value)
 {
     int value_vel, value_dist;
     float tar_vel = 0.0f, tar_dist = 0.0f;
-    CmdData cmd_data;
 
     value_vel = ui->LVVelSlider->value();
     value_dist = value;
-
-//    if(value_vel >= 10) {
-//      tar_vel = value_vel/100.0f;
-//    }
-//    else {
-//      tar_vel = 0;
-//    }
-//    tar_dist = value_dist/100.0f;
-//    cmd_data.src_index = 20;
-//    cmd_data.tar_index = 0;
-//    cmd_data.tar_vel = tar_vel;
-//    cmd_data.tar_dist = tar_dist;
-//    requestData(cmd_data);
 
     ui->LVDistSlider->setValue(value_dist);
     ui->FV1DistSlider->setValue(value_dist);
@@ -495,7 +467,7 @@ void Controller::on_LVDistSlider_valueChanged(int value)
 
 void Controller::on_pushButton_clicked()  //Emergency stop
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float LV_dist = ui->LVDistSlider->value()/100.0f;
     ui->MVelSlider->setValue(0);
     ui->LVVelSlider->setValue(0);
@@ -585,7 +557,7 @@ void Controller::on_FV2Box_activated(int index)
 
 void Controller::on_Send_clicked()
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int vel = ui->MTarVel->text().split(" ")[0].toFloat()*100;
@@ -617,7 +589,7 @@ void Controller::on_Send_clicked()
 
 void Controller::on_LV_Right_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->LVVelSlider->value();
@@ -644,7 +616,7 @@ void Controller::on_LV_Right_LC_toggled(bool checked)
 
 void Controller::on_LV_Left_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->LVVelSlider->value();
@@ -671,7 +643,7 @@ void Controller::on_LV_Left_LC_toggled(bool checked)
 
 void Controller::on_FV1_Right_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->FV1VelSlider->value();
@@ -698,7 +670,7 @@ void Controller::on_FV1_Right_LC_toggled(bool checked)
 
 void Controller::on_FV1_Left_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->FV1VelSlider->value();
@@ -725,7 +697,7 @@ void Controller::on_FV1_Left_LC_toggled(bool checked)
 
 void Controller::on_FV2_Left_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->FV2VelSlider->value();
@@ -752,7 +724,7 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
 
 void Controller::on_FV2_Right_LC_toggled(bool checked)
 {
-    CmdData cmd_data;
+    ros2_msg::msg::Cmd2xav cmd_data;
     float tar_vel, tar_dist;
 
     int value_vel = ui->FV2VelSlider->value();

@@ -24,11 +24,14 @@
 #include "std_msgs/msg/float32.hpp"
 
 //custom msgs
-#include "ros2_msg/msg/lrc2ocr.hpp"
-#include "ros2_msg/msg/ocr2lrc.hpp"
 #include "ros2_msg/msg/xav2lrc.hpp"
+#include "ros2_msg/msg/xav2lane.hpp"
+#include "ros2_msg/msg/xav2cmd.hpp"
+#include "ros2_msg/msg/lrc2ocr.hpp"
 #include "ros2_msg/msg/lrc2xav.hpp"
-#include "ros2_msg/msg/cmd_data.hpp"
+#include "ros2_msg/msg/ocr2lrc.hpp"
+#include "ros2_msg/msg/lane2xav.hpp"
+#include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/lane.hpp"
 
 using namespace std::chrono_literals;
@@ -50,30 +53,30 @@ private:
  
     //Publisher 
     rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
-    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr CmdPublisher_;
-    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr LanePublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Xav2cmd>::SharedPtr CmdPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Xav2lane>::SharedPtr LanePublisher_;
 
     //Subscriber 
     rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr CmdSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Cmd2xav>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LaneSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
-    void CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);  
+    void CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    void LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
+    void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
     void displayConsole();
     void recordData(struct timeval startTime);
-    void reply(ros2_msg::msg::CmdData* cmd);
+    void reply(ros2_msg::msg::Xav2cmd* cmd);
 
-    //CmdData
-    ros2_msg::msg::CmdData* cmd_data_;
+    // xav->cmd
+    ros2_msg::msg::Xav2cmd* cmd_data_;
 
     //.cpp config
     double CycleTime_ = 0.0;
@@ -110,8 +113,8 @@ private:
     //image
     bool enableConsoleOutput_;
     bool imageStatus_ = false;
-    ros2_msg::msg::CmdData lane_coef_;
-    ros2_msg::msg::CmdData prev_lane_coef_;
+    ros2_msg::msg::Lane2xav lane_coef_;
+    ros2_msg::msg::Lane2xav prev_lane_coef_;
 
     float AngleDegree_ = 0.0f; 
     float AngleDegree = 0.0f; 

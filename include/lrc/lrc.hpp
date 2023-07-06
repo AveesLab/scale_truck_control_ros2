@@ -26,7 +26,6 @@
 #include "ros2_msg/msg/ocr2lrc.hpp"
 #include "ros2_msg/msg/xav2lrc.hpp"
 #include "ros2_msg/msg/lrc2xav.hpp"
-#include "ros2_msg/msg/cmd_data.hpp"
 
 using namespace std::chrono_literals;
 
@@ -45,19 +44,19 @@ private:
     //Subscriber
     rclcpp::Subscription<ros2_msg::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Xav2lrc>::SharedPtr XavSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Xav2lrc>::SharedPtr LVSubscriber_;
 
     //Publisher
     rclcpp::Publisher<ros2_msg::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
     rclcpp::Publisher<ros2_msg::msg::Lrc2xav>::SharedPtr XavPublisher_;
     rclcpp::TimerBase::SharedPtr OcrPublishTimer_;
-    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr FVPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Lrc2xav>::SharedPtr FVPublisher_;
 
     //Callback
     void Lrc2ocrCallback(void);
     void OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg);
     void XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg);
-    void LVCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
+    void LVCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg);
 
     bool isNodeRunning();
     void rosPub();

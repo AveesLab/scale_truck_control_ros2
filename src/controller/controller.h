@@ -37,8 +37,10 @@
 #include "fv2thread.h"
 #include "ros2node.hpp"
 #include "ros2_msg/msg/cmd_data.hpp"
+#include "ros2_msg/msg/cmd2xav.hpp"
+#include "ros2_msg/msg/xav2cmd.hpp"
 
-typedef ros2_msg::msg::CmdData CmdData;
+typedef ros2_msg::msg::Xav2cmd CmdData;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Controller; }
@@ -79,7 +81,7 @@ public:
     bool FV2_lc_left = false;
 
 private slots:
-    void requestData(CmdData cmd_data);
+    void requestData(ros2_msg::msg::Cmd2xav cmd_data);
 
     void updateData(CmdData cmd_data);
 
@@ -122,15 +124,15 @@ private:
     const std::shared_ptr<Ros2Node> ros2_node;
 
     //Publisher 
-    rclcpp::Publisher<ros2_msg::msg::CmdData>::SharedPtr XavPublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Cmd2xav>::SharedPtr XavPublisher_;
 
     //Subscriber 
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LVSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr FV1Subscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr FV2Subscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Xav2cmd>::SharedPtr LVSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Xav2cmd>::SharedPtr FV1Subscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Xav2cmd>::SharedPtr FV2Subscriber_;
 
     //Callback Func
-    void XavSubCallback(const ros2_msg::msg::CmdData &msg);
+    void XavSubCallback(const ros2_msg::msg::Xav2cmd &msg);
 
     cv::Mat display_Map(CmdData cmd_data);
     LVThread* lv_thread_;

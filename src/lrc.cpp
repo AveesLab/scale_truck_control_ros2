@@ -66,7 +66,7 @@ void LocalRC::init(){
   XavSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
 
   if (index_ == 11 || index_ == 12){
-    LVSubscriber_ = this->create_subscription<ros2_msg::msg::CmdData>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
+    LVSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
   }
 
   /************************/
@@ -75,7 +75,7 @@ void LocalRC::init(){
   XavPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2xav>(XavPubTopicName, XavPubQueueSize);  
   OcrPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
   if (index_ == 10) {
-    FVPublisher_ = this->create_publisher<ros2_msg::msg::CmdData>(FVPubTopicName, FVPubQueueSize);
+    FVPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2xav>(FVPubTopicName, FVPubQueueSize);
   }
 
   /*********************/
@@ -97,7 +97,7 @@ bool LocalRC::isNodeRunning(){
 /****************/
 void LocalRC::radio()
 {
-  ros2_msg::msg::CmdData lv_data_;
+  ros2_msg::msg::Lrc2xav lv_data_;
   while(isNodeRunning()){
     {
       std::scoped_lock lock(data_mutex_);
@@ -221,7 +221,7 @@ void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)
 /***************/
 /* FVs from LV */
 /***************/
-void LocalRC::LVCallback(const ros2_msg::msg::CmdData::SharedPtr msg)
+void LocalRC::LVCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   tar_vel_ = msg->tar_vel;
