@@ -66,7 +66,7 @@ void LocalRC::init(){
   XavSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
 
   if (index_ == 11 || index_ == 12){
-    LVSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
+    LVSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
   }
 
   /************************/
@@ -221,7 +221,7 @@ void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)
 /***************/
 /* FVs from LV */
 /***************/
-void LocalRC::LVCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
+void LocalRC::LVCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   tar_vel_ = msg->tar_vel;
