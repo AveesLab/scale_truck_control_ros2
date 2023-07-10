@@ -7,8 +7,8 @@
     image_view/wait_key_delay: 1
     
     image_view/enable_adthreshold: true
-    threshold/box_size: 71 #51 
-    threshold/box_offset: 43 #50 
+    threshold/box_size: 51   # 51 71 
+    threshold/box_offset: 50 # 50 43
     ROI/threshold: 128
 
     params/angle_degree: 0.0

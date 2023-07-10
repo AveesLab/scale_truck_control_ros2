@@ -58,7 +58,6 @@ private:
 
     //Subscriber 
     rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
-<<<<<<< Updated upstream
     rclcpp::Subscription<ros2_msg::msg::Cmd2xav>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
@@ -69,31 +68,6 @@ private:
     void CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
-=======
-<<<<<<< HEAD
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr CmdSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Obj2xav>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::CmdData>::SharedPtr LaneSubscriber_;
-
-    //Callback Func
-    void Lrc2ocrCallback(void);
-    void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
-    void CmdSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);  
-    void objectCallback(const ros2_msg::msg::Obj2xav::SharedPtr msg);
-    void LaneSubCallback(const ros2_msg::msg::CmdData::SharedPtr msg);
-=======
-    rclcpp::Subscription<ros2_msg::msg::Cmd2xav>::SharedPtr CmdSubscriber_;
-    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
-    
-    //Callback Func
-    void Lrc2ocrCallback(void);
-    void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
-    void CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg);  
-    void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
->>>>>>> 786a090b3133cf59d10e8d5275b5123e42ba8944
->>>>>>> Stashed changes
     
     void spin();
     bool getImageStatus(void);
