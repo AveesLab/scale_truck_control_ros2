@@ -2,13 +2,13 @@
   ros__parameters:
     subscribers/image_to_lane/topic: usb_cam/image_raw
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     rear_image_view/enable_opencv: false
     image_view/wait_key_delay: 1
     
     image_view/enable_adthreshold: true
-    threshold/box_size: 51
-    threshold/box_offset: 50
+    threshold/box_size: 71 #51 
+    threshold/box_offset: 43 #50 
     ROI/threshold: 128
 
     params/angle_degree: 0.0
