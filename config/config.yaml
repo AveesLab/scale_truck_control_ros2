@@ -12,7 +12,7 @@
     publishers/xavier_to_cmd/topic: xav2cmd_msg
     publishers/xavier_to_cmd/queue_size: 1
     
-    params/index: 0
+    params/index: 1
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
@@ -23,7 +23,7 @@
     params/target_dist: 0.8
     params/safety_dist: 1.5
     params/lv_stop_dist: 0.5
-    params/fv_stop_dist: 0.3
+    params/fv_stop_dist: 0.5
 
     image_view/enable_console_output: true 
     image_view/lane_change_right: false # cmd lane change
@@ -45,7 +45,7 @@
     LrcPub/lv_to_fv/topic: /lv2fv_msg
     LrcPub/lv_to_fv/queue_size: 1
 
-    LrcParams/lrc_index: 10
+    LrcParams/lrc_index: 11
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 

@@ -34,6 +34,7 @@
 #include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/lane.hpp"
 
+using namespace std;
 using namespace std::chrono_literals;
 
 namespace scale_truck_control 
@@ -101,6 +102,7 @@ private:
     bool fv2_lc_right_ = false;
     bool fv2_lc_left_ = false;
     int lane_diff_cnt_ = 150;
+    int lane_diff_ = 0;
     
     //Pure Puresuit
     float purePuresuit(float tx_, float ty_);
@@ -108,7 +110,6 @@ private:
     float Ld_offset_ = 0.0f;
     float target_x_ = 0.0f;
     float target_y_ = 0.0f;
-
 
     //image
     bool enableConsoleOutput_;
@@ -125,6 +126,8 @@ private:
     float SafetyVel_;
     float ResultVel_;
     float FVmaxVel_;
+    vector<float> e_values_;
+    float K1_ = 0.0f, K2_ = 0.0f;
 
     //object
     int ObjSegments_;

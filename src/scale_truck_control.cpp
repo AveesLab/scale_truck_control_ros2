@@ -150,6 +150,8 @@ void ScaleTruckController::init()
   lane_coef_.coef.resize(3);
   prev_lane_coef_.coef.resize(3);
 
+  e_values_.resize(3);
+
   /************/
   /* CMD Data */
   /************/
@@ -209,6 +211,7 @@ void ScaleTruckController::checkState() {
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
   int i = 480; //height
+  int car_position = 320; // width/2
   double lane_diff = 999.0; 
   double prev_center_base = 0, cur_center_base = 0;
   
@@ -216,9 +219,11 @@ void ScaleTruckController::checkState() {
     std::scoped_lock lock(lane_mutex_);
     if(sizeof(prev_lane_coef_.coef) != 0 && sizeof(lane_coef_.coef) != 0) 
     {
-      prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
+      //prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
+      //prev_center_base = car_position;
       cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
       lane_diff = abs(cur_center_base - prev_center_base); 
+      lane_diff_ = lane_diff;
     }
 
     if(lane_diff <= 10 && lane_diff >= 0) {
@@ -262,31 +267,31 @@ void ScaleTruckController::checkState() {
 
 }
 
-float ScaleTruckController::laneChange()
-{
-  float tx_ = 0.0f, ty_ = 0.0f;
-  {
-    std::scoped_lock lock(lane_mutex_);
-    if (target_x_ != 0 && target_y_ != 0) {
-      tx_ = target_x_;
-      ty_ = target_y_;
-    }
-    ppAngle_ = purePuresuit(tx_, ty_);
-  }
-  return ppAngle_;
-}
-
-float ScaleTruckController::purePuresuit(float tx_, float ty_)
-{
-  float Ld_, angle_A_, ampersand_, ppAngle;
-
-  Ld_ = sqrt(pow(tx_, 2) + pow(ty_, 2)) + Ld_offset_;
-  angle_A_ = atanf(ty_/(tx_));
-  ampersand_ = atanf(2*sin(angle_A_)/Ld_) * (180.0f/M_PI);
-  ppAngle = ampersand_;
-
-  return ppAngle;
-}
+//float ScaleTruckController::laneChange()
+//{
+//  float tx_ = 0.0f, ty_ = 0.0f;
+//  {
+//    std::scoped_lock lock(lane_mutex_);
+//    if (target_x_ != 0 && target_y_ != 0) {
+//      tx_ = target_x_;
+//      ty_ = target_y_;
+//    }
+//    ppAngle_ = purePuresuit(tx_, ty_);
+//  }
+//  return ppAngle_;
+//}
+//
+//float ScaleTruckController::purePuresuit(float tx_, float ty_)
+//{
+//  float Ld_, angle_A_, ampersand_, ppAngle;
+//
+//  Ld_ = sqrt(pow(tx_, 2) + pow(ty_, 2)) + Ld_offset_;
+//  angle_A_ = atanf(ty_/(tx_));
+//  ampersand_ = atanf(2*sin(angle_A_)/Ld_) * (180.0f/M_PI);
+//  ppAngle = ampersand_;
+//
+//  return ppAngle;
+//}
 
 void ScaleTruckController::objectdetectInThread() 
 {
@@ -325,12 +330,12 @@ void ScaleTruckController::objectdetectInThread()
     std::scoped_lock lock(rep_mutex_, lane_mutex_, vel_mutex_);
     if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
     {
-      Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
+      //Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
+      Lane_.cur_dist = (int)((1.24f - dist_tmp)*390.0f)+40;
     }
     else {
       Lane_.cur_dist = 0;
     }
-    // xav -> lane (dist, vel)
     Lane_.cur_vel = CurVel_;
     Lane_.lc_right_flag = lc_right_flag_;
     Lane_.lc_left_flag = lc_left_flag_;
@@ -445,17 +450,23 @@ void ScaleTruckController::displayConsole() {
   printf("\033[5;1H");
   printf("E2/E1 lc_flag   : %d / %d", lc_left_flag_, lc_right_flag_);
   printf("\033[6;1H");
-  printf("Refer Vel       : %3.3f m/s", RefVel_);
+  printf("k1/k2           : %3.3f %3.3f", K1_, K2_);
   printf("\033[7;1H");
-  printf("Send Vel        : %3.3f m/s", ResultVel_);
+  printf("e1/eL           : %3.3f %3.3f", e_values_[1], e_values_[0]);
   printf("\033[8;1H");
   printf("Tar/Cur Vel     : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
   printf("\033[9;1H");
   printf("Tar/Cur Dist    : %3.3f / %3.3f m", TargetDist_, distance_);
   printf("\033[10;1H");
-  printf("Cycle Time      : %3.3f ms", CycleTime_);
+  printf("Refer Vel       : %3.3f m/s", RefVel_);
   printf("\033[11;1H");
-  printf("lane diff cnt   : %d\n", lane_diff_cnt_);
+  printf("Send Vel        : %3.3f m/s", ResultVel_);
+  printf("\033[12;1H");
+  printf("lane diff cnt   : %d", lane_diff_cnt_);
+  printf("\033[13;1H");
+  printf("lane diff cnt   : %d", lane_diff_);
+  printf("\033[14;1H");
+  printf("Cycle Time      : %3.3f ms\n", CycleTime_);
 }
 
 void ScaleTruckController::recordData(struct timeval startTime){
@@ -502,8 +513,11 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     AngleDegree = msg->cur_angle;
     AngleDegree2 = msg->cur_angle2;
     center_select_ = msg->center_select;
-    target_x_ = msg->target_x;
-    target_y_ = msg->target_y;
+    e_values_ = msg->e_values;
+    K1_ = msg->k1;
+    K2_ = msg->k2;
+//    target_x_ = msg->target_x;
+//    target_y_ = msg->target_y;
   }
 }
 

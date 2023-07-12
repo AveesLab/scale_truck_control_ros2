@@ -69,6 +69,9 @@
     ROI/wide_left/extra_down: 220
 
     params/K: 0.15
+    params/K3: 0.15 # e1 0.15 아래로 튜닝
+    params/K4: 0.15 # eL 
+
     params/a/a: 0.
     params/a/b: -0.37169
     params/a/c: 1.2602
@@ -82,8 +85,8 @@
     params/b/e: 1.6722
 
     LaneDetector/eL_height: 0.2
-    LaneDetector/e1_height: 1.2563
+    LaneDetector/e1_height: 1.1852 # 1.2563 1.1852
     LaneDetector/trust_height: 0.6667
-    LaneDetector/lp: 609.3
+    LaneDetector/lp: 472.9 # 609.3 472.9
     LaneDetector/steer_angle: 0.0
 
