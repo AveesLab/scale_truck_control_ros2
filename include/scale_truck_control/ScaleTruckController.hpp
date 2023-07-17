@@ -103,6 +103,7 @@ private:
     bool fv2_lc_left_ = false;
     int lane_diff_cnt_ = 150;
     int lane_diff_ = 0;
+    bool lc_center_follow_ = true;
     
     //Pure Puresuit
     float purePuresuit(float tx_, float ty_);
