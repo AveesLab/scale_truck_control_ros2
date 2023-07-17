@@ -1,4 +1,5 @@
 // https://raw.githubusercontent.com/ROBOTIS-GIT/OpenCR/master/arduino/opencr_release/package_opencr_index.json
+
 // micro-ros library
 #include <micro_ros_arduino.h>
 #include <stdio.h>
@@ -20,12 +21,15 @@
 #include <sensor_msgs/Imu.h>
 #include <SD.h>
 #include <IMU.h>
-#include <lrc2ocr.h>
-#include <ocr2lrc.h>
 
-// Check
+// Ros2 function Check
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
+#define EXECUTE_EVERY_N_MS(MS, X)  do { \
+  static volatile int64_t init = -1; \
+  if (init == -1) { init = uxr_millis();} \
+  if (uxr_millis() - init > MS) { X; init = uxr_millis();} \
+} while (0)\
 
 // Period
 #define BAUD_RATE     (57600)
@@ -50,7 +54,7 @@
 #define ZERO_PWM      (1500)
 #define MAX_STEER     (1800)
 #define MIN_STEER     (1200)
-#define STEER_CENTER  (1480)
+#define STEER_CENTER  (1530)
 
 #define DATA_LOG      (0)
 
@@ -58,23 +62,31 @@ rcl_node_t node;
 rclc_support_t support;
 rcl_allocator_t allocator;
 
-// publisher 
+// publisher
 rcl_publisher_t OcrPublisher_;
 ros2_msg__msg__Ocr2lrc pub_msg_;
-std_msgs__msg__Int32 test_msg_; // test_msg_.data = 10;
+std_msgs__msg__Int32 test_msg_; 
 rclc_executor_t executor_pub_;
 rcl_timer_t timer;
 
-// subscriber 
+// subscriber
 rcl_subscription_t OcrSubscriber_;
 ros2_msg__msg__Lrc2ocr sub_msg_;
 rclc_executor_t executor_sub_;
+
+enum states {
+  WAITING_AGENT,
+  AGENT_AVAILABLE,
+  AGENT_CONNECTED,
+  AGENT_DISCONNECTED
+} state;
 
 sensor_msgs::Imu imu_msg_;
 
 cIMU  IMU;
 Servo throttle_;
 Servo steer_;
+bool is_reset_;
 int Index_;
 bool fi_encoder_;
 bool Alpha_;
@@ -89,7 +101,7 @@ float output_;
 volatile int EN_pos_;
 volatile int CountT_;
 volatile int cumCountT_;
-char filename_[] = "LV1_00.TXT";
+char filename_[] = "FV1_00.TXT";
 File logfile_;
 
 HardwareTimer Timer1(TIMER_CH1); // T Method
@@ -122,7 +134,7 @@ float a_ = -6.063e-06;
 float b_ = 0.0269;
 float c_ = -27.327;
 
-float setSPEED(float tar_vel, float current_vel) { 
+float setSPEED(float tar_vel, float current_vel) {
   static float output, err, P_err, I_err;
   static float prev_u_k, prev_u, A_err;
   static float dist_err, prev_dist_err, P_dist_err, D_dist_err;
@@ -131,59 +143,59 @@ float setSPEED(float tar_vel, float current_vel) {
   float ref_vel = 0.f, cur_vel = 0.f;
   cur_vel = current_vel;
   pub_msg_.cur_vel = cur_vel;
-  
+
   //if(tar_vel <= 0 ) {
-    //output = ZERO_PWM;
-    //I_err = 0;
-    //A_err = 0;
+  //output = ZERO_PWM;
+  //I_err = 0;
+  //A_err = 0;
   //} else {
-    if(Index_ != 10) {
-      dist_err = tx_dist_ - tx_tdist_;    
-      P_dist_err = Kp_dist_ * dist_err;
-      D_dist_err = (Kd_dist_ * ((dist_err - prev_dist_err) / dt_ )); 
-      u_dist = P_dist_err + D_dist_err + tar_vel;
-  
-      // sat(u(k))  saturation start 
-      if(u_dist > 1.2) u_dist_k = 1.2;
-      else if(u_dist <= 0) u_dist_k = 0;
-      else u_dist_k = u_dist;
-      
-      ref_vel = u_dist_k;
-    } else {
-      ref_vel = tar_vel;
-    }
+  if (Index_ != 10) {
+    dist_err = tx_dist_ - tx_tdist_;
+    P_dist_err = Kp_dist_ * dist_err;
+    D_dist_err = (Kd_dist_ * ((dist_err - prev_dist_err) / dt_ ));
+    u_dist = P_dist_err + D_dist_err + tar_vel;
 
-    pub_msg_.ref_vel = ref_vel;
-    
+    // sat(u(k))  saturation start
+    if (u_dist > 1.2) u_dist_k = 1.2;
+    else if (u_dist <= 0) u_dist_k = 0;
+    else u_dist_k = u_dist;
 
-    err = ref_vel - cur_vel;
-    P_err = Kp_ * err;
-    I_err += Ki_ * err * dt_;
-    A_err += Ka_ * ((prev_u_k - prev_u) / dt_);
+    ref_vel = u_dist_k;
+  } else {
+    ref_vel = tar_vel;
+  }
 
-    if(tar_vel <= 0){
-      P_err = 0;
-      I_err = 0;
-      A_err = 0;
-    }
-    
-    u = P_err + I_err + A_err + ref_vel * Kf_;
+  pub_msg_.ref_vel = ref_vel;
 
-    if(u > 2.0) u_k = 2.0;
-    else if(u <= 0) u_k = 0;
-    else u_k = u;
 
-    pub_msg_.u_k = u_k;
-    
+  err = ref_vel - cur_vel;
+  P_err = Kp_ * err;
+  I_err += Ki_ * err * dt_;
+  A_err += Ka_ * ((prev_u_k - prev_u) / dt_);
 
-    if(tar_vel <= 0){
-      output = ZERO_PWM;
-    }
-    else{    // inverse function  
-      output = ((-1.0f)*b_ + sqrt(pow(b_,2)-4*a_*(c_-u_k)))/(2*a_);
-    }
-    //output = tx_throttle_;
-  
+  if (tar_vel <= 0) {
+    P_err = 0;
+    I_err = 0;
+    A_err = 0;
+  }
+
+  u = P_err + I_err + A_err + ref_vel * Kf_;
+
+  if (u > 2.0) u_k = 2.0;
+  else if (u <= 0) u_k = 0;
+  else u_k = u;
+
+  pub_msg_.u_k = u_k;
+
+
+  if (tar_vel <= 0) {
+    output = ZERO_PWM;
+  }
+  else {   // inverse function
+    output = ((-1.0f) * b_ + sqrt(pow(b_, 2) - 4 * a_ * (c_ - u_k))) / (2 * a_);
+  }
+  //output = tx_throttle_;
+
   //}
   // output command
   prev_u_k = u_k;
@@ -198,7 +210,7 @@ float setSPEED(float tar_vel, float current_vel) {
 void setANGLE() {
   static float output;
   float angle = tx_steer_;
-  if(IMU.update() > 0) {
+  if (IMU.update() > 0) {
     imu_msg_.orientation.x = IMU.quat[0];
     imu_msg_.orientation.y = IMU.quat[1];
     imu_msg_.orientation.z = IMU.quat[2];
@@ -211,9 +223,9 @@ void setANGLE() {
     imu_msg_.linear_acceleration.z = IMU.rpy[2];
   }
   output = (angle * 12.0) + (float)STEER_CENTER;
-  if(output > MAX_STEER)
+  if (output > MAX_STEER)
     output = MAX_STEER;
-  else if(output < MIN_STEER)
+  else if (output < MIN_STEER)
     output = MIN_STEER;
   steer_.writeMicroseconds(output);
 }
@@ -254,18 +266,18 @@ void CheckEN() {
   static float cur_RPM;
   target_vel = tx_throttle_; // m/s
   target_ANGLE = tx_steer_; // degree
-  if(cumCountT_ == 0)
+  if (cumCountT_ == 0)
     cur_vel = 0;
-  else{
+  else {
     if (fi_encoder_) EN_pos_ = 0;
-    cur_vel = (float)EN_pos_ / TICK2CYCLE * ( SEC_TIME / ((float)cumCountT_*T_TIME)) * circ_; // m/s
+    cur_vel = (float)EN_pos_ / TICK2CYCLE * ( SEC_TIME / ((float)cumCountT_ * T_TIME)) * circ_; // m/s
   }
 
-  if(cur_vel < 0)
+  if (cur_vel < 0)
     cur_vel = 0;
   output_vel = setSPEED(target_vel, cur_vel);
   output_angle = IMU.rpy[2];
-  if(DATA_LOG)
+  if (DATA_LOG)
   {
     Serial.print(target_vel);
     Serial.print(" m/s | ");
@@ -341,14 +353,14 @@ void setup() {
   attachInterrupt(0, getENA, CHANGE);
   IMU.begin();
   Serial.begin(BAUD_RATE);
-  if(!SD.begin(10)){
+  if (!SD.begin(10)) {
     Serial.println("Card failed, or not present");
   } else {
     Serial.println("card initialized.");
-    for(uint8_t i=0; i<100; i++){
-      filename_[4] = i/10 + '0';
-      filename_[5] = i%10 + '0';
-      if(! SD.exists(filename_)){
+    for (uint8_t i = 0; i < 100; i++) {
+      filename_[4] = i / 10 + '0';
+      filename_[5] = i % 10 + '0';
+      if (! SD.exists(filename_)) {
         logfile_ = SD.open(filename_, FILE_WRITE);
         break;
       }
@@ -374,57 +386,107 @@ void setup() {
   tx_steer_ = 0.0;
 
   /*
-   ros2 variable
+    ros2 variable
   */
   set_microros_transports();
+  state = WAITING_AGENT;
+}
+
+bool create_entities()
+{
   allocator = rcl_get_default_allocator();
+  
+  // create init_options
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
+  // create node
   RCCHECK(rclc_node_init_default(&node, "opencr_node", "FV1", &support)); // "": namespace
-  
+
+  // create subscriber & publisher
   RCCHECK(rclc_subscription_init_default(
-      &OcrSubscriber_,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Lrc2ocr),
-      "lrc2ocr_msg"));
-      
+            &OcrSubscriber_,
+            &node,
+            ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Lrc2ocr),
+            "lrc2ocr_msg"));
+
   RCCHECK(rclc_publisher_init_default(
-      &OcrPublisher_,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Ocr2lrc),
-      "ocr2lrc_msg"));
-      
+            &OcrPublisher_,
+            &node,
+            ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Ocr2lrc),
+            "ocr2lrc_msg"));
+  // create executor
   RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_init(&executor_sub_, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_add_subscription(&executor_sub_, &OcrSubscriber_, &sub_msg_, &LrcCallback, ON_NEW_DATA));
+
+  return true;
+}
+
+void destroy_entities()
+{
+  rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
+  (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+
+  rcl_publisher_fini(&OcrPublisher_, &node);
+  rcl_subscription_fini(&OcrSubscriber_, &node);
+  rclc_executor_fini(&executor_pub_);
+  rclc_executor_fini(&executor_sub_);
+  rcl_node_fini(&node);
+  rclc_support_fini(&support);
 }
 
 void loop() {
   static unsigned long prevTime = 0;
   static unsigned long currentTime;
+  
+  //  if(DATA_LOG)
+  //  {
+  //    static float speed_vel;
+  //    static boolean flag_ = false;
+  //    if(Serial.available() > 0) {
+  //      //tx_steer_ = Serial.parseFloat();
+  //      //tx_throttle_ = Serial.parseFloat();
+  //      speed_vel = Serial.parseFloat();
+  //      flag_ = true;
+  //      Serial.println(speed_vel);
+  //    }
+  //    if(flag_) {
+  //      delay(1000);
+  //      tx_throttle_ = speed_vel;
+  //      delay(5000);
+  //      tx_throttle_ = 0;
+  //      flag_ = false;
+  //    }
+  //  }
 
-//  if(DATA_LOG)
-//  {
-//    static float speed_vel;
-//    static boolean flag_ = false;
-//    if(Serial.available() > 0) {
-//      //tx_steer_ = Serial.parseFloat();
-//      //tx_throttle_ = Serial.parseFloat();
-//      speed_vel = Serial.parseFloat();
-//      flag_ = true;
-//      Serial.println(speed_vel);
-//    }
-//    if(flag_) {
-//      delay(1000);
-//      tx_throttle_ = speed_vel;
-//      delay(5000);
-//      tx_throttle_ = 0;
-//      flag_ = false;
-//    }
-//  }
+  switch (state) {
+    case WAITING_AGENT:
+      EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_AVAILABLE : WAITING_AGENT;);
+      break;
 
-  RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(1)));
-  RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(1)));
+    case AGENT_AVAILABLE:
+      state = (true == create_entities()) ? AGENT_CONNECTED : WAITING_AGENT;
+      if (state == WAITING_AGENT) {
+        destroy_entities();
+      }
+      break;
+
+    case AGENT_CONNECTED:
+      EXECUTE_EVERY_N_MS(200, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
+      if (state == AGENT_CONNECTED) {
+        RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(1)));
+        RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(1)));
+      }
+      break;
+
+    case AGENT_DISCONNECTED:
+      destroy_entities();
+      state = WAITING_AGENT;
+      break;
+
+    default:
+      break;
+  }
 
   currentTime = millis();
   if ((currentTime - prevTime) >= (ANGLE_TIME / 1000)) {

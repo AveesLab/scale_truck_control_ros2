@@ -21,9 +21,14 @@
 #include <SD.h>
 #include <IMU.h>
 
-// Check
+// Ros2 function Check
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
+#define EXECUTE_EVERY_N_MS(MS, X)  do { \
+  static volatile int64_t init = -1; \
+  if (init == -1) { init = uxr_millis();} \
+  if (uxr_millis() - init > MS) { X; init = uxr_millis();} \
+} while (0)\
 
 // Period
 #define BAUD_RATE     (57600)
@@ -67,6 +72,13 @@ rcl_timer_t timer;
 rcl_subscription_t OcrSubscriber_;
 ros2_msg__msg__Lrc2ocr sub_msg_;
 rclc_executor_t executor_sub_;
+
+enum states {
+  WAITING_AGENT,
+  AGENT_AVAILABLE,
+  AGENT_CONNECTED,
+  AGENT_DISCONNECTED
+} state;
 
 sensor_msgs::Imu imu_msg_;
 
@@ -372,26 +384,50 @@ void setup() {
    ros2 variable
   */
   set_microros_transports();
+  state = WAITING_AGENT;
+}
+
+bool create_entities()
+{
   allocator = rcl_get_default_allocator();
+
+  // create init_options
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
+  // create node
   RCCHECK(rclc_node_init_default(&node, "opencr_node", "FV2", &support)); // "": namespace
-  
+
+  // create subscriber & publisher
   RCCHECK(rclc_subscription_init_default(
-      &OcrSubscriber_,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Lrc2ocr),
-      "lrc2ocr_msg"));
-      
+            &OcrSubscriber_,
+            &node,
+            ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Lrc2ocr),
+            "lrc2ocr_msg"));
+
   RCCHECK(rclc_publisher_init_default(
-      &OcrPublisher_,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Ocr2lrc),
-      "ocr2lrc_msg"));
-      
+            &OcrPublisher_,
+            &node,
+            ROSIDL_GET_MSG_TYPE_SUPPORT(ros2_msg, msg, Ocr2lrc),
+            "ocr2lrc_msg"));
+  // create executor
   RCCHECK(rclc_executor_init(&executor_pub_, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_init(&executor_sub_, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_add_subscription(&executor_sub_, &OcrSubscriber_, &sub_msg_, &LrcCallback, ON_NEW_DATA));
+
+  return true;
+}
+
+void destroy_entities()
+{
+  rmw_context_t * rmw_context = rcl_context_get_rmw_context(&support.context);
+  (void) rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+
+  rcl_publisher_fini(&OcrPublisher_, &node);
+  rcl_subscription_fini(&OcrSubscriber_, &node);
+  rclc_executor_fini(&executor_pub_);
+  rclc_executor_fini(&executor_sub_);
+  rcl_node_fini(&node);
+  rclc_support_fini(&support);
 }
 
 void loop() {
@@ -418,8 +454,34 @@ void loop() {
 //    }
 //  }
 
-  RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(1)));
-  RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(1)));
+  switch (state) {
+    case WAITING_AGENT:
+      EXECUTE_EVERY_N_MS(500, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_AVAILABLE : WAITING_AGENT;);
+      break;
+
+    case AGENT_AVAILABLE:
+      state = (true == create_entities()) ? AGENT_CONNECTED : WAITING_AGENT;
+      if (state == WAITING_AGENT) {
+        destroy_entities();
+      }
+      break;
+
+    case AGENT_CONNECTED:
+      EXECUTE_EVERY_N_MS(200, state = (RMW_RET_OK == rmw_uros_ping_agent(100, 1)) ? AGENT_CONNECTED : AGENT_DISCONNECTED;);
+      if (state == AGENT_CONNECTED) {
+        RCCHECK(rclc_executor_spin_some(&executor_pub_, RCL_MS_TO_NS(1)));
+        RCCHECK(rclc_executor_spin_some(&executor_sub_, RCL_MS_TO_NS(1)));
+      }
+      break;
+
+    case AGENT_DISCONNECTED:
+      destroy_entities();
+      state = WAITING_AGENT;
+      break;
+
+    default:
+      break;
+  }
 
   currentTime = millis();
   if ((currentTime - prevTime) >= (ANGLE_TIME / 1000)) {
