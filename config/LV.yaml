@@ -1,11 +1,18 @@
 /**/LaneDetector:
   ros__parameters:
     subscribers/image_to_lane/topic: usb_cam/image_raw
+    subscribers/image_to_lane/queue_size: 1
+    subscribers/rearImage_to_lane/topic: null
+    subscribers/rearImage_to_lane/queue_size: 1
+    subscribers/xavier_to_lane/topic: xav2lane_msg
+    subscribers/xavier_to_lane/queue_size: 1
 
-    image_view/enable_opencv: false
-    rear_image_view/enable_opencv: false
+    publishers/lane_to_xavier/topic: lane2xav_msg
+    publishers/lane_to_xavier/queue_size: 1
+
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
-    
+
     image_view/enable_adthreshold: true
     threshold/box_size: 51   # 51 71 
     threshold/box_offset: 50 # 50 43
@@ -89,4 +96,47 @@
     LaneDetector/trust_height: 0.6667
     LaneDetector/lp: 472.9 # 609.3 472.9
     LaneDetector/steer_angle: 0.0
+
+/**/RearLaneDetector:
+  ros__parameters:
+    subscribers/image_to_lane/topic: null
+    subscribers/image_to_lane/queue_size: 1
+    subscribers/rearImage_to_lane/topic: rear_cam/image_raw
+    subscribers/rearImage_to_lane/queue_size: 1
+
+    publishers/lane_to_xavier/topic: rear_lane2xav_msg
+    publishers/lane_to_xavier/queue_size: 1
+
+    image_view/enable_opencv: true
+    image_view/wait_key_delay: 1
+
+    image_view/enable_adthreshold: true
+    threshold/box_size:   51 # 51 71 
+    threshold/box_offset: 50 # 50 43
+    ROI/threshold: 128
+
+    Calibration/r_matrix/a: 326.31389227574556
+    Calibration/r_matrix/b: 0.
+    Calibration/r_matrix/c: 320.
+    Calibration/r_matrix/d: 0.
+    Calibration/r_matrix/e: 326.31389227574556
+    Calibration/r_matrix/f: 240.
+    Calibration/r_matrix/g: 0.
+    Calibration/r_matrix/h: 0.
+    Calibration/r_matrix/i: 1.
+
+    Calibration/r_dist_coef/a: -0.33295846454356126
+    Calibration/r_dist_coef/b: 0.12386827336557986
+    Calibration/r_dist_coef/c: 0.
+    Calibration/r_dist_coef/d: 0.
+    Calibration/r_dist_coef/e: -0.022565312043601477
+
+    ROI/rear_cam/top_gap: 0.405
+    ROI/rear_cam/bot_gap: 0.17
+    ROI/rear_cam/top_height: 0.99
+    ROI/rear_cam/bot_height: 0.47
+    ROI/rear_cam/extra_f: 1.
+    ROI/rear_cam/extra_b: 10.
+    ROI/rear_cam/extra_up: 140
+    ROI/rear_cam/extra_down: 180
 
