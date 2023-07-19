@@ -78,6 +78,10 @@ public:
     bool FV1_lc_left = false;
     bool FV2_lc_right = false;
     bool FV2_lc_left = false;
+    
+    bool LV_Rear = false;
+    bool FV1_Rear = false;
+    bool FV2_Rear = false;
 
 private slots:
     void requestData(ros2_msg::msg::Cmd2xav cmd_data);
