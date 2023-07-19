@@ -120,6 +120,10 @@ https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
 >sudo apt upgrade
 >sudo apt install ros-galactic-desktop
 >```
+>## colcon install
+>```
+>sudo apt install python3-colcon-common-extensions
+>```
 >## Environment setup
 >```
 ># Replace ".bash" with your shell if you're not using bash
