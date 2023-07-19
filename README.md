@@ -12,6 +12,10 @@ Implemented dual ROI version for normal and lane-changing modes
 ```
 
 # Set OpenCV 4.4.0
+> If your device is notebook, click below link and install Opencv 4.4.0.
+> 
+> https://velog.io/@minukiki/Ubuntu-20.04%EC%97%90-OpenCV-4.4.0-%EC%84%A4%EC%B9%98
+> 
 - Uninstall old version of OpenCV
 ```
 sudo apt-get purge  libopencv* python-opencv
