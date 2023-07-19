@@ -376,6 +376,9 @@ cv::Mat Controller::display_Map(CmdData value)
     std::vector<cv::Point> CpointList;
     int cam_height = 480, cam_width = 640; // pixel
     float cam_y_dist = 98, cam_x_dist = 77; // cm
+    if(LV_Rear == true || FV1_Rear == true || FV2_Rear == true) {
+      value.coef = value.rear_coef;
+    }
     for(int i = -550; i < cam_height*1.2; i++){
         cv::Point temp_point;
         temp_point.y = i*cam_y_dist/cam_height-26;
@@ -748,3 +751,25 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
 
     requestData(cmd_data);
 }
+
+void Controller::on_LV_Rear_toggled(bool checked)
+{
+    LV_Rear = checked;
+    qDebug() << "LV_Rear";
+
+}
+
+void Controller::on_FV1_Rear_toggled(bool checked)
+{
+    FV1_Rear = checked;
+    qDebug() << "FV1_Rear";
+
+}
+
+void Controller::on_FV2_Rear_toggled(bool checked)
+{
+    FV2_Rear = checked;
+    qDebug() << "FV2_Rear";
+
+}
+
