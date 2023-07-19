@@ -36,7 +36,6 @@
 #include "fv1thread.h"
 #include "fv2thread.h"
 #include "ros2node.hpp"
-#include "ros2_msg/msg/cmd_data.hpp"
 #include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/xav2cmd.hpp"
 
@@ -114,6 +113,13 @@ private slots:
     void on_LV_Right_LC_toggled(bool checked);
 
     void on_LV_Left_LC_toggled(bool checked);
+    
+    void on_LV_Rear_toggled(bool checked);
+
+    void on_FV1_Rear_toggled(bool checked);
+
+    void on_FV2_Rear_toggled(bool checked);
+
 
 signals:
     void send(CmdData cmd_data);

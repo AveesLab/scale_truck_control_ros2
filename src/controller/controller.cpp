@@ -748,3 +748,22 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
 
     requestData(cmd_data);
 }
+
+void Controller::on_LV_Rear_toggled(bool checked)
+{
+    qDebug() << "LV_Rear";
+
+}
+
+void Controller::on_FV1_Rear_toggled(bool checked)
+{
+    qDebug() << "FV1_Rear";
+
+}
+
+void Controller::on_FV2_Rear_toggled(bool checked)
+{
+    qDebug() << "FV2_Rear";
+
+}
+
