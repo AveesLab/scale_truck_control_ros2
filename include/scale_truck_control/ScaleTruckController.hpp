@@ -62,6 +62,7 @@ private:
     rclcpp::Subscription<ros2_msg::msg::Cmd2xav>::SharedPtr CmdSubscriber_;
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
@@ -69,6 +70,7 @@ private:
     void CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg);  
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
+    void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
@@ -115,7 +117,7 @@ private:
     //image
     bool enableConsoleOutput_;
     bool imageStatus_ = false;
-    ros2_msg::msg::Lane2xav lane_coef_;
+    ros2_msg::msg::Lane2xav lane_coef_, rear_coef_;
     ros2_msg::msg::Lane2xav prev_lane_coef_;
 
     float AngleDegree_ = 0.0f; 
@@ -123,6 +125,7 @@ private:
     float AngleDegree2 = 0.0f; 
     float ppAngle_ = 0.0f; 
     int center_select_ = 0; 
+    int rear_center_select_ = 0; 
     float TargetVel_ = 0.0f; 
     float SafetyVel_;
     float ResultVel_;

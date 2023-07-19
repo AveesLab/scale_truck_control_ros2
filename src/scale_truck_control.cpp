@@ -88,6 +88,8 @@ void ScaleTruckController::init()
 
   std::string LaneTopicName;
   int LaneQueueSize;
+  std::string RearTopicName;
+  int RearQueueSize;
   std::string objectTopicName;
   int objectQueueSize;
   std::string LrcSubTopicName;
@@ -107,6 +109,8 @@ void ScaleTruckController::init()
   /******************************/
   this->get_parameter_or("subscribers/lane_to_xavier/topic", LaneTopicName, std::string("lane2xav_msg"));
   this->get_parameter_or("subscribers/lane_to_xavier/queue_size", LaneQueueSize, 1);
+  this->get_parameter_or("subscribers/rear_to_xavier/topic", RearTopicName, std::string("rear2xav_msg"));
+  this->get_parameter_or("subscribers/rear_to_xavier/queue_size", RearQueueSize, 1);
   this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("raw_obstacles"));
   this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
@@ -135,6 +139,8 @@ void ScaleTruckController::init()
 
   LaneSubscriber_ = this->create_subscription<ros2_msg::msg::Lane2xav>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
 
+  RearSubscriber_ = this->create_subscription<ros2_msg::msg::Lane2xav>(RearTopicName, RearQueueSize, std::bind(&ScaleTruckController::RearSubCallback, this, std::placeholders::_1));
+
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
@@ -148,6 +154,7 @@ void ScaleTruckController::init()
   distAngle_ = 0;
 
   lane_coef_.coef.resize(3);
+  rear_coef_.coef.resize(3);
   prev_lane_coef_.coef.resize(3);
 
   e_values_.resize(3);
@@ -194,6 +201,17 @@ void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
       cmd->coef[2].a = lane_coef_.coef[2].a;
       cmd->coef[2].b = lane_coef_.coef[2].b;
       cmd->coef[2].c = lane_coef_.coef[2].c;
+
+      cmd->rear_coef.resize(3);
+      cmd->rear_coef[0].a = rear_coef_.coef[0].a;
+      cmd->rear_coef[0].b = rear_coef_.coef[0].b;
+      cmd->rear_coef[0].c = rear_coef_.coef[0].c;
+      cmd->rear_coef[1].a = rear_coef_.coef[1].a;
+      cmd->rear_coef[1].b = rear_coef_.coef[1].b;
+      cmd->rear_coef[1].c = rear_coef_.coef[1].c;
+      cmd->rear_coef[2].a = rear_coef_.coef[2].a;
+      cmd->rear_coef[2].b = rear_coef_.coef[2].b;
+      cmd->rear_coef[2].c = rear_coef_.coef[2].c;
    }
    {
      std::scoped_lock lock(rep_mutex_);
@@ -519,6 +537,15 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     e_values_ = msg->e_values;
     K1_ = msg->k1;
     K2_ = msg->k2;
+  }
+}
+
+void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg)
+{
+  {
+    std::scoped_lock lock(lane_mutex_);
+    rear_coef_.coef = msg->coef;
+    rear_center_select_ = msg->center_select;
   }
 }
 

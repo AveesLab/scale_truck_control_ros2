@@ -110,7 +110,7 @@
     subscribers/rearImage_to_lane/topic: rear_cam/image_raw
     subscribers/rearImage_to_lane/queue_size: 1
 
-    publishers/lane_to_xavier/topic: rear_lane2xav_msg
+    publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
     image_view/enable_opencv: true 
