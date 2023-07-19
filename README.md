@@ -121,6 +121,7 @@ https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
 ># Replace ".bash" with your shell if you're not using bash
 ># Possible values are: setup.bash, setup.sh, setup.zsh
 >source /opt/ros/galactic/setup.bash
+>mkdir -p ~/ros2_ws/src
 >```
 
 # Set cv_bridge
