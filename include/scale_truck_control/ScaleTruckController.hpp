@@ -33,6 +33,8 @@
 #include "ros2_msg/msg/lane2xav.hpp"
 #include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/lane.hpp"
+#include "ros2_msg/msg/boundingbox.hpp"
+#include "ros2_msg/msg/yoloflag.hpp"
 
 using namespace std;
 using namespace std::chrono_literals;
@@ -56,6 +58,7 @@ private:
     rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
     rclcpp::Publisher<ros2_msg::msg::Xav2cmd>::SharedPtr CmdPublisher_;
     rclcpp::Publisher<ros2_msg::msg::Xav2lane>::SharedPtr LanePublisher_;
+    rclcpp::Publisher<ros2_msg::msg::Yoloflag>::SharedPtr runYoloPublisher_;
 
     //Subscriber 
     rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
@@ -63,6 +66,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr YoloSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
@@ -71,12 +75,14 @@ private:
     void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
+    void YoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
     void displayConsole();
     void recordData(struct timeval startTime);
     void reply(ros2_msg::msg::Xav2cmd* cmd);
+    bool RSS(float d0, float cf_vel, float cr_vel);
 
     // xav->cmd
     ros2_msg::msg::Xav2cmd* cmd_data_;
@@ -106,18 +112,26 @@ private:
     int lane_diff_cnt_ = 150;
     int lane_diff_ = 0;
     bool lc_center_follow_ = true;
+
+    //RSS
+    bool RSS_flag_ = false;
+    float est_dist_ = 0.0f, r_est_dist_ = 0.0f;
+    float est_vel_ = 0.0f, r_est_vel_ = 0.0f;
+    float a_max_accel = 0.0f, a_min_brake = 0.0f, a_max_brake = 0.0f;
+    float p_ = 0.0f; // response time
     
-    //Pure Puresuit
-    float purePuresuit(float tx_, float ty_);
-    float Lw_ = 0.0f;
-    float Ld_offset_ = 0.0f;
-    float target_x_ = 0.0f;
-    float target_y_ = 0.0f;
+    //bbox
+    std::string name_;
+    uint32_t x_ = 0;
+    uint32_t y_ = 0;
+    uint32_t w_ = 0;
+    uint32_t h_ = 0;
+    bool isbboxReady_ = false;
 
     //image
     bool enableConsoleOutput_;
     bool imageStatus_ = false;
-    ros2_msg::msg::Lane2xav lane_coef_, rear_coef_;
+    ros2_msg::msg::Lane2xav lane_coef_, r_lane_coef_;
     ros2_msg::msg::Lane2xav prev_lane_coef_;
 
     float AngleDegree_ = 0.0f; 
@@ -125,7 +139,7 @@ private:
     float AngleDegree2 = 0.0f; 
     float ppAngle_ = 0.0f; 
     int center_select_ = 0; 
-    int rear_center_select_ = 0; 
+    int r_center_select_ = 0; 
     float TargetVel_ = 0.0f; 
     float SafetyVel_;
     float ResultVel_;
@@ -144,6 +158,7 @@ private:
     float SafetyDist_;
     std_msgs::msg::Float32MultiArray Obstacle_;
 
+
     void lanedetectInThread();
     void objectdetectInThread();
     
@@ -160,6 +175,7 @@ private:
     std::mutex vel_mutex_;
     std::mutex dist_mutex_;
     std::mutex rep_mutex_;
+    std::mutex bbox_mutex_;
 
     std::condition_variable cv_; // cv_.wait() 용도-> ROI거리 파악 후 Lane 그리기
 

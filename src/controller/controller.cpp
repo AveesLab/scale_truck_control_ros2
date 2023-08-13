@@ -338,8 +338,8 @@ void Controller::updateData(CmdData cmd_data)
 	    wait_flag = true;
 
 	  if (wait_flag == true) {
-            if(FV2_lc_right == true) {
-              if(tmp.lc_right_flag == false) {
+            if(FV2_lc_right == true) { // Controller state -> lc_right flag on 
+              if(tmp.lc_right_flag == false) { // FV2 state -> FV2 LC complete
 	        wait_flag = false;
                 ui->FV2_Right_LC->toggle(); 
                 ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 

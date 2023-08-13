@@ -1,0 +1,27 @@
+/**/yolo_object_detection_node:
+  ros__parameters:    
+
+    yolo_model/names_file/name: obj.names
+    names_path: /home/avees/ros2_ws/src/yolo_object_detection_ros2/yolo_network_config/names
+    yolo_model/cfg_file/name: yolov3-tiny-scale_truck.cfg
+    cfg_path: /home/avees/ros2_ws/src/yolo_object_detection_ros2/yolo_network_config/cfg
+    yolo_model/weights_file/name: yolov3-tiny-scale_truck.weights
+    weights_path: /home/avees/ros2_ws/src/yolo_object_detection_ros2/yolo_network_config/weights
+
+    image/width: 640
+    image/height: 480
+
+    image_view/enable_opencv: true
+    image_view/wait_key_delay: 1
+    image_view/enable_console_output: false
+
+    subscribers/front_camera_reading/topic: usb_cam/image_raw
+    subscribers/front_camera_reading/queue_size: 1
+    subscribers/rear_camera_reading/topic: rear_cam/image_raw
+    subscribers/rear_camera_reading/queue_size: 1
+    subscribers/run_yolo_/topic: run_yolo_flag
+    subscribers/run_yolo_/queue_size: 1
+
+    publishers/Boundingbox/topic: yolo_object_detection/Boundingbox
+    publishers/Boundingbox/queue_size: 1
+

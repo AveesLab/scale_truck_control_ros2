@@ -40,6 +40,12 @@ def generate_launch_description():
             'config', 
             'LV.yaml')                 
 
+    yolo_param_file = os.path.join(
+            get_package_share_directory('scale_truck_control_ros2'),
+            'config',
+            'yolov3-tiny-custom.yaml')
+
+
 ############################################ Node_list ##############################################
 usb_cam_node=Node(
             package='usb_cam',
@@ -153,6 +159,14 @@ usb_cam_node=Node(
             arguments = ["serial", "--dev", "/dev/ttyACM0"]
             )
 
+    yolo_node=Node(
+            package='yolo_object_detection_ros2',
+            namespace='LV',
+            name='yolo_object_detection_node',
+            executable='yolo_object_detection_ros2',
+            output='screen',
+            parameters = [yolo_param_file])
+
 ######################################### Node_list End #############################################
 
     ld = LaunchDescription()
@@ -168,6 +182,7 @@ usb_cam_node=Node(
     ld.add_action(control_node)
     ld.add_action(lrc_node)
     ld.add_action(opencr_node)
+    ld.add_action(yolo_node)
 
     return ld
 
