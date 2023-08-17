@@ -398,14 +398,31 @@ void ScaleTruckController::spin()
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
 
+    if (r_run_yolo_flag_ && isbboxReady_) {
+      est_vel_ = r_est_vel_;
+      est_dist_ = r_est_dist_;
+    }
+    else if (f_run_yolo_flag_ && isbboxReady_) {
+      est_vel_ = f_est_vel_;
+      est_dist_ = f_est_dist_;
+    }
+
+//    {
+//      std::scoped_lock lock(dist_mutex_);
+//      if ((lc_right_flag_ || lc_left_flag_)) {
+//        //RSS(float d0, float cf_vel, float cr_vel);
+//
+//        //RSS(est_dist_, )
+//      }
+//    }
+
     objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
     objectdetect_thread.join();
     {
       std::scoped_lock lock(rep_mutex_);
       if((AngleDegree2 != 0) && (lc_right_flag_ || lc_left_flag_)) { 
-//        AngleDegree_ = laneChange();
         AngleDegree_ = AngleDegree2;
-	checkState(); // lane change complete ?
+	checkState(); // lane change complete ?	
       }
       else{ 
         AngleDegree_ = AngleDegree;
@@ -480,9 +497,9 @@ void ScaleTruckController::displayConsole() {
   printf("\033[8;1H");
   printf("e1/eL             : %3.3f %3.3f", e_values_[1], e_values_[0]);
   printf("\033[9;1H");
-  printf("Tar/Cur Vel       : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
+  printf("Tar/Cur/Est Vel   : %3.3f / %3.3f / %3.3f m/s", TargetVel_, CurVel_, est_vel_);
   printf("\033[10;1H");
-  printf("Tar/Cur Dist      : %3.3f / %3.3f m", TargetDist_, distance_);
+  printf("Tar/Cur/Est Dist  : %3.3f / %3.3f / %3.3f m", TargetDist_, distance_, est_dist_);
   printf("\033[11;1H");
   printf("Refer Vel         : %3.3f m/s", RefVel_);
   printf("\033[12;1H");
@@ -518,7 +535,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
       read_file.close();
     }
     //write_file << "time,tar_vel,cur_vel,tar_dist,cur_dist,normal_angle,lc_angle,lc_right_flag,lc_left_flag" << std::endl; //seconds
-    write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist" << std::endl; //seconds
+    write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist,r_run_yolo_flag,y_run_yolo_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
@@ -526,7 +543,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
 //    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d,%d", diff_time, TargetVel_, CurVel_, TargetDist_, distance_, AngleDegree_, AngleDegree2, lc_right_flag_, lc_left_flag_, lc_center_follow_);
-    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", diff_time, TargetVel_, CurVel_, est_vel_, TargetDist_, distance_, est_dist_);
+    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f, %d, %d", diff_time, TargetVel_, CurVel_, est_vel_, TargetDist_, distance_, est_dist_, r_run_yolo_flag_, f_run_yolo_flag_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
@@ -545,8 +562,8 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     e_values_ = msg->e_values;
     K1_ = msg->k1;
     K2_ = msg->k2;
-    est_dist_ = msg->est_dist;
-    est_vel_ = msg->est_vel;
+    f_est_dist_ = msg->est_dist;
+    f_est_vel_ = msg->est_vel;
   }
 }
 
@@ -555,7 +572,7 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
   {
     std::scoped_lock lock(lane_mutex_);
     r_lane_coef_.coef = msg->coef;
-    r_center_select_ = msg->center_select;
+    //r_center_select_ = msg->center_select;
     r_est_dist_ = msg->est_dist;
     r_est_vel_ = msg->est_vel;
   }
@@ -575,6 +592,9 @@ void ScaleTruckController::YoloSubCallback(const ros2_msg::msg::Boundingbox::Sha
       w_ = msg->w;
       h_ = msg->h;
       isbboxReady_ = true;
+    }
+    if(name_ == "") {
+      isbboxReady_ = false;
     }
   }
 }
@@ -638,12 +658,14 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       }
 
       if(msg->fv2_lc_right == true) {
-        yolo_flag_msg.f_run_yolo = true; // r_run_yolo 사용해야함. 실험중.
+	r_run_yolo_flag_ = true;
+        yolo_flag_msg.r_run_yolo = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       if(msg->fv2_lc_left == true) {
-        yolo_flag_msg.f_run_yolo = true; // r_run_yolo 사용해야함. 실험중.
+	r_run_yolo_flag_ = true;
+        yolo_flag_msg.r_run_yolo = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
@@ -655,16 +677,18 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       if(fv2_lc_right_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_right_flag_ = true;
-//	yolo_flag_msg.f_run_yolo = true;
-//	runYoloPublisher_->publish(yolo_flag_msg);
+	r_run_yolo_flag_ = true;
+	yolo_flag_msg.r_run_yolo = true;
+	runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       fv2_lc_left_ = msg->fv2_lc_left;
       if(fv2_lc_left_) {
         prev_lane_coef_ = lane_coef_; // for compare prev_center vs. cur_center after lane change
         lc_left_flag_ = true;
-//	yolo_flag_msg.f_run_yolo = true;
-//	runYoloPublisher_->publish(yolo_flag_msg);
+	r_run_yolo_flag_ = true;
+	yolo_flag_msg.r_run_yolo = true;
+	runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
   }

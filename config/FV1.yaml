@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     image_view/enable_adthreshold: true
@@ -113,7 +113,7 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true 
+    image_view/enable_opencv: false 
     image_view/wait_key_delay: 1
 
     image_view/enable_adthreshold: true
@@ -143,5 +143,5 @@
     ROI/rear_cam/bot_height: 0.47
     ROI/rear_cam/extra_f: 1.
     ROI/rear_cam/extra_b: 10.
-    ROI/rear_cam/extra_up: 140
-    ROI/rear_cam/extra_down: 180
+    ROI/rear_cam/extra_up: 180 # 140
+    ROI/rear_cam/extra_down: 220 # 180

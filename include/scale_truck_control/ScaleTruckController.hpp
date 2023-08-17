@@ -115,8 +115,8 @@ private:
 
     //RSS
     bool RSS_flag_ = false;
-    float est_dist_ = 0.0f, r_est_dist_ = 0.0f;
-    float est_vel_ = 0.0f, r_est_vel_ = 0.0f;
+    float est_dist_ = 0.0f, f_est_dist_ = 0.0f, r_est_dist_ = 0.0f;
+    float est_vel_ = 0.0f, f_est_vel_ = 0.0f, r_est_vel_ = 0.0f;
     float a_max_accel = 0.0f, a_min_brake = 0.0f, a_max_brake = 0.0f;
     float p_ = 0.0f; // response time
     
@@ -127,6 +127,9 @@ private:
     uint32_t w_ = 0;
     uint32_t h_ = 0;
     bool isbboxReady_ = false;
+    bool f_run_yolo_flag_ = false;
+    bool r_run_yolo_flag_ = false;
+
 
     //image
     bool enableConsoleOutput_;
