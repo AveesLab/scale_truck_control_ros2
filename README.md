@@ -256,6 +256,7 @@ git clone https://github.com/AveesLab/scale_truck_control_ros2.git
 sudo vim ~/.bashrc
 ```
 ```
+source /opt/ros/galactic/setup.bash
 alias cw='cd ~/ros2_ws/src'
 alias cb='source ~/ros2_ws/install/setup.bash'
 alias sb='source ~/.bashrc'
