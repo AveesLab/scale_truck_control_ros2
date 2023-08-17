@@ -140,7 +140,7 @@ git clone -b galactic https://github.com/ros-perception/vision_opencv.git
 ```
 - cv_bridge Setup
 ```
-cd /vision_opencv/cv_bridge
+cd vision_opencv/cv_bridge
 vim CMakelist.txt
 ```
 ```
