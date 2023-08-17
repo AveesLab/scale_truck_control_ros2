@@ -187,7 +187,7 @@ float setSPEED(float tar_vel, float current_vel) {
       output = ZERO_PWM;
     }
     else{    // inverse function  
-      output = (-4.3253e-02 + sqrt(pow(4.3253e-02,2)-4*(-1.0444e-05)*(-42.3682-u_k)))/(2*(-1.0444e-05));
+      output = (-4.8278e-02+sqrt(pow(-4.8278e-02, 2)-4*(-1.1446e-05)*(-47.94-u_k)))/(2*(-1.1446e-05));
     }
     //output = tx_throttle_;
   
