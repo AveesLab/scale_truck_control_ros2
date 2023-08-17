@@ -236,12 +236,20 @@ git clone https://github.com/AveesLab/object_detection_ros2.git
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/lane_detection_ros2.git
 ```
+
+- yolo_object_detection_ros2
+```
+cd ~/ros2_ws/src
+git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
+cd yolo_object_detection_ros2/darknet
+make -j8
+```
+
 - scale_truck_control_ros2
 ```
 cd ~/ros2_ws/src
 git clone https://github.com/AveesLab/scale_truck_control_ros2.git
 ```
-
 
 # alias
 ```
