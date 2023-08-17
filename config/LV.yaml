@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     image_view/enable_adthreshold: true
@@ -76,8 +76,8 @@
     ROI/wide_left/extra_down: 220
 
     params/K: 0.15
-    params/K3: 0.15 # e1 0.15 아래로 튜닝
-    params/K4: 0.15 # eL 
+    params/K3: 0.13 # e1 0.16
+    params/K4: 0.173 # eL 0.18
 
     params/a/a: 0.
     params/a/b: -0.37169
@@ -94,7 +94,7 @@
     LaneDetector/eL_height: 0.2
     LaneDetector/e1_height: 1.1852 # 1.2563 1.1852
     LaneDetector/trust_height: 0.6667
-    LaneDetector/lp: 472.9 # 609.3 472.9
+    LaneDetector/lp: 609.3 # 609.3 472.9
     LaneDetector/steer_angle: 0.0
 
 /**/RearLaneDetector:
@@ -107,7 +107,7 @@
     publishers/lane_to_xavier/topic: rear_lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     image_view/enable_adthreshold: true
