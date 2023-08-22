@@ -4,7 +4,7 @@
     subscribers/lane_to_xavier/queue_size: 1
     subscribers/rear_to_xavier/topic: rear2xav_msg
     subscribers/rear_to_xavier/queue_size: 1
-    subscribers/obstacle_reading/topic: raw_obstacles
+    subscribers/obstacle_reading/topic: min_distance #raw_obstacles
     subscribers/obstacle_reading/queue_size: 100
     subscribers/lrc_to_xavier/topic: lrc2xav_msg
     subscribers/lrc_to_xavier/queue_size: 1

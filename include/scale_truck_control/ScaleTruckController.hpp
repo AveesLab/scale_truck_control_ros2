@@ -30,6 +30,7 @@
 #include "ros2_msg/msg/lrc2ocr.hpp"
 #include "ros2_msg/msg/lrc2xav.hpp"
 #include "ros2_msg/msg/ocr2lrc.hpp"
+#include "ros2_msg/msg/obj2xav.hpp"
 #include "ros2_msg/msg/lane2xav.hpp"
 #include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/lane.hpp"
@@ -67,7 +68,8 @@ private:
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr YoloSubscriber_;
-    
+    rclcpp::Subscription<ros2_msg::msg::Obj2xav>::SharedPtr DistSubscriber_;
+
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
@@ -76,7 +78,8 @@ private:
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void YoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
-    
+    void DistCallback(const ros2_msg::msg::Obj2xav::SharedPtr msg);
+
     void spin();
     bool getImageStatus(void);
     void displayConsole();
@@ -160,7 +163,7 @@ private:
     float TargetDist_;
     float SafetyDist_;
     std_msgs::msg::Float32MultiArray Obstacle_;
-
+    float mindist_;
 
     void lanedetectInThread();
     void objectdetectInThread();
