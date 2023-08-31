@@ -30,7 +30,6 @@
 #include "ros2_msg/msg/lrc2ocr.hpp"
 #include "ros2_msg/msg/lrc2xav.hpp"
 #include "ros2_msg/msg/ocr2lrc.hpp"
-#include "ros2_msg/msg/obj2xav.hpp"
 #include "ros2_msg/msg/lane2xav.hpp"
 #include "ros2_msg/msg/cmd2xav.hpp"
 #include "ros2_msg/msg/lane.hpp"
@@ -68,8 +67,7 @@ private:
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr YoloSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Obj2xav>::SharedPtr DistSubscriber_;
-
+    
     //Callback Func
     void Lrc2ocrCallback(void);
     void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
@@ -78,14 +76,20 @@ private:
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void YoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
-    void DistCallback(const ros2_msg::msg::Obj2xav::SharedPtr msg);
-
+    
     void spin();
     bool getImageStatus(void);
     void displayConsole();
     void recordData(struct timeval startTime);
     void reply(ros2_msg::msg::Xav2cmd* cmd);
     bool RSS(float d0, float cf_vel, float cr_vel);
+		void isLaneChangeCommandReceived();
+		void isFV2Detected();
+		void isFV1Detected();
+		void isLVDetected();
+		void isAreaSafe(int indexArea);
+		void adjustTargetVelocity();
+		void setLaneChangeFlags(bool no_object = false);
 
     // xav->cmd
     ros2_msg::msg::Xav2cmd* cmd_data_;
@@ -106,12 +110,12 @@ private:
     void checkState();
     bool lc_right_flag_ = false;
     bool lc_left_flag_ = false;
-    bool lv_lc_right_ = false;
-    bool lv_lc_left_ = false;
-    bool fv1_lc_right_ = false;
-    bool fv1_lc_left_ = false;
-    bool fv2_lc_right_ = false;
-    bool fv2_lc_left_ = false;
+    bool cmd_lv_lc_right_ = false;
+    bool cmd_lv_lc_left_ = false;
+    bool cmd_fv1_lc_right_ = false;
+    bool cmd_fv1_lc_left_ = false;
+    bool cmd_fv2_lc_right_ = false;
+    bool cmd_fv2_lc_left_ = false;
     int lane_diff_cnt_ = 150;
     int lane_diff_ = 0;
     bool lc_center_follow_ = true;
@@ -121,18 +125,25 @@ private:
     float est_dist_ = 0.0f, f_est_dist_ = 0.0f, r_est_dist_ = 0.0f;
     float est_vel_ = 0.0f, f_est_vel_ = 0.0f, r_est_vel_ = 0.0f;
     float a_max_accel = 0.0f, a_min_brake = 0.0f, a_max_brake = 0.0f;
-    float p_ = 0.0f; // response time
+    float p_ = 0.0f;
+    float lv_rss_dist_ = 0.0f, fv1_rss_dist_ = 0.0f, fv2_rss_dist_ = 0.0f;
+		float lv_cur_dist_ = 0.0f, fv1_cur_dist_ = 0.0f, fv2_cur_dist_ = 0.0f;
+    float lv_est_dist_ = 0.0f, fv1_est_dist_ = 0.0f, fv2_est_dist_ = 0.0f;
+		bool req_flag_ = false;
     
     //bbox
     std::string name_;
+    std::string use_cam_;
     uint32_t x_ = 0;
     uint32_t y_ = 0;
     uint32_t w_ = 0;
     uint32_t h_ = 0;
     bool isbboxReady_ = false;
+    bool lv_bbox_ready_ = false;
+    bool fv1_bbox_ready_ = false;
+    bool fv2_bbox_ready_ = false;
     bool f_run_yolo_flag_ = false;
     bool r_run_yolo_flag_ = false;
-
 
     //image
     bool enableConsoleOutput_;
@@ -163,7 +174,7 @@ private:
     float TargetDist_;
     float SafetyDist_;
     std_msgs::msg::Float32MultiArray Obstacle_;
-    float mindist_;
+
 
     void lanedetectInThread();
     void objectdetectInThread();
@@ -177,7 +188,7 @@ private:
     //mutex
     std::mutex image_mutex_;
     std::mutex object_mutex_;
-    std::mutex lane_mutex_;
+    std::mutex lane_mutex_, r_lane_mutex_;
     std::mutex vel_mutex_;
     std::mutex dist_mutex_;
     std::mutex rep_mutex_;

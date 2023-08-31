@@ -83,10 +83,24 @@ public:
     bool FV1_Rear = false;
     bool FV2_Rear = false;
 
+		float lv_cur_dist_ = 0.0f;
+		float fv1_cur_dist_ = 0.0f;
+		float fv2_cur_dist_ = 0.0f;
+
+		float lv_est_dist_ = 0.0f;
+		float fv1_est_dist_ = 0.0f;
+		float fv2_est_dist_ = 0.0f;
+
+		bool lv_bbox_ready_ = false;
+		bool fv1_bbox_ready_ = false;
+		bool fv2_bbox_ready_ = false;
+
 private slots:
     void requestData(ros2_msg::msg::Cmd2xav cmd_data);
 
     void updateData(CmdData cmd_data);
+
+    void replyData(int tar_index);
 
     void on_MVelSlider_valueChanged(int value);
 
