@@ -1,0 +1,29 @@
+/**/scale_truck_control_node:
+  ros__parameters:    
+    subscribers/lane_to_xavier/topic: lane2xav_msg
+    subscribers/lane_to_xavier/queue_size: 1
+
+    publishers/xavier_to_lane/topic: xav2lane_msg
+    publishers/xavier_to_lane/queue_size: 1
+    publishers/xavier_to_lrc/topic: xav2lrc_msg
+    publishers/xavier_to_lrc/queue_size: 1
+    
+    params/index: 3
+    params/xav_log_path: /home/avees/ros2_ws/logfiles/
+
+    image_view/enable_console_output: false 
+    image_view/lane_change_right: false # cmd lane change
+    image_view/lane_change_left: false 
+
+/**/LRC:
+  ros__parameters:
+    LrcSub/xavier_to_lrc/topic: xav2lrc_msg
+    LrcSub/xavier_to_lrc/queue_size: 1
+
+    LrcPub/lrc_to_ocr/topic: lrc2ocr_msg
+    LrcPub/lrc_to_ocr/queue_size: 1
+
+    LrcParams/lrc_index: 13
+    LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
+    LrcParams/enable_console_output: false
+
