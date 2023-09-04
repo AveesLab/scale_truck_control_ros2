@@ -238,28 +238,46 @@ void Controller::requestData(ros2_msg::msg::Cmd2xav cmd_data)
 	}
 }
 
-void Controller::replyData(int src_index)
+void Controller::replyData()
 {
 	ros2_msg::msg::Cmd2xav cmd_data;
 	float tar_vel, tar_dist;
 
-	//FV2
-	if (src_index == 2) { 
-		cmd_data.src_index = 20;
-		cmd_data.tar_index = 2;
+	int value_vel = ui->LVVelSlider->value();
+	int value_dist = ui->LVDistSlider->value();
 
-		cmd_data.lv_cur_dist = lv_cur_dist_;
-		cmd_data.fv1_cur_dist = fv1_cur_dist_;
-		cmd_data.fv2_cur_dist = fv2_cur_dist_;
-
-		cmd_data.lv_est_dist = lv_est_dist_;
-		cmd_data.fv1_est_dist = fv1_est_dist_;
-		cmd_data.fv2_est_dist = fv2_est_dist_;
-
-		cmd_data.lv_bbox_ready = lv_bbox_ready_;
-		cmd_data.fv1_bbox_ready = fv1_bbox_ready_;
-		cmd_data.fv2_bbox_ready = fv2_bbox_ready_;
+	if(value_vel >= 10) {
+		tar_vel = value_vel/100.0f;
 	}
+	else {
+		tar_vel = 0;
+	}
+	tar_dist = value_dist/100.0f;
+
+	//LV, FV1, FV2
+	cmd_data.src_index = 20;
+	cmd_data.tar_vel = tar_vel;
+	cmd_data.tar_dist = tar_dist;
+
+	cmd_data.lv_cur_dist = lv_cur_dist_;
+	cmd_data.fv1_cur_dist = fv1_cur_dist_;
+	cmd_data.fv2_cur_dist = fv2_cur_dist_;
+
+	cmd_data.lv_est_vel = lv_est_vel_;
+	cmd_data.fv1_est_vel = fv1_est_vel_;
+	cmd_data.fv2_est_vel = fv2_est_vel_;
+
+	cmd_data.lv_est_dist = lv_est_dist_;
+	cmd_data.fv1_est_dist = fv1_est_dist_;
+	cmd_data.fv2_est_dist = fv2_est_dist_;
+
+	cmd_data.lv_bbox_ready = lv_bbox_ready_;
+	cmd_data.fv1_bbox_ready = fv1_bbox_ready_;
+	cmd_data.fv2_bbox_ready = fv2_bbox_ready_;
+
+	cmd_data.lv_r_bbox_ready = lv_r_bbox_ready_;
+	cmd_data.fv1_r_bbox_ready = fv1_r_bbox_ready_;
+	cmd_data.fv2_r_bbox_ready = fv2_r_bbox_ready_;
 
 	requestData(cmd_data);
 }
@@ -274,6 +292,9 @@ void Controller::updateData(CmdData cmd_data)
 	dist = tmp.cur_dist*deci; // cm
 
 	if(tmp.tar_index == 20){
+		/******/
+		/* LV */
+		/******/
 		if(tmp.src_index == 0)
 		{
 			ui->LVCurVel->setText(QString::number(vel/deci));
@@ -310,8 +331,16 @@ void Controller::updateData(CmdData cmd_data)
 
 			lv_cur_dist_ = dist/deci;
 			lv_est_dist_ = tmp.est_dist;
+			lv_r_est_dist_ = tmp.r_est_dist;
+			lv_r_est_vel_ = tmp.r_est_vel;
 			lv_bbox_ready_ = tmp.bbox_ready;
+			lv_r_bbox_ready_ = tmp.r_bbox_ready;
+
+			if(tmp.req_flag) replyData();
 		}
+		/*******/
+		/* FV1 */
+		/*******/
 		else if (tmp.src_index == 1)
 		{
 			ui->FV1CurVel->setText(QString::number(vel/deci));
@@ -350,8 +379,17 @@ void Controller::updateData(CmdData cmd_data)
 
 			fv1_cur_dist_ = dist/deci;
 			fv1_est_dist_ = tmp.est_dist;
+			fv1_r_est_dist_ = tmp.r_est_dist;
+			fv1_est_vel_ = tmp.est_vel;
+			fv1_r_est_vel_ = tmp.r_est_vel;
 			fv1_bbox_ready_ = tmp.bbox_ready;
+			fv1_r_bbox_ready_ = tmp.r_bbox_ready;
+
+			if(tmp.req_flag) replyData();
 		}
+		/*******/
+		/* FV2 */
+		/*******/
 		else if (tmp.src_index == 2)
 		{
 			ui->FV2CurVel->setText(QString::number(vel/deci));
@@ -390,9 +428,13 @@ void Controller::updateData(CmdData cmd_data)
 			
 			fv2_cur_dist_ = dist/deci;
 			fv2_est_dist_ = tmp.est_dist;
+			fv2_r_est_dist_ = tmp.r_est_dist;
+			fv2_est_vel_ = tmp.est_vel;
+			fv2_r_est_vel_ = tmp.r_est_vel;
 			fv2_bbox_ready_ = tmp.bbox_ready;
+			fv2_r_bbox_ready_ = tmp.r_bbox_ready;
 
-			if(tmp.req_flag) replyData(tmp.src_index);
+			if(tmp.req_flag) replyData();
 		}
 	}
 }

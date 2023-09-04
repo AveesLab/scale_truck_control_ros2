@@ -67,6 +67,7 @@ private:
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
     rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr YoloSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr RearYoloSubscriber_;
     
     //Callback Func
     void Lrc2ocrCallback(void);
@@ -76,6 +77,7 @@ private:
     void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
     void YoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
+    void RearYoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
     
     void spin();
     bool getImageStatus(void);
@@ -121,27 +123,70 @@ private:
     bool lc_center_follow_ = true;
 
     //RSS
-    bool RSS_flag_ = false;
-    float est_dist_ = 0.0f, f_est_dist_ = 0.0f, r_est_dist_ = 0.0f;
-    float est_vel_ = 0.0f, f_est_vel_ = 0.0f, r_est_vel_ = 0.0f;
-    float a_max_accel = 0.0f, a_min_brake = 0.0f, a_max_brake = 0.0f;
-    float p_ = 0.0f;
-    float lv_rss_dist_ = 0.0f, fv1_rss_dist_ = 0.0f, fv2_rss_dist_ = 0.0f;
-		float lv_cur_dist_ = 0.0f, fv1_cur_dist_ = 0.0f, fv2_cur_dist_ = 0.0f;
-    float lv_est_dist_ = 0.0f, fv1_est_dist_ = 0.0f, fv2_est_dist_ = 0.0f;
+		float a_max_accel = 0.0f;
+		float	a_min_brake = 0.0f; 
+		float a_max_brake = 0.0f;
+		float p_ = 0.0f;
+
+		float est_vel_ = 0.0f;
+		float	r_est_vel_ = 0.0f;
+
+		float lv_est_vel_ = 0.0f;
+		float fv1_est_vel_ = 0.0f;
+		float	fv2_est_vel_ = 0.0f;
+
+		float lv_r_est_vel_ = 0.0f;
+		float fv1_r_est_vel_ = 0.0f;
+		float	fv2_r_est_vel_ = 0.0f;
+
+		float est_dist_ = 0.0f; 
+		float r_est_dist_ = 0.0f;
+
+		float lv_cur_dist_ = 0.0f;
+		float	fv1_cur_dist_ = 0.0f;
+		float fv2_cur_dist_ = 0.0f;
+
+		float lv_est_dist_ = 0.0f;
+		float fv1_est_dist_ = 0.0f;
+		float	fv2_est_dist_ = 0.0f;
+
+		float lv_rss_dist_ = 0.0f;
+		float fv1_rss_dist_ = 0.0f;
+		float	fv2_rss_dist_ = 0.0f;
+
+		float lv_r_est_dist_ = 0.0f;
+		float fv1_r_est_dist_ = 0.0f;
+		float fv2_r_est_dist_ = 0.0f;
+
+		float lv_r_rss_dist_ = 0.0f;
+		float fv1_r_rss_dist_ = 0.0f;
+		float fv2_r_rss_dist_ = 0.0f;
+
 		bool req_flag_ = false;
-    
-    //bbox
-    std::string name_;
-    std::string use_cam_;
+
+		//bbox
+		std::string name_;
+		std::string r_name_;
     uint32_t x_ = 0;
     uint32_t y_ = 0;
     uint32_t w_ = 0;
     uint32_t h_ = 0;
-    bool isbboxReady_ = false;
-    bool lv_bbox_ready_ = false;
-    bool fv1_bbox_ready_ = false;
-    bool fv2_bbox_ready_ = false;
+    uint32_t rx_ = 0;
+    uint32_t ry_ = 0;
+    uint32_t rw_ = 0;
+    uint32_t rh_ = 0;
+
+    int isbboxReady_ = 3;   //isbboxObject? 1:Yes,  2:No, 3:No_Msg 
+    int r_isbboxReady_ = 3;
+
+    int lv_bbox_ready_ = 3;
+    int fv1_bbox_ready_ = 3;
+    int fv2_bbox_ready_ = 3;
+
+    int lv_r_bbox_ready_ = 3;
+    int fv1_r_bbox_ready_ = 3;
+    int fv2_r_bbox_ready_ = 3;
+
     bool f_run_yolo_flag_ = false;
     bool r_run_yolo_flag_ = false;
 

@@ -2,14 +2,18 @@
   ros__parameters:    
     subscribers/lane_to_xavier/topic: lane2xav_msg
     subscribers/lane_to_xavier/queue_size: 1
-    subscribers/rear_to_xavier/topic: rear2xav_msg
-    subscribers/rear_to_xavier/queue_size: 1
+    subscribers/rearlane_to_xavier/topic: rear2xav_msg
+    subscribers/rearlane_to_xavier/queue_size: 1
     subscribers/obstacle_reading/topic: raw_obstacles
     subscribers/obstacle_reading/queue_size: 100
     subscribers/lrc_to_xavier/topic: lrc2xav_msg
     subscribers/lrc_to_xavier/queue_size: 1
     subscribers/cmd_to_xavier/topic: /cmd2xav_msg
     subscribers/cmd_to_xavier/queue_size: 1
+		subscribers/yolo_to_xavier/topic: yolo_object_detection/Boundingbox
+		subscribers/yolo_to_xavier/queue_size: 1
+		subscribers/rearyolo_to_xavier/topic: rear_yolo_object_detection/Boundingbox 
+		subscribers/rearyolo_to_xavier/queue_size: 1
 
     publishers/xavier_to_lane/topic: xav2lane_msg
     publishers/xavier_to_lane/queue_size: 1
@@ -36,7 +40,7 @@
     rss/a_min_brake: 2.136
     rss/response_time: 0.458
 
-    image_view/enable_console_output: true 
+    image_view/enable_console_output: false 
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 

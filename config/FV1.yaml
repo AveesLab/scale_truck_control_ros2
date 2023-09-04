@@ -108,7 +108,7 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false 
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
 
     Calibration/r_matrix/a: 326.31389227574556
@@ -127,8 +127,15 @@
     Calibration/r_dist_coef/d: 0.
     Calibration/r_dist_coef/e: -0.022565312043601477
 
-    ROI/rear_cam/top_gap: 0.405 
-    ROI/rear_cam/bot_gap: 0.17 
+    ROI/dynamic_roi: false
+    ROI/canny/thresh1: 100
+    ROI/canny/thresh2: 200
+
+    ROI/width: 640
+    ROI/height: 480
+
+    ROI/rear_cam/top_gap: 0.43 # 0.405 
+    ROI/rear_cam/bot_gap: 0.18 # 0.17 
     ROI/rear_cam/top_height: 0.99
     ROI/rear_cam/bot_height: 0.47
     ROI/rear_cam/extra_f: 1.

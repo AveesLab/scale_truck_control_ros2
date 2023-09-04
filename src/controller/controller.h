@@ -83,24 +83,47 @@ public:
     bool FV1_Rear = false;
     bool FV2_Rear = false;
 
+		// 1
 		float lv_cur_dist_ = 0.0f;
 		float fv1_cur_dist_ = 0.0f;
 		float fv2_cur_dist_ = 0.0f;
 
+		// 2
 		float lv_est_dist_ = 0.0f;
 		float fv1_est_dist_ = 0.0f;
 		float fv2_est_dist_ = 0.0f;
 
-		bool lv_bbox_ready_ = false;
-		bool fv1_bbox_ready_ = false;
-		bool fv2_bbox_ready_ = false;
+		// 3
+		float lv_r_est_dist_ = 0.0f;
+		float fv1_r_est_dist_ = 0.0f;
+		float fv2_r_est_dist_ = 0.0f;
+
+		// 4
+		float lv_est_vel_ = 0.0f;
+		float fv1_est_vel_ = 0.0f;
+		float fv2_est_vel_ = 0.0f;
+
+		// 5
+		float lv_r_est_vel_ = 0.0f;
+		float fv1_r_est_vel_ = 0.0f;
+		float fv2_r_est_vel_ = 0.0f;
+
+		// 6
+		int lv_bbox_ready_ = 3; //isbboxObject? 1:Yes,  2:No, 3:No_Msg
+		int fv1_bbox_ready_ = 3;
+		int fv2_bbox_ready_ = 3;
+
+		// 7
+		int lv_r_bbox_ready_ = 3;
+		int fv1_r_bbox_ready_ = 3;
+		int fv2_r_bbox_ready_ = 3;
 
 private slots:
     void requestData(ros2_msg::msg::Cmd2xav cmd_data);
 
     void updateData(CmdData cmd_data);
 
-    void replyData(int tar_index);
+    void replyData();
 
     void on_MVelSlider_valueChanged(int value);
 
