@@ -8,10 +8,10 @@
     publishers/xavier_to_lrc/topic: xav2lrc_msg
     publishers/xavier_to_lrc/queue_size: 1
     
-    params/index: 3
+    params/index: 4
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
-    image_view/enable_console_output: false 
+    image_view/enable_console_output: true 
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 
@@ -23,7 +23,7 @@
     LrcPub/lrc_to_ocr/topic: lrc2ocr_msg
     LrcPub/lrc_to_ocr/queue_size: 1
 
-    LrcParams/lrc_index: 13
+    LrcParams/lrc_index: 14
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 

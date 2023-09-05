@@ -24,6 +24,7 @@
 //custom msgs
 #include "ros2_msg/msg/lrc2ocr.hpp"
 #include "ros2_msg/msg/xav2lrc.hpp"
+#include "ros2_msg/msg/ocr2lrc.hpp"
 
 using namespace std::chrono_literals;
 
@@ -41,12 +42,14 @@ private:
 
     //Subscriber
     rclcpp::Subscription<ros2_msg::msg::Xav2lrc>::SharedPtr XavSubscriber_;
+    rclcpp::Subscription<ros2_msg::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
 
     //Publisher
     rclcpp::Publisher<ros2_msg::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
 
     //Callback
     void XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg);
+    void OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg);
 
     bool isNodeRunning();
     void rosPub();

@@ -23,6 +23,9 @@ void LocalRC::init(){
 
   std::string XavSubTopicName;
   int XavSubQueueSize;
+  std::string OcrSubTopicName;
+  int OcrSubQueueSize;
+
   std::string OcrPubTopicName;
   int OcrPubQueueSize;
 
@@ -34,6 +37,8 @@ void LocalRC::init(){
   /******************************/
   this->get_parameter_or("LrcSub/xavier_to_lrc/topic", XavSubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("LrcSub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
+  this->get_parameter_or("LrcSub/ocr_to_lrc/topic", OcrSubTopicName, std::string("ocr2lrc_msg"));
+  this->get_parameter_or("LrcSub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
 
   /******************************/
   /* ROS Topic Publish Option */
@@ -45,6 +50,8 @@ void LocalRC::init(){
   /* ROS Topic Subscriber */
   /************************/
   XavSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
+
+  OcrSubscriber_ = this->create_subscription<ros2_msg::msg::Ocr2lrc>(OcrSubTopicName, OcrSubQueueSize, std::bind(&LocalRC::OcrCallback, this, std::placeholders::_1));
 
   /************************/
   /* ROS Topic Publisher */
@@ -142,6 +149,15 @@ void LocalRC::XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
 {
   std::scoped_lock lock(data_mutex_);
   angle_degree_ = msg->steer_angle;
+}
+
+void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)
+{
+  float ocr_angle = msg->cur_angle;
+  float ocr_angle_output = msg->angle_output;
+
+//  RCLCPP_INFO(this->get_logger(), "ocr_angle/output : %3.3f / %3.3f\n", ocr_angle, ocr_angle_output);
+
 }
 
 } /* namespace scale_truck_control */

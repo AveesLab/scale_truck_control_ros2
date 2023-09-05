@@ -108,8 +108,7 @@ void ScaleTruckController::objectdetectInThread()
 	float dist, dist_tmp;
 	dist_tmp = 10.1f;
 	ros2_msg::msg::Xav2lane Lane_;
-	//dist_tmp = dist;
-	dist_tmp = 0.8f;
+	//dist_tmp = 0.8f;
 	distance_ = dist_tmp;
 
 	/*****************************/
