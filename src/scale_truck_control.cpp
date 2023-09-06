@@ -417,9 +417,9 @@ void ScaleTruckController::objectdetectInThread()
 void ScaleTruckController::isLaneChangeCommandReceived() {
 	{
 		std::scoped_lock lock(rep_mutex_);
-		if(index_ == 2 && (cmd_fv2_lc_right_ || cmd_fv2_lc_left_)) return isFV2Detected();
+		if(index_ == 2 && (cmd_fv2_lc_right_ || cmd_fv2_lc_left_)) isFV2Detected();
 		else if(index_ == 1 && (cmd_fv1_lc_right_ || cmd_fv1_lc_left_)) isFV2Detected();
-		else if(index_ == 0 && (cmd_lv_lc_right_ || cmd_lv_lc_left_)) return isFV1Detected();
+		else if(index_ == 0 && (cmd_lv_lc_right_ || cmd_lv_lc_left_)) isFV1Detected();
 	}
 }
 
@@ -427,13 +427,13 @@ void ScaleTruckController::isFV2Detected() {
 	{
 		std::scoped_lock lock(rep_mutex_);
 		if (index_ == 2) { //FV2
-			if(fv2_bbox_ready_ == 1 || fv2_r_bbox_ready_ == 1) return isAreaSafe(2); 
-			else if(fv2_bbox_ready_ == 2 && fv2_r_bbox_ready_ == 2) return isFV1Detected();
+			if(fv2_bbox_ready_ == 1 || fv2_r_bbox_ready_ == 1) isAreaSafe(2); 
+			else if(fv2_bbox_ready_ == 2 && fv2_r_bbox_ready_ == 2) isFV1Detected();
 			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No front & rearYolo Msg\n", index_);
 		}
 		else if (index_ == 1) { //FV1
-			if(fv2_bbox_ready_ == 1) return isAreaSafe(2);
-			else if(fv2_bbox_ready_ == 2) return isFV1Detected();
+			if(fv2_bbox_ready_ == 1) isAreaSafe(2);
+			else if(fv2_bbox_ready_ == 2) isFV1Detected();
 			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No frontYolo Msg\n", index_);
 		}
 	}
@@ -443,18 +443,18 @@ void ScaleTruckController::isFV1Detected() {
 	{
 		std::scoped_lock lock(rep_mutex_);
 		if(index_ == 2) {
-			if(fv1_r_bbox_ready_ == 1) return isAreaSafe(1);	
-			else if(fv1_r_bbox_ready_ == 2) return setLaneChangeFlags();
+			if(fv1_r_bbox_ready_ == 1) isAreaSafe(1);	
+			else if(fv1_r_bbox_ready_ == 2) setLaneChangeFlags();
 			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No rearYolo Msg\n");
 		}
 		else if(index_ == 1) {
-			if(fv1_bbox_ready_ == 1) return isAreaSafe(1);
-		  else if(fv1_bbox_ready_ == 2) return setLaneChangeFlags();	
+			if(fv1_bbox_ready_ == 1) isAreaSafe(1);
+		  else if(fv1_bbox_ready_ == 2) setLaneChangeFlags();	
 			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
 		}
 		else {
-			if(fv1_bbox_ready_ == 1) return isAreaSafe(1);
-		  else if(fv1_bbox_ready_ == 2) return isLVDetected();	
+			if(fv1_bbox_ready_ == 1) isAreaSafe(1);
+		  else if(fv1_bbox_ready_ == 2) isLVDetected();	
 			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
 		}
 	}
@@ -483,8 +483,8 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 			//FV1 Area is OK?
 			if(indexArea == 1) { 
 				if(fv1_r_est_dist_ != 0 && fv2_cur_dist_ != 0) {
-					if(fv1_r_est_dist_ <= d1_) return adjustTargetVelocity();
-					else return setLaneChangeFlags(); // FV2 LC
+					if(fv1_r_est_dist_ <= d1_) adjustTargetVelocity();
+					else setLaneChangeFlags(); // FV2 LC
 				}
 				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_r_est, fv2_cur)_dist\n");
 			} 
@@ -492,25 +492,25 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 				//FV2 Rear && Front Area is OK?
 				if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ == 1) {
 					if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0 && fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
-						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) return adjustTargetVelocity();
-						else if (fv2_est_dist_ <= fv2_rss_dist_) return adjustTargetVelocity();
-						else return isFV1Detected();
+						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) adjustTargetVelocity();
+						else if (fv2_est_dist_ <= fv2_rss_dist_) adjustTargetVelocity();
+						else isFV1Detected();
 					}
 					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_est, fv2_r_rss, fv2_rss)_dist\n");
 				}
 				//FV2 Rear Area is OK?
 				else if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ != 1) {
 					if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0) {
-						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) return adjustTargetVelocity();
-						else return isFV1Detected();
+						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) adjustTargetVelocity();
+						else isFV1Detected();
 					}
 					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_r_rss)_dist\n");
 				}
 				//FV2 Front Area is OK?
 				else if (fv2_bbox_ready_ == 1) {
 					if(fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
-						if(fv2_est_dist_ <= fv2_rss_dist_) return adjustTargetVelocity();
-						else return isFV1Detected();
+						if(fv2_est_dist_ <= fv2_rss_dist_) adjustTargetVelocity();
+						else isFV1Detected();
 					}
 					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_rss)_dist\n");
 				}
@@ -522,15 +522,15 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 		else if (index_ == 1) {
 			if(indexArea == 1) {
 				if(fv1_est_dist_ != 0 && fv1_rss_dist_ != 0) {
-					if(fv1_est_dist_ <= fv1_rss_dist_) return adjustTargetVelocity();
-					else return setLaneChangeFlags(); // FV1 LC
+					if(fv1_est_dist_ <= fv1_rss_dist_) adjustTargetVelocity();
+					else setLaneChangeFlags(); // FV1 LC
 				}
 				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_rss)_dist\n");
 			} 
 			else if(indexArea == 2) {
 				if(fv2_est_dist_ != 0 && fv2_cur_dist_ != 0) {
-					if(fv2_est_dist_ <= d1_) return adjustTargetVelocity();
-					else return isFV1Detected();
+					if(fv2_est_dist_ <= d1_) adjustTargetVelocity();
+					else isFV1Detected();
 				}	
 				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_cur)_dist\n");
 			} 
@@ -541,15 +541,15 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 		else if (index_ == 0) {
 			if(indexArea == 0) {
 				if(lv_est_dist_ != 0 && lv_rss_dist_ != 0) {
-					if(lv_est_dist_ <= lv_rss_dist_) return adjustTargetVelocity();
-					else return setLaneChangeFlags(); // LV LC
+					if(lv_est_dist_ <= lv_rss_dist_) adjustTargetVelocity();
+					else setLaneChangeFlags(); // LV LC
 				}
 				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (lv_est, lv_rss)_dist\n");
 			}
 			else if(indexArea == 1) {
 				if(fv1_est_dist_ != 0 && fv1_cur_dist_ != 0) {
-					if(fv1_est_dist_ <= d2_) return adjustTargetVelocity();
-					else return isLVDetected(); 
+					if(fv1_est_dist_ <= d2_) adjustTargetVelocity();
+					else isLVDetected(); 
 				}
 				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_cur)_dist\n");
 			} 
