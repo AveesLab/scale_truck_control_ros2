@@ -72,9 +72,9 @@ bool ScaleTruckController::readParameters() {
 	this->get_parameter_or("image_view/lane_change_right", lc_right_flag_, false); // cmd
 	this->get_parameter_or("image_view/lane_change_left", lc_left_flag_, false); // cmd
 
-	/**************/
-	/* RSS Option */
-	/**************/
+	/*************/
+	/* RSS_Param */
+	/*************/
 	this->get_parameter_or("rss/a_max_accel", a_max_accel, 0.0f); 
 	this->get_parameter_or("rss/a_max_brake", a_max_brake, 0.0f); 
 	this->get_parameter_or("rss/a_min_brake", a_min_brake, 0.0f); 
@@ -175,7 +175,6 @@ void ScaleTruckController::init()
 
 	lane_coef_.coef.resize(3);
 	r_lane_coef_.coef.resize(3);
-	prev_lane_coef_.coef.resize(3);
 
 	e_values_.resize(3);
 
@@ -201,7 +200,7 @@ void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
 	while(isNodeRunning_)
 	{
 		{
-			std::scoped_lock lock(vel_mutex_, dist_mutex_, bbox_mutex_);
+			std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_);
 			cmd->tar_vel = TargetVel_;
 			cmd->cur_vel = CurVel_;
 			cmd->cur_dist = distance_;
@@ -212,9 +211,7 @@ void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
 			cmd->bbox_ready = isbboxReady_;
 			cmd->r_bbox_ready = r_isbboxReady_;
 			cmd->req_flag = req_flag_;
-		}
-		{
-			std::scoped_lock lock(lane_mutex_, r_lane_mutex_);
+
 			cmd->coef.resize(3);
 			cmd->coef[0].a = lane_coef_.coef[0].a;
 			cmd->coef[0].b = lane_coef_.coef[0].b;
@@ -242,9 +239,6 @@ void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
 			cmd->lc_right_flag = lc_right_flag_;
 			cmd->lc_left_flag = lc_left_flag_;
 		}
-		{
-			std::scoped_lock lock(rep_mutex_);
-		}
 
 		CmdPublisher_->publish(*cmd);
 
@@ -260,10 +254,9 @@ void ScaleTruckController::checkState() {
 	double prev_center_base = 0, cur_center_base = 0;
 
 	{
-		std::scoped_lock lock(lane_mutex_);
-		if(sizeof(prev_lane_coef_.coef) != 0 && sizeof(lane_coef_.coef) != 0) 
+		std::scoped_lock lock(lane_mutex_, rep_mutex_);
+		if(sizeof(lane_coef_.coef) != 0) 
 		{
-			//prev_center_base = (prev_lane_coef_.coef[2].a * pow(i, 2)) + (prev_lane_coef_.coef[2].b * i) + prev_lane_coef_.coef[2].c;
 			prev_center_base = car_position;
 			cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
 			lane_diff = abs(cur_center_base - prev_center_base); 
@@ -275,43 +268,43 @@ void ScaleTruckController::checkState() {
 			if(lane_diff_cnt_ <= 0) {
 				lane_diff_cnt_ = 150;
 
-				/* right lane change */
-				if(lc_right_flag_ == true) {
-					if(cmd_fv2_lc_right_ == true) {
-						cmd_fv2_lc_right_ = false;
-						lc_right_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-					}
-					else if (cmd_fv1_lc_right_ == true) {
-						cmd_fv1_lc_right_ = false;
-						lc_right_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-					}
-					else {
-						cmd_lv_lc_right_ = false;
-						lc_right_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
-					}
-				}
-				/* left lane change */
-				else if(lc_left_flag_ == true) {
-					if(cmd_fv2_lc_left_ == true) {
-						cmd_fv2_lc_left_ = false;
-						lc_left_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-					}
-					else if (cmd_fv1_lc_left_ == true) {
-						cmd_fv1_lc_left_ = false;
-						lc_left_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-					}
-					else {
-						cmd_lv_lc_left_ = false;
-						lc_left_flag_ = false;
-//						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
-					}
-				}
-				runYoloPublisher_->publish(yolo_flag_msg);
+        /* right lane change */
+        if(lc_right_flag_ == true) {
+          if(cmd_fv2_lc_right_ == true) {
+            cmd_fv2_lc_right_ = false;
+            lc_right_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+          }
+          else if (cmd_fv1_lc_right_ == true) {
+            cmd_fv1_lc_right_ = false;
+            lc_right_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+          }
+          else {
+            cmd_lv_lc_right_ = false;
+            lc_right_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
+          }
+        }
+        /* left lane change */
+        else if(lc_left_flag_ == true) {
+          if(cmd_fv2_lc_left_ == true) {
+            cmd_fv2_lc_left_ = false;
+            lc_left_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+          }
+          else if (cmd_fv1_lc_left_ == true) {
+            cmd_fv1_lc_left_ = false;
+            lc_left_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+          }
+          else {
+            cmd_lv_lc_left_ = false;
+            lc_left_flag_ = false;
+            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
+          }
+        }
+        runYoloPublisher_->publish(yolo_flag_msg);
 			}
 		}
 	}  
@@ -326,32 +319,34 @@ void ScaleTruckController::objectdetectInThread()
 	/* Lidar Data */
 	/**************/
 	{
-		std::scoped_lock lock(lane_mutex_, object_mutex_);         
+		std::scoped_lock lock(object_mutex_);         
 		ObjCircles_ = Obstacle_.data.size();    
-	}   
-	for(int i=0; i < ObjCircles_; i+=3)
-	{
-		if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
-		{
-			//dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
-			dist = sqrt(pow(Obstacle_.data[i], 2));
-			if(dist_tmp >= dist)
-			{
-				dist_tmp = dist;
-			}
-		}	
-	}
 
-	if(ObjCircles_ != 0)
-	{
-		distance_ = dist_tmp;
-	}
+    for(int i=0; i < ObjCircles_; i+=3)
+    {
+      if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
+      {
+        //dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+        dist = sqrt(pow(Obstacle_.data[i], 2));
+        if(dist_tmp >= dist)
+        {
+          dist_tmp = dist;
+        }
+      }	
+    }
+
+    if(ObjCircles_ != 0)
+    {
+      std::scoped_lock lock(dist_mutex_);
+      distance_ = dist_tmp;
+    }
+	}   
 
 	/*****************************/
 	/* Dynamic ROI Distance Data */
 	/*****************************/
 	{
-		std::scoped_lock lock(rep_mutex_, lane_mutex_, vel_mutex_, bbox_mutex_);
+		std::scoped_lock lock(lane_mutex_, vel_mutex_, rep_mutex_);
 		if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
 		{
 			Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f)+40;
@@ -363,27 +358,32 @@ void ScaleTruckController::objectdetectInThread()
 		Lane_.cur_vel = CurVel_;
 		Lane_.lc_right_flag = lc_right_flag_;
 		Lane_.lc_left_flag = lc_left_flag_;
-
-		if(isbboxReady_ == 1){
-			Lane_.name = name_;
-			Lane_.x = x_;
-			Lane_.y = y_;
-			Lane_.w = w_;
-			Lane_.h = h_;    
-		}
-		if(r_isbboxReady_ == 1) {
-			Lane_.r_name = r_name_;
-			Lane_.rx = rx_;
-			Lane_.ry = ry_;
-			Lane_.rw = rw_;
-			Lane_.rh = rh_;    
-		}
-		LanePublisher_->publish(Lane_);
-	}
+  }
+  {
+    std::scoped_lock lock(bbox_mutex_);
+    if(isbboxReady_ == 1){
+      Lane_.name = name_;
+      Lane_.x = x_;
+      Lane_.y = y_;
+      Lane_.w = w_;
+      Lane_.h = h_;    
+    }
+  }
+  {
+    std::scoped_lock lock(rbbox_mutex_);
+    if(r_isbboxReady_ == 1) {
+      Lane_.r_name = r_name_;
+      Lane_.rx = rx_;
+      Lane_.ry = ry_;
+      Lane_.rw = rw_;
+      Lane_.rh = rh_;    
+    }
+  }
+  LanePublisher_->publish(Lane_);
 
 	if(index_ == 0) //LV
 	{  
-		std::scoped_lock lock(rep_mutex_, dist_mutex_);
+		std::scoped_lock lock(dist_mutex_, rep_mutex_);
 		if(distance_ <= LVstopDist_) {
 			// Emergency Brake
 			ResultVel_ = 0.0f;
@@ -415,206 +415,207 @@ void ScaleTruckController::objectdetectInThread()
 }
 
 void ScaleTruckController::isLaneChangeCommandReceived() {
-	{
-		std::scoped_lock lock(rep_mutex_);
-		if(index_ == 2 && (cmd_fv2_lc_right_ || cmd_fv2_lc_left_)) isFV2Detected();
-		else if(index_ == 1 && (cmd_fv1_lc_right_ || cmd_fv1_lc_left_)) isFV2Detected();
-		else if(index_ == 0 && (cmd_lv_lc_right_ || cmd_lv_lc_left_)) isFV1Detected();
-	}
+  if(index_ == 2 && (cmd_fv2_lc_right_ || cmd_fv2_lc_left_)) isFV2Detected();
+  else if(index_ == 1 && (cmd_fv1_lc_right_ || cmd_fv1_lc_left_)) isFV2Detected();
+  else if(index_ == 0 && (cmd_lv_lc_right_ || cmd_lv_lc_left_)) isFV1Detected();
 }
 
 void ScaleTruckController::isFV2Detected() {
-	{
-		std::scoped_lock lock(rep_mutex_);
-		if (index_ == 2) { //FV2
-			if(fv2_bbox_ready_ == 1 || fv2_r_bbox_ready_ == 1) isAreaSafe(2); 
-			else if(fv2_bbox_ready_ == 2 && fv2_r_bbox_ready_ == 2) isFV1Detected();
-			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No front & rearYolo Msg\n", index_);
-		}
-		else if (index_ == 1) { //FV1
-			if(fv2_bbox_ready_ == 1) isAreaSafe(2);
-			else if(fv2_bbox_ready_ == 2) isFV1Detected();
-			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No frontYolo Msg\n", index_);
-		}
-	}
+  if (index_ == 2) { //FV2
+    if(fv2_bbox_ready_ == 1 || fv2_r_bbox_ready_ == 1) isAreaSafe(2); 
+    else if(fv2_bbox_ready_ == 2 && fv2_r_bbox_ready_ == 2) isFV1Detected();
+    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No front & rearYolo Msg\n", index_);
+  }
+  else if (index_ == 1) { //FV1
+    if(fv2_bbox_ready_ == 1) isAreaSafe(2);
+    else if(fv2_bbox_ready_ == 2) isFV1Detected();
+    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No frontYolo Msg\n", index_);
+  }
 }
 
 void ScaleTruckController::isFV1Detected() {
-	{
-		std::scoped_lock lock(rep_mutex_);
-		if(index_ == 2) {
-			if(fv1_r_bbox_ready_ == 1) isAreaSafe(1);	
-			else if(fv1_r_bbox_ready_ == 2) setLaneChangeFlags();
-			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No rearYolo Msg\n");
-		}
-		else if(index_ == 1) {
-			if(fv1_bbox_ready_ == 1) isAreaSafe(1);
-		  else if(fv1_bbox_ready_ == 2) setLaneChangeFlags();	
-			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
-		}
-		else {
-			if(fv1_bbox_ready_ == 1) isAreaSafe(1);
-		  else if(fv1_bbox_ready_ == 2) isLVDetected();	
-			else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
-		}
-	}
+  if(index_ == 2) {
+    if(fv1_r_bbox_ready_ == 1) isAreaSafe(1);	
+    else if(fv1_r_bbox_ready_ == 2) setLaneChangeFlags();
+    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No rearYolo Msg\n");
+  }
+  else if(index_ == 1) {
+    if(fv1_bbox_ready_ == 1) isAreaSafe(1);
+    else if(fv1_bbox_ready_ == 2) setLaneChangeFlags();	
+    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
+  }
+  else {
+    if(fv1_bbox_ready_ == 1) isAreaSafe(1);
+    else if(fv1_bbox_ready_ == 2) isLVDetected();	
+    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
+  }
 }
 
 void ScaleTruckController::isLVDetected() {
-	{
-		std::scoped_lock lock(rep_mutex_);
-		if(lv_bbox_ready_ == 1) isAreaSafe(0);
-		else if (lv_bbox_ready_ == 2) setLaneChangeFlags(); // LV LC
-		else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "LV No frontYolo Msg\n");
-	}
+  if(lv_bbox_ready_ == 1) isAreaSafe(0);
+  else if (lv_bbox_ready_ == 2) setLaneChangeFlags(); // LV LC
+  else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "LV No frontYolo Msg\n");
 }
 
 void ScaleTruckController::isAreaSafe(int indexArea) {
-	{
-		std::scoped_lock lock(rep_mutex_);
-		// car_length_ = 1.15
-		int d1_ = fv2_cur_dist_ + 1.15f + 0.23f;  
-		int d2_ = fv1_cur_dist_ + 1.15f + 0.23f; 
+  // car_length_ = 1.15
+  int d1_ = fv2_cur_dist_ + 1.15f + 0.23f;  
+  int d2_ = fv1_cur_dist_ + 1.15f + 0.23f; 
 
-		/*******/
-		/* FV2 */
-		/*******/
-		if (index_ == 2) {
-			//FV1 Area is OK?
-			if(indexArea == 1) { 
-				if(fv1_r_est_dist_ != 0 && fv2_cur_dist_ != 0) {
-					if(fv1_r_est_dist_ <= d1_) adjustTargetVelocity();
-					else setLaneChangeFlags(); // FV2 LC
-				}
-				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_r_est, fv2_cur)_dist\n");
-			} 
-			else if(indexArea == 2) { 
-				//FV2 Rear && Front Area is OK?
-				if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ == 1) {
-					if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0 && fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
-						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) adjustTargetVelocity();
-						else if (fv2_est_dist_ <= fv2_rss_dist_) adjustTargetVelocity();
-						else isFV1Detected();
-					}
-					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_est, fv2_r_rss, fv2_rss)_dist\n");
-				}
-				//FV2 Rear Area is OK?
-				else if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ != 1) {
-					if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0) {
-						if(fv2_r_est_dist_ <= fv2_r_rss_dist_) adjustTargetVelocity();
-						else isFV1Detected();
-					}
-					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_r_rss)_dist\n");
-				}
-				//FV2 Front Area is OK?
-				else if (fv2_bbox_ready_ == 1) {
-					if(fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
-						if(fv2_est_dist_ <= fv2_rss_dist_) adjustTargetVelocity();
-						else isFV1Detected();
-					}
-					else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_rss)_dist\n");
-				}
-			} 
-		}
-		/*******/
-		/* FV1 */
-		/*******/
-		else if (index_ == 1) {
-			if(indexArea == 1) {
-				if(fv1_est_dist_ != 0 && fv1_rss_dist_ != 0) {
-					if(fv1_est_dist_ <= fv1_rss_dist_) adjustTargetVelocity();
-					else setLaneChangeFlags(); // FV1 LC
-				}
-				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_rss)_dist\n");
-			} 
-			else if(indexArea == 2) {
-				if(fv2_est_dist_ != 0 && fv2_cur_dist_ != 0) {
-					if(fv2_est_dist_ <= d1_) adjustTargetVelocity();
-					else isFV1Detected();
-				}	
-				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_cur)_dist\n");
-			} 
-		}
-		/*******/
-		/* LV  */
-		/*******/
-		else if (index_ == 0) {
-			if(indexArea == 0) {
-				if(lv_est_dist_ != 0 && lv_rss_dist_ != 0) {
-					if(lv_est_dist_ <= lv_rss_dist_) adjustTargetVelocity();
-					else setLaneChangeFlags(); // LV LC
-				}
-				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (lv_est, lv_rss)_dist\n");
-			}
-			else if(indexArea == 1) {
-				if(fv1_est_dist_ != 0 && fv1_cur_dist_ != 0) {
-					if(fv1_est_dist_ <= d2_) adjustTargetVelocity();
-					else isLVDetected(); 
-				}
-				else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_cur)_dist\n");
-			} 
-		}
-	}
+  /*******/
+  /* FV2 */
+  /*******/
+  if (index_ == 2) {
+    //FV1 Area is OK?
+    if(indexArea == 1) { 
+      if(fv1_r_est_dist_ != 0 && fv2_cur_dist_ != 0) {
+        if(fv1_r_est_dist_ <= d1_) {
+          //adjustTargetVelocity();
+        }
+        else setLaneChangeFlags(); // FV2 LC
+      }
+      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_r_est, fv2_cur)_dist\n");
+    } 
+    else if(indexArea == 2) { 
+      //FV2 Rear && Front Area is OK?
+      if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ == 1) {
+        if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0 && fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
+          if(fv2_r_est_dist_ <= fv2_r_rss_dist_) {
+            //adjustTargetVelocity();
+          }
+          else if (fv2_est_dist_ <= fv2_rss_dist_) {
+            //adjustTargetVelocity();
+          }
+          else isFV1Detected();
+        }
+        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_est, fv2_r_rss, fv2_rss)_dist\n");
+      }
+      //FV2 Rear Area is OK?
+      else if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ != 1) {
+        if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0) {
+          if(fv2_r_est_dist_ <= fv2_r_rss_dist_) {
+            //adjustTargetVelocity();
+          }
+          else isFV1Detected();
+        }
+        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_r_rss)_dist\n");
+      }
+      //FV2 Front Area is OK?
+      else if (fv2_bbox_ready_ == 1) {
+        if(fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
+          if(fv2_est_dist_ <= fv2_rss_dist_) {
+            //adjustTargetVelocity();
+          }
+          else isFV1Detected();
+        }
+        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_rss)_dist\n");
+      }
+    } 
+  }
+  /*******/
+  /* FV1 */
+  /*******/
+  else if (index_ == 1) {
+    if(indexArea == 1) {
+      if(fv1_est_dist_ != 0 && fv1_rss_dist_ != 0) {
+        if(fv1_est_dist_ <= fv1_rss_dist_) {
+          //adjustTargetVelocity();
+        }
+        else setLaneChangeFlags(); // FV1 LC
+      }
+      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_rss)_dist\n");
+    } 
+    else if(indexArea == 2) {
+      if(fv2_est_dist_ != 0 && fv2_cur_dist_ != 0) {
+        if(fv2_est_dist_ <= d1_) {
+          //adjustTargetVelocity();
+        }
+        else {
+          isFV1Detected();
+        }
+      }	
+      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_cur)_dist\n");
+    } 
+  }
+  /*******/
+  /* LV  */
+  /*******/
+  else if (index_ == 0) {
+    if(indexArea == 0) {
+      if(lv_est_dist_ != 0 && lv_rss_dist_ != 0) {
+        if(lv_est_dist_ <= lv_rss_dist_) {
+          //adjustTargetVelocity();
+        }
+        else setLaneChangeFlags(); // LV LC
+      }
+      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (lv_est, lv_rss)_dist\n");
+    }
+    else if(indexArea == 1) {
+      if(fv1_est_dist_ != 0 && fv1_cur_dist_ != 0) {
+        if(fv1_est_dist_ <= d2_) {
+          //adjustTargetVelocity();
+        }
+        else isLVDetected(); 
+      }
+      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_cur)_dist\n");
+    } 
+  }
 }
 
 void ScaleTruckController::adjustTargetVelocity() {
-	{
-		std::scoped_lock lock(vel_mutex_, rep_mutex_);
-		if(index_ == 2) {
-			if (fv2_r_bbox_ready_ == 1) {
-				if(CurVel_ >= fv2_r_est_vel_) {
-					TargetVel_ += 0.01f;
-					if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-				}
-				else {
-					TargetVel_ -= 0.01f;
-					if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
-				}
-			}
-			else if (fv2_bbox_ready_ == 1) {
-				if(CurVel_ >= fv2_est_vel_) {
-					TargetVel_ += 0.01f;
-					if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-				}
-				else {
-					TargetVel_ -= 0.01f;
-					if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
-				}
-			}
-			else if (fv1_r_bbox_ready_ == 1) {
-				if(CurVel_ >= fv1_r_est_vel_ ) {
-					TargetVel_ += 0.01f;
-					if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-				}
-				else {
-					TargetVel_ -= 0.01f;
-					if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
-				}
-			
-			}
-		}
-		else if (index_ == 0 || index_ == 1) {
-			TargetVel_ -= 0.01;
-			if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
-		}
-	}
+  std::scoped_lock lock(vel_mutex_);
+  if(index_ == 2) {
+    if (fv2_r_bbox_ready_ == 1) {
+      if(CurVel_ >= fv2_r_est_vel_) {
+        TargetVel_ += 0.01f;
+        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+      }
+      else {
+        TargetVel_ -= 0.01f;
+        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
+      }
+    }
+    else if (fv2_bbox_ready_ == 1) {
+      if(CurVel_ >= fv2_est_vel_) {
+        TargetVel_ += 0.01f;
+        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+      }
+      else {
+        TargetVel_ -= 0.01f;
+        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
+      }
+    }
+    else if (fv1_r_bbox_ready_ == 1) {
+      if(CurVel_ >= fv1_r_est_vel_ ) {
+        TargetVel_ += 0.01f;
+        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+      }
+      else {
+        TargetVel_ -= 0.01f;
+        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
+      }
+
+    }
+  }
+  else if (index_ == 0 || index_ == 1) {
+    TargetVel_ -= 0.01;
+    if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_;	
+  }
 }
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
-	ros2_msg::msg::Yoloflag yolo_flag_msg;
-	{
-		std::scoped_lock lock(rep_mutex_);
-		if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
-			lc_right_flag_ = true;
-			yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-		}
-		else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
-			lc_left_flag_ = true;
-			yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-		}
+  ros2_msg::msg::Yoloflag yolo_flag_msg;
 
-		runYoloPublisher_->publish(yolo_flag_msg);
-	}
+  if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
+    lc_right_flag_ = true;
+    yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+  }
+  else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
+    lc_left_flag_ = true;
+    yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+  }
+
+  runYoloPublisher_->publish(yolo_flag_msg);
 }
 
 void ScaleTruckController::spin() 
@@ -629,25 +630,26 @@ void ScaleTruckController::spin()
 		struct timeval start_time, end_time;
 		gettimeofday(&start_time, NULL);
 
-		{
-			std::scoped_lock lock(lane_mutex_, r_lane_mutex_, vel_mutex_);
-  		if((est_vel_ != 0 && est_dist_ != 0)) {
-				RSS(est_dist_, CurVel_, est_vel_);
-  		}
-  		if((r_est_vel_ != 0 && r_est_dist_ != 0)) {
-				RSS(r_est_dist_, CurVel_, r_est_vel_);
-			}
-		}
 
 		objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
 		objectdetect_thread.join();
 
-		/* 데이터들 들어왔는지 확인 후 판단 */
-		/* lv,fv1,fv2 | bbox | cur_dist | est_dist | */
-		if (lc_right_flag_== false || lc_left_flag_ == false)	isLaneChangeCommandReceived();	
+    {
+      std::scoped_lock lock(rep_mutex_, rss_mutex_);
+      if (lc_right_flag_== false || lc_left_flag_ == false)	{
+        RSS();
+        isLaneChangeCommandReceived();	
 
-		{
-			std::scoped_lock lock(rep_mutex_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
+      }
+    }
+    {
+			std::scoped_lock lock(lane_mutex_, rep_mutex_);
 			if((AngleDegree2 != 0) && (lc_right_flag_ || lc_left_flag_)) { 
 				AngleDegree_ = AngleDegree2;
 				checkState(); // is lane change complete ?	
@@ -662,6 +664,7 @@ void ScaleTruckController::spin()
 			msg.steer_angle = AngleDegree_; 
 			msg.cur_dist = distance_;       
 		}
+
 		{
 			std::scoped_lock lock(rep_mutex_);
 			msg.tar_dist = TargetDist_;
@@ -694,33 +697,35 @@ void ScaleTruckController::spin()
 	}
 }
 
-bool ScaleTruckController::RSS(float est_dist, float cf_vel, float cr_vel) {
-	if (f_run_yolo_flag_) {
-		float d_long_min = 0.0f;
-		
-		/*이때는 a_max_accel = 0으로 해도 무방*/
-		d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
-		d_long_min = max(d_long_min, 0.0f);
+void ScaleTruckController::RSS() {
+  {
+    std::scoped_lock lock(lane_mutex_, vel_mutex_);
+    if (f_run_yolo_flag_) {
+      float cf_vel = est_vel_;
+      float cr_vel = CurVel_;
+      float d_long_min = 0.0f;
 
-		//	RCLCPP_INFO(this->get_logger(), "est_dist : %.3f", est_dist);
-		//	RCLCPP_INFO(this->get_logger(), "cf_vel : %.3f", cf_vel);
-		//	RCLCPP_INFO(this->get_logger(), "cr_vel : %.3f", cr_vel);
-		//	RCLCPP_INFO(this->get_logger(), "d_long_min : %.3f\n", d_long_min);
-		if(index_ == 0) lv_rss_dist_ = d_long_min;
-		else if(index_ == 1) fv1_rss_dist_ = d_long_min;
-		else if(index_ == 2) fv2_rss_dist_ = d_long_min;
-	}
+      /*이때는 a_max_accel = 0으로 해도 무방*/
+      d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      d_long_min = max(d_long_min, 0.0f);
 
-	if (r_run_yolo_flag_) {
-		float d_long_min = 0.0f;
+      if(index_ == 0) lv_rss_dist_ = d_long_min;
+      else if(index_ == 1) fv1_rss_dist_ = d_long_min;
+      else if(index_ == 2) fv2_rss_dist_ = d_long_min;
+    }
+    if (r_run_yolo_flag_) {
+      float cf_vel = CurVel_;
+      float cr_vel = est_vel_;
+      float d_long_min = 0.0f;
 
-		d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
-		d_long_min = max(d_long_min, 0.0f);
+      d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      d_long_min = max(d_long_min, 0.0f);
 
-		if(index_ == 0) lv_r_rss_dist_ = d_long_min;
-		else if(index_ == 1) fv1_r_rss_dist_ = d_long_min;
-		else if(index_ == 2) fv2_r_rss_dist_ = d_long_min;
-	}
+      if(index_ == 0) lv_r_rss_dist_ = d_long_min;
+      else if(index_ == 1) fv1_r_rss_dist_ = d_long_min;
+      else if(index_ == 2) fv2_r_rss_dist_ = d_long_min;
+    }
+  }
 }
 
 void ScaleTruckController::displayConsole() {
@@ -785,7 +790,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
 		flag = true;
 	}
 	if(flag){
-		std::scoped_lock lock(dist_mutex_);
+		std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_, rep_mutex_);
 		gettimeofday(&currentTime, NULL);
 		diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
 		//    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d,%d", diff_time, TargetVel_, CurVel_, TargetDist_, distance_, AngleDegree_, AngleDegree2, lc_right_flag_, lc_left_flag_, lc_center_follow_);
@@ -816,7 +821,7 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
 void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg)
 {
 	{
-		std::scoped_lock lock(r_lane_mutex_);
+		std::scoped_lock lock(rlane_mutex_);
 		r_lane_coef_.coef = msg->coef;
 		//r_center_select_ = msg->center_select;
 		r_est_dist_ = msg->est_dist;
@@ -850,7 +855,7 @@ void ScaleTruckController::RearYoloSubCallback(const ros2_msg::msg::Boundingbox:
 {
 	// isbboxObject? 1:Yes,  2:No, 3:No_Msg 
 	{
-		std::scoped_lock lock(bbox_mutex_);
+		std::scoped_lock lock(rbbox_mutex_);
 		r_name_ = msg->name;
 		if ((msg->x > 0 && msg->x < 640) && \
 				(msg->y > 0 && msg->y < 480) && \
@@ -896,18 +901,15 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 		/* LV */
 		/******/
 		if(index_ == 0) {   
-			TargetVel_ = msg->tar_vel;
-			TargetDist_ = msg->tar_dist;
-
-			cmd_lv_lc_right_ = msg->lv_lc_right; 
+      TargetVel_ = msg->tar_vel;
+      TargetDist_ = msg->tar_dist;
+      cmd_lv_lc_right_ = msg->lv_lc_right; 
 			if(cmd_lv_lc_right_){
-				prev_lane_coef_ = lane_coef_; 
 				//lc_right_flag_ = true;
 			}
 
 			cmd_lv_lc_left_ = msg->lv_lc_left;
 			if(cmd_lv_lc_left_) {
-				prev_lane_coef_ = lane_coef_; 
 				//lc_left_flag_ = true;
 			}
 
@@ -925,13 +927,11 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 		else if(index_ == 1) {   
 			cmd_fv1_lc_right_ = msg->fv1_lc_right; 
 			if(cmd_fv1_lc_right_){
-				prev_lane_coef_ = lane_coef_; 
 				//lc_right_flag_ = true;
 			}
 
 			cmd_fv1_lc_left_ = msg->fv1_lc_left;
 			if(cmd_fv1_lc_left_) {
-				prev_lane_coef_ = lane_coef_; 
 				//lc_left_flag_ = true;
 			}
 
@@ -940,8 +940,8 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			}
 
 			if(msg->fv2_lc_left) {
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-			}
+				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+      }	
 		}
 		/*******/
 		/* FV2 */
@@ -950,7 +950,6 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			cmd_fv2_lc_right_ = msg->fv2_lc_right;
 			if(cmd_fv2_lc_right_) {
 				req_flag_ = true;
-				prev_lane_coef_ = lane_coef_; 
 				//lc_right_flag_ = true;
 				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
 				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
@@ -959,20 +958,24 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			cmd_fv2_lc_left_ = msg->fv2_lc_left;
 			if(cmd_fv2_lc_left_) {
 				req_flag_ = true;
-				prev_lane_coef_ = lane_coef_; 
 				//lc_left_flag_ = true;
 				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
 				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
 			}
 		}
 
+		runYoloPublisher_->publish(yolo_flag_msg);
+  }
+	{
+    std::scoped_lock lock(rss_mutex_);
 		lv_cur_dist_ = msg->lv_cur_dist;
 		fv1_cur_dist_ = msg->fv1_cur_dist;
 		fv2_cur_dist_ = msg->fv2_cur_dist;
 
 		lv_est_dist_ = msg->lv_est_dist;
 		fv1_est_dist_ = msg->fv1_est_dist;
-		fv2_est_dist_ = msg->fv2_est_dist;
+		//fv2_est_dist_ = msg->fv2_est_dist;
+		fv2_est_dist_ = 1;
 
 		lv_r_est_dist_ = msg->lv_r_est_dist;
 		fv1_r_est_dist_ = msg->fv1_r_est_dist;
@@ -988,14 +991,14 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 
 		lv_bbox_ready_ = msg->lv_bbox_ready;
 		fv1_bbox_ready_ = msg->fv1_bbox_ready;
-		fv2_bbox_ready_ = msg->fv2_bbox_ready;
+		//fv2_bbox_ready_ = msg->fv2_bbox_ready;
+		fv2_bbox_ready_ = 1;
 
 		lv_r_bbox_ready_ = msg->lv_r_bbox_ready;
 		fv1_r_bbox_ready_ = msg->fv1_r_bbox_ready;
 		fv2_r_bbox_ready_ = msg->fv2_r_bbox_ready;
-
-		runYoloPublisher_->publish(yolo_flag_msg);
-	}
+	 
+  }
 }
 
 

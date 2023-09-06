@@ -84,7 +84,6 @@ private:
     void displayConsole();
     void recordData(struct timeval startTime);
     void reply(ros2_msg::msg::Xav2cmd* cmd);
-    bool RSS(float d0, float cf_vel, float cr_vel);
 		void isLaneChangeCommandReceived();
 		void isFV2Detected();
 		void isFV1Detected();
@@ -123,6 +122,7 @@ private:
     bool lc_center_follow_ = true;
 
     //RSS
+    void RSS();
 		float a_max_accel = 0.0f;
 		float	a_min_brake = 0.0f; 
 		float a_max_brake = 0.0f;
@@ -233,11 +233,14 @@ private:
     //mutex
     std::mutex image_mutex_;
     std::mutex object_mutex_;
-    std::mutex lane_mutex_, r_lane_mutex_;
+    std::mutex lane_mutex_; 
+    std::mutex rlane_mutex_;
     std::mutex vel_mutex_;
     std::mutex dist_mutex_;
     std::mutex rep_mutex_;
     std::mutex bbox_mutex_;
+    std::mutex rbbox_mutex_;
+    std::mutex rss_mutex_;
 
     std::condition_variable cv_; // cv_.wait() 용도-> ROI거리 파악 후 Lane 그리기
 

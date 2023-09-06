@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     params/angle_degree: 0.0
@@ -108,7 +108,7 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     Calibration/r_matrix/a: 326.31389227574556
