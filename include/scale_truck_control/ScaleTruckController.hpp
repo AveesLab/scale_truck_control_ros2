@@ -127,6 +127,8 @@ private:
 		float	a_min_brake = 0.0f; 
 		float a_max_brake = 0.0f;
 		float p_ = 0.0f;
+		float rss_min_dist_= 0.0f;
+		float rrss_min_dist_= 0.0f;
 
 		float est_vel_ = 0.0f;
 		float	r_est_vel_ = 0.0f;

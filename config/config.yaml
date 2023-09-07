@@ -37,12 +37,12 @@
     params/lv_stop_dist: 0.5
     params/fv_stop_dist: 0.5
 
-    rss/a_max_accel: 0.087
-    rss/a_max_brake: -0.083
-    rss/a_min_brake: 2.136
-    rss/response_time: 0.458
+    rss/a_max_accel: 6.9 #0.087 
+    rss/a_max_brake: 3.22 #-0.083
+    rss/a_min_brake: 0.6 #2.136
+    rss/response_time: 0.160 # 0.059
 
-    image_view/enable_console_output: false 
+    image_view/enable_console_output: true 
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 

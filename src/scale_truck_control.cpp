@@ -72,9 +72,9 @@ bool ScaleTruckController::readParameters() {
 	this->get_parameter_or("image_view/lane_change_right", lc_right_flag_, false); // cmd
 	this->get_parameter_or("image_view/lane_change_left", lc_left_flag_, false); // cmd
 
-	/*************/
-	/* RSS_Param */
-	/*************/
+	/*******/
+	/* RSS */
+	/******/
 	this->get_parameter_or("rss/a_max_accel", a_max_accel, 0.0f); 
 	this->get_parameter_or("rss/a_max_brake", a_max_brake, 0.0f); 
 	this->get_parameter_or("rss/a_min_brake", a_min_brake, 0.0f); 
@@ -501,7 +501,7 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
         else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_r_rss)_dist\n");
       }
       //FV2 Front Area is OK?
-      else if (fv2_bbox_ready_ == 1) {
+      else if (fv2_r_bbox_ready_ != 1 && fv2_bbox_ready_ == 1) {
         if(fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
           if(fv2_est_dist_ <= fv2_rss_dist_) {
             //adjustTargetVelocity();
@@ -639,13 +639,13 @@ void ScaleTruckController::spin()
       if (lc_right_flag_== false || lc_left_flag_ == false)	{
         RSS();
         isLaneChangeCommandReceived();	
-
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
+//
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
+//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
       }
     }
     {
@@ -669,6 +669,12 @@ void ScaleTruckController::spin()
 			std::scoped_lock lock(rep_mutex_);
 			msg.tar_dist = TargetDist_;
 		}    
+
+    struct timeval cur_time;
+    gettimeofday(&cur_time, NULL);
+    msg.stamp_sec = cur_time.tv_sec;
+    msg.stamp_usec = cur_time.tv_usec;
+
 		LrcPublisher_->publish(msg);   
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -688,12 +694,12 @@ void ScaleTruckController::spin()
 		cnt++;
 
 		CycleTime_ = diff_time / (double)cnt;
+//    RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", CycleTime_);
 
 		if (cnt > 3000){
 			diff_time = 0.0;
 			cnt = 0;
 		}
-
 	}
 }
 
@@ -703,27 +709,26 @@ void ScaleTruckController::RSS() {
     if (f_run_yolo_flag_) {
       float cf_vel = est_vel_;
       float cr_vel = CurVel_;
-      float d_long_min = 0.0f;
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
-      d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
-      d_long_min = max(d_long_min, 0.0f);
+      rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      rss_min_dist_ = max(rss_min_dist_, 0.0f);
 
-      if(index_ == 0) lv_rss_dist_ = d_long_min;
-      else if(index_ == 1) fv1_rss_dist_ = d_long_min;
-      else if(index_ == 2) fv2_rss_dist_ = d_long_min;
+      if(index_ == 0) lv_rss_dist_ = rss_min_dist_;
+      else if(index_ == 1) fv1_rss_dist_ = rss_min_dist_;
+      else if(index_ == 2) fv2_rss_dist_ = rss_min_dist_;
     }
     if (r_run_yolo_flag_) {
       float cf_vel = CurVel_;
       float cr_vel = est_vel_;
-      float d_long_min = 0.0f;
 
-      d_long_min = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
-      d_long_min = max(d_long_min, 0.0f);
+      rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
 
-      if(index_ == 0) lv_r_rss_dist_ = d_long_min;
-      else if(index_ == 1) fv1_r_rss_dist_ = d_long_min;
-      else if(index_ == 2) fv2_r_rss_dist_ = d_long_min;
+      if(index_ == 0) lv_r_rss_dist_ = rrss_min_dist_;
+      else if(index_ == 1) fv1_r_rss_dist_ = rrss_min_dist_;
+      else if(index_ == 2) fv2_r_rss_dist_ = rrss_min_dist_;
+//      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
     }
   }
 }
@@ -748,18 +753,20 @@ void ScaleTruckController::displayConsole() {
 	printf("\033[8;1H");
 	printf("e1/eL             : %3.3f %3.3f", e_values_[1], e_values_[0]);
 	printf("\033[9;1H");
-	printf("Tar/Cur/Est Vel   : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
+	printf("Tar/Cur Vel       : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
 	printf("\033[10;1H");
-	printf("Tar/Cur/Est Dist  : %3.3f / %3.3f m", TargetDist_, distance_);
+	printf("Tar/Cur Dist      : %3.3f / %3.3f m", TargetDist_, distance_);
 	printf("\033[11;1H");
 	printf("F/R Est_Vel       : %3.3f / %3.3f m/s", est_vel_, r_est_vel_);
 	printf("\033[12;1H");
 	printf("F/R Est_Dist      : %3.3f / %3.3f m", est_dist_, r_est_dist_);
 	printf("\033[13;1H");
-	printf("lane diff         : %d", lane_diff_);
+	printf("F/R RSS_Dist      : %3.3f / %3.3f m", rss_min_dist_, rrss_min_dist_);
 	printf("\033[14;1H");
-	printf("lane diff cnt     : %d", lane_diff_cnt_);
+	printf("lane diff         : %d", lane_diff_);
 	printf("\033[15;1H");
+	printf("lane diff cnt     : %d", lane_diff_cnt_);
+	printf("\033[16;1H");
 	printf("Cycle Time        : %3.3f ms\n", CycleTime_);
 }
 
@@ -803,6 +810,10 @@ void ScaleTruckController::recordData(struct timeval startTime){
 
 void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg)
 {
+//  static double stamp_time_sec, stamp_time_usec;
+//  static double delay_, diff_time;
+//  static float cnt_;
+//  struct timeval end_time;
 	{
 		std::scoped_lock lock(lane_mutex_);
 		lane_coef_.coef = msg->coef;
@@ -815,6 +826,25 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
 		K2_ = msg->k2;
 		est_dist_ = msg->est_dist;
 		est_vel_ = msg->est_vel;
+    
+//    stamp_time_sec = msg->stamp_sec;
+//    stamp_time_usec = msg->stamp_usec;
+//
+//    /* delay time */
+//    gettimeofday(&end_time, NULL);
+//    diff_time += ((end_time.tv_sec - stamp_time_sec) * 1000.0) + ((end_time.tv_usec - stamp_time_usec) / 1000.0);
+//
+//    cnt_++;
+//
+//    delay_ = diff_time / (double)cnt_;
+//    RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", delay_);
+//
+//    if (cnt_ > 3000){
+//      diff_time = 0.0;
+//      cnt_ = 0;
+//    }
+//    /* delay time */
+
 	}
 }
 
@@ -940,7 +970,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			}
 
 			if(msg->fv2_lc_left) {
-				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
       }	
 		}
 		/*******/
@@ -974,8 +1004,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 
 		lv_est_dist_ = msg->lv_est_dist;
 		fv1_est_dist_ = msg->fv1_est_dist;
-		//fv2_est_dist_ = msg->fv2_est_dist;
-		fv2_est_dist_ = 1;
+		fv2_est_dist_ = msg->fv2_est_dist;
 
 		lv_r_est_dist_ = msg->lv_r_est_dist;
 		fv1_r_est_dist_ = msg->fv1_r_est_dist;
@@ -991,8 +1020,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 
 		lv_bbox_ready_ = msg->lv_bbox_ready;
 		fv1_bbox_ready_ = msg->fv1_bbox_ready;
-		//fv2_bbox_ready_ = msg->fv2_bbox_ready;
-		fv2_bbox_ready_ = 1;
+		fv2_bbox_ready_ = msg->fv2_bbox_ready;
 
 		lv_r_bbox_ready_ = msg->lv_r_bbox_ready;
 		fv1_r_bbox_ready_ = msg->fv1_r_bbox_ready;

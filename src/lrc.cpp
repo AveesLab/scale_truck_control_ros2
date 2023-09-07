@@ -185,6 +185,11 @@ void LocalRC::printStatus(){
 
 void LocalRC::communicate(){
   while(rclcpp::ok()){
+//    struct timeval start_time, end_time;
+//    gettimeofday(&start_time, NULL);
+//    static float cnt;
+//    static double diff_time, CycleTime_;
+
     rosPub();
     printStatus();
 
@@ -196,6 +201,18 @@ void LocalRC::communicate(){
       rclcpp::shutdown();
       break;
     }
+
+//    gettimeofday(&end_time, NULL);
+//    diff_time += ((end_time.tv_sec - start_time.tv_sec) * 1000.0) + ((end_time.tv_usec - start_time.tv_usec) / 1000.0);
+//    cnt++;
+//
+//    CycleTime_ = diff_time / (double)cnt;
+//    RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", CycleTime_);
+//
+//    if (cnt > 3000){
+//      diff_time = 0.0;
+//      cnt = 0;
+//    }
   }
 }
 
@@ -208,6 +225,30 @@ void LocalRC::XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
     tar_vel_ = msg->tar_vel;
     tar_dist_ = msg->tar_dist;
   }
+
+//  /* delay time */
+//  static double stamp_time_sec, stamp_time_usec;
+//  static double delay_, diff_time;
+//  static float cnt_;
+//  struct timeval end_time;
+//
+//  stamp_time_sec = msg->stamp_sec;
+//  stamp_time_usec = msg->stamp_usec;
+//
+//  gettimeofday(&end_time, NULL);
+//  diff_time += ((end_time.tv_sec - stamp_time_sec) * 1000.0) + ((end_time.tv_usec - stamp_time_usec) / 1000.0);
+//
+//  cnt_++;
+//
+//  delay_ = diff_time / (double)cnt_;
+//  RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", delay_);
+//
+//  if (cnt_ > 3000){
+//    diff_time = 0.0;
+//    cnt_ = 0;
+//  }
+//  /* delay time */
+
 }
 
 void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)   
