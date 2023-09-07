@@ -178,7 +178,7 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 - Uninstall old version of OpenCV
 ```
 sudo apt-get purge  libopencv* python-opencv
-sudo apt-get autoremove
+# sudo apt-get autoremove
 sudo find /usr/local/ -name "*opencv*" -exec rm -i {} \;
 ```
 - Install 4.4.0 version of OpenCV
