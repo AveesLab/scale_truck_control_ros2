@@ -188,7 +188,7 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 > ```
 > ```
 > cd ~/ros2_ws
-> colcon build --packages-select cv_bridge image_geometry --allow-overriding cv_bridge image_geometry
+> colcon build --packages-select vision_opencv
 > ```
 
 - ros2_msg
