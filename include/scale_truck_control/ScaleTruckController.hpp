@@ -91,6 +91,8 @@ private:
 		void isAreaSafe(int indexArea);
 		void adjustTargetVelocity();
 		void setLaneChangeFlags(bool no_object = false);
+    float lowPassFilter(double sampling_time, float est_value, float prev_res);
+
 
     // xav->cmd
     ros2_msg::msg::Xav2cmd* cmd_data_;
@@ -120,6 +122,8 @@ private:
     int lane_diff_cnt_ = 150;
     int lane_diff_ = 0;
     bool lc_center_follow_ = true;
+    double origin_lateral_err = 0;
+    double lateral_err = 0;
 
     //RSS
     void RSS();

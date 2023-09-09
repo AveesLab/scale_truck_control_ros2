@@ -252,62 +252,60 @@ void ScaleTruckController::checkState() {
 	int car_position = 320; // width/2
 	double lane_diff = 999.0; 
 	double prev_center_base = 0, cur_center_base = 0;
+  double Rlane_base = 0;
 
-	{
-		std::scoped_lock lock(lane_mutex_, rep_mutex_);
-		if(sizeof(lane_coef_.coef) != 0) 
-		{
-			prev_center_base = car_position;
-			cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
-			lane_diff = abs(cur_center_base - prev_center_base); 
-			lane_diff_ = lane_diff;
-		}
+  if(sizeof(lane_coef_.coef) != 0) 
+  {
+    prev_center_base = car_position;
+    cur_center_base =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
+    lane_diff = abs(cur_center_base - prev_center_base); 
+    lane_diff_ = lane_diff;
+  }
 
-		if(lane_diff <= 10 && lane_diff >= 0) {
-			lane_diff_cnt_ -= 1;
-			if(lane_diff_cnt_ <= 0) {
-				lane_diff_cnt_ = 150;
+  if(lane_diff <= 10 && lane_diff >= 0) {
+    lane_diff_cnt_ -= 1;
+    if(lane_diff_cnt_ <= 0) {
+      lane_diff_cnt_ = 150;
 
-        /* right lane change */
-        if(lc_right_flag_ == true) {
-          if(cmd_fv2_lc_right_ == true) {
-            cmd_fv2_lc_right_ = false;
-            lc_right_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-          }
-          else if (cmd_fv1_lc_right_ == true) {
-            cmd_fv1_lc_right_ = false;
-            lc_right_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-          }
-          else {
-            cmd_lv_lc_right_ = false;
-            lc_right_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
-          }
+      /* right lane change */
+      if(lc_right_flag_ == true) {
+        if(cmd_fv2_lc_right_ == true) {
+          cmd_fv2_lc_right_ = false;
+          lc_right_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
-        /* left lane change */
-        else if(lc_left_flag_ == true) {
-          if(cmd_fv2_lc_left_ == true) {
-            cmd_fv2_lc_left_ = false;
-            lc_left_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-          }
-          else if (cmd_fv1_lc_left_ == true) {
-            cmd_fv1_lc_left_ = false;
-            lc_left_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-          }
-          else {
-            cmd_lv_lc_left_ = false;
-            lc_left_flag_ = false;
-            //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
-          }
+        else if (cmd_fv1_lc_right_ == true) {
+          cmd_fv1_lc_right_ = false;
+          lc_right_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
-        runYoloPublisher_->publish(yolo_flag_msg);
-			}
-		}
-	}  
+        else {
+          cmd_lv_lc_right_ = false;
+          lc_right_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
+        }
+      }
+      /* left lane change */
+      else if(lc_left_flag_ == true) {
+        if(cmd_fv2_lc_left_ == true) {
+          cmd_fv2_lc_left_ = false;
+          lc_left_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        }
+        else if (cmd_fv1_lc_left_ == true) {
+          cmd_fv1_lc_left_ = false;
+          lc_left_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        }
+        else {
+          cmd_lv_lc_left_ = false;
+          lc_left_flag_ = false;
+          //						yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
+        }
+      }
+      runYoloPublisher_->publish(yolo_flag_msg);
+    }
+  }
 }
 
 void ScaleTruckController::objectdetectInThread() 
@@ -618,6 +616,18 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
   runYoloPublisher_->publish(yolo_flag_msg);
 }
 
+float ScaleTruckController::lowPassFilter(double sampling_time, float est_value, float prev_res){
+  float res = 0;
+  float tau = 0.01f; //0.10f
+  double st = 0.0;
+
+  if (sampling_time > 1.0) st = 1.0;
+  else st = sampling_time;
+  res = ((tau * prev_res) + (st * est_value)) / (tau + st);
+
+  return res;
+}
+
 void ScaleTruckController::spin() 
 {
 	double diff_time=0.0;
@@ -634,22 +644,51 @@ void ScaleTruckController::spin()
 		objectdetect_thread = std::thread(&ScaleTruckController::objectdetectInThread, this);
 		objectdetect_thread.join();
 
-    {
-      std::scoped_lock lock(rep_mutex_, rss_mutex_);
-      if (lc_right_flag_== false || lc_left_flag_ == false)	{
-        RSS();
-        isLaneChangeCommandReceived();	
-//
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
-//        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
-      }
-    }
+//    {
+//      std::scoped_lock lock(rep_mutex_, rss_mutex_);
+//      if (lc_right_flag_== false || lc_left_flag_ == false)	{
+//        RSS();
+//        isLaneChangeCommandReceived();	
+////
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
+////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
+//      }
+//    }
     {
 			std::scoped_lock lock(lane_mutex_, rep_mutex_);
+      /* Lateral err */
+      if(lane_coef_.coef[1].a != 0) {
+          int car_position = 320; 
+          int i = 480; // height
+          double lane_length = 0;
+          double dot_lane_base = 0;
+          static double prev_lateral_err;
+          struct timeval currentTime;
+          double sampling_time = 0;
+
+          if (AngleDegree2 != 0 && lc_right_flag_) {
+            lane_length = 
+            dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+          }
+          else if (AngleDegree2 != 0 && lc_left_flag_) {
+            dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+          }
+          else { // 왼쪽 레인에 존재. lc_right할때만 사용. lc_left할때는 coef[0]로 변경
+            dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+          }
+          origin_lateral_err = car_position - dot_lane_base;
+
+          gettimeofday(&currentTime, NULL);
+          sampling_time = ((currentTime.tv_sec - start_time.tv_sec)) + ((currentTime.tv_usec - start_time.tv_usec)/1000000.0);
+          lateral_err = lowPassFilter(sampling_time, origin_lateral_err, prev_lateral_err);
+          prev_lateral_err = lateral_err;
+      } 
+      /* Lateral err end */
+
 			if((AngleDegree2 != 0) && (lc_right_flag_ || lc_left_flag_)) { 
 				AngleDegree_ = AngleDegree2;
 				checkState(); // is lane change complete ?	
@@ -658,6 +697,7 @@ void ScaleTruckController::spin()
 				AngleDegree_ = AngleDegree;
 			}
 		}
+
 		msg.tar_vel = ResultVel_;  //Xavier to LRC and LRC to OpenCR
 		{
 			std::scoped_lock lock(dist_mutex_);
@@ -684,7 +724,7 @@ void ScaleTruckController::spin()
 			rclcpp::shutdown();
 		}
 
-		recordData(init_);
+    if(CurVel_ != 0) recordData(init_);
 
 		if(enableConsoleOutput_)
 			displayConsole();
@@ -792,16 +832,16 @@ void ScaleTruckController::recordData(struct timeval startTime){
 			}
 			read_file.close();
 		}
-		//write_file << "time,tar_vel,cur_vel,tar_dist,cur_dist,normal_angle,lc_angle,lc_right_flag,lc_left_flag" << std::endl; //seconds
-		write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist,r_run_yolo_flag,y_run_yolo_flag" << std::endl; //seconds
+		//write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist,r_run_yolo_flag,y_run_yolo_flag" << std::endl; //seconds
+		write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
 		flag = true;
 	}
 	if(flag){
 		std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_, rep_mutex_);
 		gettimeofday(&currentTime, NULL);
 		diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
-		//    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d,%d,%d", diff_time, TargetVel_, CurVel_, TargetDist_, distance_, AngleDegree_, AngleDegree2, lc_right_flag_, lc_left_flag_, lc_center_follow_);
-		sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f, %d, %d", diff_time, TargetVel_, CurVel_, est_vel_, TargetDist_, distance_, est_dist_, r_run_yolo_flag_, f_run_yolo_flag_);
+		//sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f, %d, %d", diff_time, TargetVel_, CurVel_, est_vel_, TargetDist_, distance_, est_dist_, r_run_yolo_flag_, f_run_yolo_flag_);
+		sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
 		write_file.open(file, std::ios::out | std::ios::app);
 		write_file << buf << std::endl;
 	}
@@ -935,12 +975,12 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       TargetDist_ = msg->tar_dist;
       cmd_lv_lc_right_ = msg->lv_lc_right; 
 			if(cmd_lv_lc_right_){
-				//lc_right_flag_ = true;
+				lc_right_flag_ = true;
 			}
 
 			cmd_lv_lc_left_ = msg->lv_lc_left;
 			if(cmd_lv_lc_left_) {
-				//lc_left_flag_ = true;
+				lc_left_flag_ = true;
 			}
 
 			if(msg->fv2_lc_right) {
@@ -957,12 +997,12 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 		else if(index_ == 1) {   
 			cmd_fv1_lc_right_ = msg->fv1_lc_right; 
 			if(cmd_fv1_lc_right_){
-				//lc_right_flag_ = true;
+				lc_right_flag_ = true;
 			}
 
 			cmd_fv1_lc_left_ = msg->fv1_lc_left;
 			if(cmd_fv1_lc_left_) {
-				//lc_left_flag_ = true;
+				lc_left_flag_ = true;
 			}
 
 			if(msg->fv2_lc_right) {
