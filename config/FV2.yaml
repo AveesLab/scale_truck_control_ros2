@@ -120,21 +120,21 @@
     threshold/box_offset: 50 # 50 43
     ROI/threshold: 128
 
-    Calibration/r_matrix/a: 326.31389227574556
+    Calibration/r_matrix/a: 3.2943729391263065e+02
     Calibration/r_matrix/b: 0.
     Calibration/r_matrix/c: 320.
     Calibration/r_matrix/d: 0.
-    Calibration/r_matrix/e: 326.31389227574556
+    Calibration/r_matrix/e: 3.2943729391263065e+02
     Calibration/r_matrix/f: 240.
     Calibration/r_matrix/g: 0.
     Calibration/r_matrix/h: 0.
     Calibration/r_matrix/i: 1.
 
-    Calibration/r_dist_coef/a: -0.33295846454356126
-    Calibration/r_dist_coef/b: 0.12386827336557986
+    Calibration/r_dist_coef/a: -3.4378345298743745e-01
+    Calibration/r_dist_coef/b: 1.4967084861572430e-01
     Calibration/r_dist_coef/c: 0.
     Calibration/r_dist_coef/d: 0.
-    Calibration/r_dist_coef/e: -0.022565312043601477
+    Calibration/r_dist_coef/e: -4.0688891786494791e-02
 
     ROI/rear_cam/top_gap: 0.405
     ROI/rear_cam/bot_gap: 0.17

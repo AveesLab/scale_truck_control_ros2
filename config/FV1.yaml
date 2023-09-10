@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
     params/angle_degree: 0.0
@@ -71,6 +71,17 @@
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
 
+    ROI/test/width: 640
+    ROI/test/height: 480
+    ROI/test/top_gap: 0.40 # 0.28
+    ROI/test/bot_gap: 0.16 # 0.0
+    ROI/test/top_height: 0.99
+    ROI/test/bot_height: 0.485
+    ROI/test/extra_f: 8.00 # 0
+    ROI/test/extra_b: 8.00 # 0
+    ROI/test/extra_up: 180
+    ROI/test/extra_down: 220
+
     crop/x: 100
     crop/y: 0
     crop/width: 440
@@ -108,24 +119,25 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: false 
     image_view/wait_key_delay: 1
+    image_view/TEST: false
 
-    Calibration/r_matrix/a: 326.31389227574556
+    Calibration/r_matrix/a: 3.2594106815630045e+02
     Calibration/r_matrix/b: 0.
     Calibration/r_matrix/c: 320.
     Calibration/r_matrix/d: 0.
-    Calibration/r_matrix/e: 326.31389227574556
+    Calibration/r_matrix/e: 3.2594106815630045e+02
     Calibration/r_matrix/f: 240. 
     Calibration/r_matrix/g: 0.
     Calibration/r_matrix/h: 0.
     Calibration/r_matrix/i: 1.
 
-    Calibration/r_dist_coef/a: -0.33295846454356126
-    Calibration/r_dist_coef/b: 0.12386827336557986
+    Calibration/r_dist_coef/a: -3.5237998609606364e-01
+    Calibration/r_dist_coef/b: 1.5852034332472692e-01
     Calibration/r_dist_coef/c: 0.
     Calibration/r_dist_coef/d: 0.
-    Calibration/r_dist_coef/e: -0.022565312043601477
+    Calibration/r_dist_coef/e: -3.9136397985952330e-02
 
     ROI/dynamic_roi: true
     ROI/canny/thresh1: 100
@@ -142,3 +154,25 @@
     ROI/rear_cam/extra_b: 10.
     ROI/rear_cam/extra_up: 180 # 140
     ROI/rear_cam/extra_down: 220 # 180
+
+#    ROI/test/width: 640
+#    ROI/test/height: 480
+#    ROI/test/top_gap: 0.40 # 0.28
+#    ROI/test/bot_gap: 0.16 # 0.0
+#    ROI/test/top_height: 0.99
+#    ROI/test/bot_height: 0.42
+#    ROI/test/extra_f: 8.00 # 0
+#    ROI/test/extra_b: 8.00 # 0
+#    ROI/test/extra_up: 140
+#    ROI/test/extra_down: 240
+
+    ROI/test/width: 640
+    ROI/test/height: 480
+    ROI/test/top_gap: 0.41 
+    ROI/test/bot_gap: 0.17 
+    ROI/test/top_height: 0.99
+    ROI/test/bot_height: 0.42
+    ROI/test/extra_f: 12.00
+    ROI/test/extra_b: 10.00
+    ROI/test/extra_up: 80 # 140
+    ROI/test/extra_down: 120 # 180
