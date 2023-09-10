@@ -649,13 +649,6 @@ void ScaleTruckController::spin()
 //      if (lc_right_flag_== false || lc_left_flag_ == false)	{
 //        RSS();
 //        isLaneChangeCommandReceived();	
-////
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rss_dist_: %.3f", fv1_rss_dist_);
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_bbox: %d", fv1_bbox_ready_);
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv1_rbbox: %d", fv1_r_bbox_ready_);
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "fv2_cur_dist_: %.3f", fv2_cur_dist_);
-////        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
 //      }
 //    }
     {
@@ -669,15 +662,21 @@ void ScaleTruckController::spin()
           static double prev_lateral_err;
           struct timeval currentTime;
           double sampling_time = 0;
+          static bool tmp_flag = false;
 
           if (AngleDegree2 != 0 && lc_right_flag_) {
-            lane_length = 
             dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+            tmp_flag = true;
           }
           else if (AngleDegree2 != 0 && lc_left_flag_) {
             dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+            tmp_flag = true;
           }
           else { // 왼쪽 레인에 존재. lc_right할때만 사용. lc_left할때는 coef[0]로 변경
+            dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+          }
+
+          if(tmp_flag == true && lc_right_flag_ == false) {
             dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
           }
           origin_lateral_err = car_position - dot_lane_base;
@@ -686,9 +685,15 @@ void ScaleTruckController::spin()
           sampling_time = ((currentTime.tv_sec - start_time.tv_sec)) + ((currentTime.tv_usec - start_time.tv_usec)/1000000.0);
           lateral_err = lowPassFilter(sampling_time, origin_lateral_err, prev_lateral_err);
           prev_lateral_err = lateral_err;
+
+//          double Llane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+//          double Rlane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+//          double lane_base = Rlane_base - Llane_base;
+//          RCLCPP_INFO(this->get_logger(), "lane_base        : %3.3f ms\n", lane_base);
       } 
       /* Lateral err end */
 
+      /* LaneChange */
 			if((AngleDegree2 != 0) && (lc_right_flag_ || lc_left_flag_)) { 
 				AngleDegree_ = AngleDegree2;
 				checkState(); // is lane change complete ?	
@@ -760,15 +765,27 @@ void ScaleTruckController::RSS() {
     }
     if (r_run_yolo_flag_) {
       float cf_vel = CurVel_;
-      float cr_vel = est_vel_;
+      float cr_vel = r_est_vel_;
 
-      rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
 
       if(index_ == 0) lv_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 1) fv1_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 2) fv2_r_rss_dist_ = rrss_min_dist_;
-//      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "fv1_r_rss_dist_: %.3f", fv1_r_rss_dist_);
+
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "pow             : %.3f", pow((cr_vel+(p_*a_max_accel)),2));
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "pow/            : %.3f", (2*a_min_brake));
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "rrss_min_dist   : %.3f", rrss_min_dist_);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "p_              : %.3f", p_);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_max_accel     : %.3f", a_max_accel);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_min_brake     : %.3f", a_min_brake);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_max_brake     : %.3f", a_max_brake);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "1               : %.3f", cr_vel*p_);
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "2               : %.3f",(a_max_accel*pow(p_,2)/2));
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "3               : %.3f",(pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)));
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "4               : %.3f",(pow(cf_vel,2)/(2*a_max_brake)));
+//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
     }
   }
 }
