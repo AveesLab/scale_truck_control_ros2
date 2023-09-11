@@ -38,7 +38,7 @@
     image/width: 640
     image/height: 480
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
     image_view/enable_console_output: false
 
