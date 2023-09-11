@@ -677,7 +677,7 @@ void ScaleTruckController::spin()
           }
 
           if(tmp_flag == true && lc_right_flag_ == false) {
-            dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+            dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
           }
           origin_lateral_err = car_position - dot_lane_base;
 

@@ -13,7 +13,7 @@
     image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
-    threshold/box_size: 51   # 51 71 
+    threshold/box_size:   51 # 51 71 
     threshold/box_offset: 50 # 50 43
 
     params/angle_degree: 0.0
@@ -85,8 +85,33 @@
     ROI/wide_left/extra_down: 220
 
     params/K: 0.15  #vel 0.6,   0.8,  1.0, / 1.2 
-    params/K3: 0.13 # e1 0.13,  0.08, 0.07/    키우면 각도 커진다, 고개 오실레이션 -> 낮춰 
-    params/K4: 0.173 # eL 0.173, 0.16, 0.14/   키우면 각도 작아져, 낮추면 오실? 각도 작아? 
+
+    # 0.01 들어갈때 반응이 커서 곡선, 직선에서   헤드를 획 돌림,  0.10보단 않좋음
+    # 0.03 들어갈때 헤드 획 돌림. 
+    # 0.05 들어갈때 반응이 커서 헤드를 획 돌림, 직선에선 스무스,  0.10보단 좋음
+    # 0.06 곡선 들어가서 밟음.  직선에선 스무스,  0.10보단 좋음
+    # 0.07 헤드 조금 획 돌림, 괜찮음.
+    # 0.073 곡선이 튄다..
+    # 0.074 직선 좋은데 완료를 못함.
+    # 0.075 직선 좋고, 곡선 살짝 오실레이션
+    # 0.077 직선 살짝 튄다. 곡선 살짝 깔짝깔짞  오실레이션
+    # 0.078 직선 못들어간다.. 곡선 살짝 깔짝깔짞  오실레이션
+    # 0.08 헤드 조금 획 돌림, 덜 들어간다.
+    # 0.085 헤드 아직 조금 획 돌리고, 살짝 덜  들어감
+    # 0.087 헤드 아직 조금 획 돌리고, 살짝 덜  들어감
+    # 0.0873 더 들어가서 살짝 차선 밟는다.
+    # 0.0875 더 들어가서 살짝 차선 밟는다.
+    # 0.0885  살짝 오실레이션
+    # 0.09 살짝 오실레이션
+    # 0.10 살짝 더 들어가서 조끔 오실레이션, 0.15보단 좋음
+    # 0.15 들어가서 오실레이션
+    params/K3: 0.06 # e1 0.13,  0.08, 0.07/    키우면 각도 커진다, 고개 오실레이션 -> 낮춰 
+    
+    # 0.10 직선 굉장히 부드러움, 곡선 못들어감.
+    # 0.13 직선 굉장히 부드러움, 곡선 들어가긴 하는데 살짝 못들어감.
+    # 0.14 직선 부드러운데 들어갔다 다시 꺾어서 차선 문다. , 곡선 들어가긴 하는데 살짝 못들어감.
+    # 0.15 굉장히 부드러움 좋음
+    params/K4: 0.16 # eL 0.173, 0.16, 0.14/   키우면 각도 작아져, 낮추면 오실? 각도 작아? 
 
     params/a/a: 0.
     params/a/b: -0.37169
@@ -116,8 +141,9 @@
     publishers/lane_to_xavier/topic: rear_lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
+    image_view/TEST: true
 
     image_view/enable_adthreshold: true
     threshold/box_size:   51 # 51 71 
@@ -149,3 +175,13 @@
     ROI/rear_cam/extra_up: 140
     ROI/rear_cam/extra_down: 180
 
+    ROI/test/width: 640 
+    ROI/test/height: 480 
+    ROI/test/top_gap: 0.475  
+    ROI/test/bot_gap: 0.22  
+    ROI/test/top_height: 0.99 
+    ROI/test/bot_height: 0.41 
+    ROI/test/extra_f: -28.00 
+    ROI/test/extra_b: -299.00 
+    ROI/test/extra_up: 0  #240  # 140 
+    ROI/test/extra_down: 0 #100 #280  # 180 

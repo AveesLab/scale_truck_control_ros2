@@ -47,16 +47,16 @@ def generate_launch_description():
 
 
 ############################################ Node_list ##############################################
-usb_cam_node=Node(
+    usb_cam_node=Node(
             package='usb_cam',
             namespace='LV',
             name='usb_cam',
             executable='usb_cam_node_exe',
-                        parameters=[
+            parameters=[
                 PathJoinSubstitution([
-                        get_package_share_directory('scale_truck_control_ros2'),
-                        'config', 'camera_params.yaml',
-                        ])],
+                    get_package_share_directory('scale_truck_control_ros2'),
+                    'config', 'camera_params.yaml',
+                    ])],
             remappings=[('image_raw', 'usb_cam/image_raw')],
             output='screen')
 
@@ -167,6 +167,16 @@ usb_cam_node=Node(
             output='screen',
             parameters = [yolo_param_file])
 
+    rear_yolo_node=Node(
+            package='yolo_object_detection_ros2',
+            namespace='LV',
+            name='rear_yolo_object_detection_node',
+            executable='yolo_object_detection_ros2',
+            output='screen',
+            parameters = [yolo_param_file])
+
+
+    
 ######################################### Node_list End #############################################
 
     ld = LaunchDescription()
@@ -182,7 +192,8 @@ usb_cam_node=Node(
     ld.add_action(control_node)
     ld.add_action(lrc_node)
     ld.add_action(opencr_node)
-    ld.add_action(yolo_node)
+#    ld.add_action(yolo_node)
+#    ld.add_action(rear_yolo_node)
 
     return ld
 
