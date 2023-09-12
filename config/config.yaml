@@ -24,7 +24,7 @@
     publishers/xavier_to_Yolo/topic: run_yolo_flag
     publishers/xavier_to_Yolo/queue_size: 1
     
-    params/index: 0
+    params/index: 0 
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
