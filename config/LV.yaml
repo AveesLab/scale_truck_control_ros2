@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
 
     threshold/box_size:   51 # 51 71 
