@@ -192,8 +192,8 @@ def generate_launch_description():
     ld.add_action(control_node)
     ld.add_action(lrc_node)
     ld.add_action(opencr_node)
-#    ld.add_action(yolo_node)
-#    ld.add_action(rear_yolo_node)
+    ld.add_action(yolo_node)
+    ld.add_action(rear_yolo_node)
 
     return ld
 
