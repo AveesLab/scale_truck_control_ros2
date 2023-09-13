@@ -10,13 +10,11 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
-    image_view/enable_adthreshold: true
     threshold/box_size: 51   # 51 71 
     threshold/box_offset: 50 # 50 43
-    ROI/threshold: 200
 
     params/angle_degree: 0.0
     params/Kp_d: 2.0
@@ -112,13 +110,11 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
-    image_view/enable_adthreshold: true
     threshold/box_size:   51 # 51 71 
     threshold/box_offset: 50 # 50 43
-    ROI/threshold: 128
 
     Calibration/r_matrix/a: 3.2943729391263065e+02
     Calibration/r_matrix/b: 0.

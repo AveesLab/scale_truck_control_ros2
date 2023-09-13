@@ -125,6 +125,11 @@ private:
     double origin_lateral_err = 0;
     double lateral_err = 0;
 
+		// FOR ICRA
+		float ICRA_dist = 10.1;
+		bool  wroi_flag_ = false;
+		float cur_vel = 0.0;
+
     //RSS
     void RSS();
 		float a_max_accel = 0.0f;
