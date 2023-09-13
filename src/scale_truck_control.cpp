@@ -206,7 +206,7 @@ void ScaleTruckController::reply(ros2_msg::msg::Xav2cmd* cmd)
 			cmd->cur_dist = distance_;
 			cmd->cur_angle = AngleDegree_;
 			cmd->est_dist = est_dist_;
-			cmd->est_dist = est_vel_;
+			cmd->est_vel = est_vel_;
 			cmd->r_est_dist = r_est_dist_;
 			cmd->bbox_ready = isbboxReady_;
 			cmd->r_bbox_ready = r_isbboxReady_;
@@ -1023,6 +1023,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			}
 
 			if(msg->fv2_lc_right) {
+				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
 				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
 			}
 

@@ -24,7 +24,11 @@
     publishers/xavier_to_Yolo/topic: run_yolo_flag
     publishers/xavier_to_Yolo/queue_size: 1
     
+<<<<<<< HEAD
     params/index: 0 
+=======
+    params/index: 1
+>>>>>>> 4b7c310e28e7b812fc72a9f723455e163e6fffa4
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
@@ -42,7 +46,7 @@
     rss/a_max_brake: -0.472 #0.6 #2.136
     rss/response_time: 1.23 #0.160 # 0.059
 
-    image_view/enable_console_output: false 
+    image_view/enable_console_output: true 
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 
@@ -62,7 +66,7 @@
     LrcPub/lv_to_fv/topic: /lv2fv_msg
     LrcPub/lv_to_fv/queue_size: 1
 
-    LrcParams/lrc_index: 10
+    LrcParams/lrc_index: 11
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 
