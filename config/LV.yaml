@@ -33,9 +33,9 @@
     Calibration/f_dist_coef/d: 0.
     Calibration/f_dist_coef/e: -0.032260115806245951
 
-		ROI/dynamic_roi: true
-		ROI/width: 640
-		ROI/height: 480
+    ROI/dynamic_roi: true
+    ROI/width: 640
+    ROI/height: 480
 
     ROI/front_cam/width: 640
     ROI/front_cam/height: 480
