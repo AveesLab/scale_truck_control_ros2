@@ -70,17 +70,6 @@
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
 
-    ROI/wide_left/width: 640
-    ROI/wide_left/height: 480
-    ROI/wide_left/top_gap: 0.40 # 0.28
-    ROI/wide_left/bot_gap: 0.16 # 0.0
-    ROI/wide_left/top_height: 0.99
-    ROI/wide_left/bot_height: 0.47
-    ROI/wide_left/extra_f: 0.00 # 0
-    ROI/wide_left/extra_b: 0.00 # 0
-    ROI/wide_left/extra_up: 180
-    ROI/wide_left/extra_down: 220
-
     threshold/box_size:   51 # 51 71 
     threshold/box_offset: 50 # 50 43
 
