@@ -337,7 +337,6 @@ void ScaleTruckController::objectdetectInThread()
     }
 
 		/* FOR ICRA  */
-//		dist_tmp = 0.6f;
 //		dist_tmp = ICRA_dist;
 //    distance_ = dist_tmp;
 

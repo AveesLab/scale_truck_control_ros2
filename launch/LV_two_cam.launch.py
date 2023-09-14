@@ -111,13 +111,13 @@ def generate_launch_description():
             output='screen',)
 
     object_node=Node(
-	    package='object_detection_ros2',
-	    namespace='LV',	    
-	    executable='object_detection_ros2_node',
-	    output={
-	    	'stdout': 'screen',
-	    	'stderr': 'screen',
-	    	})
+				package='object_detection_ros2',
+				namespace='LV',	    
+				executable='object_detection_ros2_node',
+				output={
+				'stdout': 'screen',
+				'stderr': 'screen',
+				})
 
     lane_detection_node=Node(
             package='lane_detection_ros2',

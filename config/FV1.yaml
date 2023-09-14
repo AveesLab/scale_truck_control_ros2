@@ -34,9 +34,6 @@
     Calibration/f_dist_coef/e: -0.037408338000060472
 
     ROI/dynamic_roi: true
-    ROI/canny/thresh1: 100
-    ROI/canny/thresh2: 200
-
     ROI/width: 640
     ROI/height: 480
 
@@ -82,11 +79,6 @@
     ROI/test/extra_up: 180
     ROI/test/extra_down: 220
 
-    crop/x: 100
-    crop/y: 0
-    crop/width: 440
-    crop/height: 380
-
     params/K: 0.15
     params/K3: 0.15 # e1 
     params/K4: 0.20 # eL  
@@ -119,7 +111,7 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true 
+    image_view/enable_opencv: false 
     image_view/wait_key_delay: 1
     image_view/TEST: false
 
@@ -140,9 +132,6 @@
     Calibration/r_dist_coef/e: -3.9136397985952330e-02
 
     ROI/dynamic_roi: true
-    ROI/canny/thresh1: 100
-    ROI/canny/thresh2: 200
-
     ROI/width: 640
     ROI/height: 480
 
@@ -154,17 +143,6 @@
     ROI/rear_cam/extra_b: 10.
     ROI/rear_cam/extra_up: 180 # 140
     ROI/rear_cam/extra_down: 220 # 180
-
-#    ROI/test/width: 640
-#    ROI/test/height: 480
-#    ROI/test/top_gap: 0.40 # 0.28
-#    ROI/test/bot_gap: 0.16 # 0.0
-#    ROI/test/top_height: 0.99
-#    ROI/test/bot_height: 0.42
-#    ROI/test/extra_f: 8.00 # 0
-#    ROI/test/extra_b: 8.00 # 0
-#    ROI/test/extra_up: 140
-#    ROI/test/extra_down: 240
 
     ROI/test/width: 640
     ROI/test/height: 480
