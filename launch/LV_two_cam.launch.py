@@ -104,20 +104,20 @@ def generate_launch_description():
             namespace='LV',
             executable="scan_to_scan_filter_chain",
             parameters=[
-            	PathJoinSubstitution([
-            		get_package_share_directory("laser_filters"),
-            		"examples", "laserfilter_angle.yaml",
-            		])],
+              PathJoinSubstitution([
+                get_package_share_directory("laser_filters"),
+                "examples", "laserfilter_angle.yaml",
+                ])],
             output='screen',)
 
     object_node=Node(
-				package='object_detection_ros2',
-				namespace='LV',	    
-				executable='object_detection_ros2_node',
-				output={
-				'stdout': 'screen',
-				'stderr': 'screen',
-				})
+        package='object_detection_ros2',
+        namespace='LV',     
+        executable='object_detection_ros2_node',
+        output={
+        'stdout': 'screen',
+        'stderr': 'screen',
+        })
 
     lane_detection_node=Node(
             package='lane_detection_ros2',
