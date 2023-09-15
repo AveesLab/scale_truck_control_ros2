@@ -1028,6 +1028,11 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 			if(cmd_lv_lc_left_) {
 				lc_left_flag_ = true;
 			}
+
+			if(msg->fv2_lc_right) {
+				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+			}
 		}
 		/*******/
 		/* FV1 */

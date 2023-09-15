@@ -44,7 +44,7 @@
 
     #icra/dist: 1.0
 
-    image_view/enable_console_output: false 
+    image_view/enable_console_output: true
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 
