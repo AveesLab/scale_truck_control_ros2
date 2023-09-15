@@ -84,13 +84,13 @@ private:
     void displayConsole();
     void recordData(struct timeval startTime);
     void reply(ros2_msg::msg::Xav2cmd* cmd);
-		void isLaneChangeCommandReceived();
-		void isFV2Detected();
-		void isFV1Detected();
-		void isLVDetected();
-		void isAreaSafe(int indexArea);
-		void adjustTargetVelocity();
-		void setLaneChangeFlags(bool no_object = false);
+    void isLaneChangeCommandReceived();
+    void isFV2Detected();
+    void isFV1Detected();
+    void isLVDetected();
+    void isAreaSafe(int indexArea);
+    void adjustTargetVelocity();
+    void setLaneChangeFlags(bool no_object = false);
     float lowPassFilter(double sampling_time, float est_value, float prev_res);
 
 
@@ -125,59 +125,59 @@ private:
     double origin_lateral_err = 0;
     double lateral_err = 0;
 
-		// FOR ICRA
-		float ICRA_dist = 10.1;
-		bool  wroi_flag_ = false;
-		float cur_vel = 0.0;
+    // FOR ICRA
+    float ICRA_dist = 10.1;
+    bool  wroi_flag_ = false;
+    float cur_vel = 0.0;
 
     //RSS
     void RSS();
-		float a_max_accel = 0.0f;
-		float	a_min_brake = 0.0f; 
-		float a_max_brake = 0.0f;
-		float p_ = 0.0f;
-		float rss_min_dist_= 0.0f;
-		float rrss_min_dist_= 0.0f;
+    float a_max_accel = 0.0f;
+    float a_min_brake = 0.0f; 
+    float a_max_brake = 0.0f;
+    float p_ = 0.0f;
+    float rss_min_dist_= 0.0f;
+    float rrss_min_dist_= 0.0f;
 
-		float est_vel_ = 0.0f;
-		float	r_est_vel_ = 0.0f;
+    float est_vel_ = 0.0f;
+    float r_est_vel_ = 0.0f;
 
-		float lv_est_vel_ = 0.0f;
-		float fv1_est_vel_ = 0.0f;
-		float	fv2_est_vel_ = 0.0f;
+    float lv_est_vel_ = 0.0f;
+    float fv1_est_vel_ = 0.0f;
+    float fv2_est_vel_ = 0.0f;
 
-		float lv_r_est_vel_ = 0.0f;
-		float fv1_r_est_vel_ = 0.0f;
-		float	fv2_r_est_vel_ = 0.0f;
+    float lv_r_est_vel_ = 0.0f;
+    float fv1_r_est_vel_ = 0.0f;
+    float fv2_r_est_vel_ = 0.0f;
 
-		float est_dist_ = 0.0f; 
-		float r_est_dist_ = 0.0f;
+    float est_dist_ = 0.0f; 
+    float r_est_dist_ = 0.0f;
 
-		float lv_cur_dist_ = 0.0f;
-		float	fv1_cur_dist_ = 0.0f;
-		float fv2_cur_dist_ = 0.0f;
+    float lv_cur_dist_ = 0.0f;
+    float fv1_cur_dist_ = 0.0f;
+    float fv2_cur_dist_ = 0.0f;
 
-		float lv_est_dist_ = 0.0f;
-		float fv1_est_dist_ = 0.0f;
-		float	fv2_est_dist_ = 0.0f;
+    float lv_est_dist_ = 0.0f;
+    float fv1_est_dist_ = 0.0f;
+    float fv2_est_dist_ = 0.0f;
 
-		float lv_rss_dist_ = 0.0f;
-		float fv1_rss_dist_ = 0.0f;
-		float	fv2_rss_dist_ = 0.0f;
+    float lv_rss_dist_ = 0.0f;
+    float fv1_rss_dist_ = 0.0f;
+    float fv2_rss_dist_ = 0.0f;
 
-		float lv_r_est_dist_ = 0.0f;
-		float fv1_r_est_dist_ = 0.0f;
-		float fv2_r_est_dist_ = 0.0f;
+    float lv_r_est_dist_ = 0.0f;
+    float fv1_r_est_dist_ = 0.0f;
+    float fv2_r_est_dist_ = 0.0f;
 
-		float lv_r_rss_dist_ = 0.0f;
-		float fv1_r_rss_dist_ = 0.0f;
-		float fv2_r_rss_dist_ = 0.0f;
+    float lv_r_rss_dist_ = 0.0f;
+    float fv1_r_rss_dist_ = 0.0f;
+    float fv2_r_rss_dist_ = 0.0f;
 
-		bool req_flag_ = false;
+    bool req_flag_ = false;
 
-		//bbox
-		std::string name_;
-		std::string r_name_;
+    //bbox
+    std::string name_;
+    std::string r_name_;
     uint32_t x_ = 0;
     uint32_t y_ = 0;
     uint32_t w_ = 0;
