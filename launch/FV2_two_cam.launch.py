@@ -51,10 +51,10 @@ def generate_launch_description():
             name='usb_cam',
             executable='usb_cam_node_exe',
             parameters=[
-            	PathJoinSubstitution([
-            		get_package_share_directory('scale_truck_control_ros2'),
-            		'config', 'camera_params.yaml',
-            		])],
+              PathJoinSubstitution([
+                get_package_share_directory('scale_truck_control_ros2'),
+                'config', 'camera_params.yaml',
+                ])],
             remappings=[('image_raw', 'usb_cam/image_raw')],
             output='screen')
 
@@ -102,20 +102,20 @@ def generate_launch_description():
             namespace='FV2',
             executable='scan_to_scan_filter_chain',
             parameters=[
-            	PathJoinSubstitution([
-            		get_package_share_directory('scale_truck_control_ros2'),
-            		'config', 'laserfilter_angle.yaml',
-            		])],
+              PathJoinSubstitution([
+                get_package_share_directory('scale_truck_control_ros2'),
+                'config', 'laserfilter_angle.yaml',
+                ])],
             output='screen',)
 
     object_node=Node(
-	    package='object_detection_ros2',
-	    namespace='FV2',	    
-	    executable='object_detection_ros2_node',
-	    output={
-	    	'stdout': 'screen',
-	    	'stderr': 'screen',
-	    	})
+      package='object_detection_ros2',
+      namespace='FV2',      
+      executable='object_detection_ros2_node',
+      output={
+        'stdout': 'screen',
+        'stderr': 'screen',
+        })
 
     lane_detection_node=Node(
             package='lane_detection_ros2',

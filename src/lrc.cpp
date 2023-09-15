@@ -5,9 +5,9 @@ using namespace std::chrono_literals;
 namespace LocalResiliencyCoordinator{
 
 LocalRC::LocalRC(void) 
-	: Node("LRC", rclcpp::NodeOptions()
+  : Node("LRC", rclcpp::NodeOptions()
                       .allow_undeclared_parameters(true)
-		      .automatically_declare_parameters_from_overrides(true))
+          .automatically_declare_parameters_from_overrides(true))
 {
   init();
 
