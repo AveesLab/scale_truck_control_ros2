@@ -271,13 +271,13 @@ public:
 
         FV1_Rear = new QPushButton(FV1GBOX);
         FV1_Rear->setObjectName(QStringLiteral("FV1_Rear"));
-	FV1_Rear->setCheckable(true);
+  FV1_Rear->setCheckable(true);
 
         FV1LaneChange->addWidget(FV1_Rear);
 
         FV1_Right_LC = new QPushButton(FV1GBOX);
         FV1_Right_LC->setObjectName(QStringLiteral("FV1_Right_LC"));
-	FV1_Right_LC->setCheckable(true);
+  FV1_Right_LC->setCheckable(true);
 
         FV1LaneChange->addWidget(FV1_Right_LC);
 
@@ -421,13 +421,13 @@ public:
 
         LV_Rear = new QPushButton(LVGBOX);
         LV_Rear->setObjectName(QStringLiteral("LV_Rear"));
-	LV_Rear->setCheckable(true);
+  LV_Rear->setCheckable(true);
 
         LVLaneChange->addWidget(LV_Rear);
 
         LV_Right_LC = new QPushButton(LVGBOX);
         LV_Right_LC->setObjectName(QStringLiteral("LV_Right_LC"));
-	LV_Right_LC->setCheckable(true);
+  LV_Right_LC->setCheckable(true);
 
         LVLaneChange->addWidget(LV_Right_LC);
 
@@ -545,7 +545,7 @@ public:
 
         FV2_Rear = new QPushButton(FV2GBOX);
         FV2_Rear->setObjectName(QStringLiteral("FV2_Rear"));
-	FV2_Rear->setCheckable(true);
+  FV2_Rear->setCheckable(true);
 
         FV2LaneChange->addWidget(FV2_Rear);
 

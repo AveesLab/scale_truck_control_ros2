@@ -1021,64 +1021,64 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       TargetDist_ = msg->tar_dist;
       cmd_lv_lc_right_ = msg->lv_lc_right; 
 
-			if(cmd_lv_lc_right_){
-				lc_right_flag_ = true;
-			}
+      if(cmd_lv_lc_right_){
+        lc_right_flag_ = true;
+      }
 
-			cmd_lv_lc_left_ = msg->lv_lc_left;
-			if(cmd_lv_lc_left_) {
-				lc_left_flag_ = true;
-			}
+      cmd_lv_lc_left_ = msg->lv_lc_left;
+      if(cmd_lv_lc_left_) {
+        lc_left_flag_ = true;
+      }
 
-			if(msg->fv2_lc_right) {
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-			}
-		}
-		/*******/
-		/* FV1 */
-		/*******/
-		else if(index_ == 1) {   
-			cmd_fv1_lc_right_ = msg->fv1_lc_right; 
-			if(cmd_fv1_lc_right_){
-				lc_right_flag_ = true;
-			}
+      if(msg->fv2_lc_right) {
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+      }
+    }
+    /*******/
+    /* FV1 */
+    /*******/
+    else if(index_ == 1) {   
+      cmd_fv1_lc_right_ = msg->fv1_lc_right; 
+      if(cmd_fv1_lc_right_){
+        lc_right_flag_ = true;
+      }
 
-			cmd_fv1_lc_left_ = msg->fv1_lc_left;
-			if(cmd_fv1_lc_left_) {
-				lc_left_flag_ = true;
-			}
+      cmd_fv1_lc_left_ = msg->fv1_lc_left;
+      if(cmd_fv1_lc_left_) {
+        lc_left_flag_ = true;
+      }
 
-			if(msg->fv2_lc_right) {
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-			}
+      if(msg->fv2_lc_right) {
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+      }
 
-			if(msg->fv2_lc_left) {
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-      }	
-		}
-		/*******/
-		/* FV2 */
-		/*******/
-		else if(index_ == 2) { 
-			cmd_fv2_lc_right_ = msg->fv2_lc_right;
-			if(cmd_fv2_lc_right_) {
-				req_flag_ = true;
-				//lc_right_flag_ = true;
-				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-			}
-			
-			cmd_fv2_lc_left_ = msg->fv2_lc_left;
-			if(cmd_fv2_lc_left_) {
-				req_flag_ = true;
-				//lc_left_flag_ = true;
-				yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-				yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-			}
-		}
+      if(msg->fv2_lc_left) {
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+      } 
+    }
+    /*******/
+    /* FV2 */
+    /*******/
+    else if(index_ == 2) { 
+      cmd_fv2_lc_right_ = msg->fv2_lc_right;
+      if(cmd_fv2_lc_right_) {
+        req_flag_ = true;
+        //lc_right_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+      }
+      
+      cmd_fv2_lc_left_ = msg->fv2_lc_left;
+      if(cmd_fv2_lc_left_) {
+        req_flag_ = true;
+        //lc_left_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+      }
+    }
 
-		runYoloPublisher_->publish(yolo_flag_msg);
+    runYoloPublisher_->publish(yolo_flag_msg);
   }
   {
     std::scoped_lock lock(rss_mutex_);
