@@ -91,14 +91,14 @@ def generate_launch_description():
                 ])],
             output='screen',)
 
-    object_node=Node(
-        package='object_detection_ros2',
-        namespace='LV',     
-        executable='object_detection_ros2_node',
-        output={
-        'stdout': 'screen',
-        'stderr': 'screen',
-        })
+#    object_node=Node(
+#        package='object_detection_ros2',
+#        namespace='LV',     
+#        executable='object_detection_ros2_node',
+#        output={
+#        'stdout': 'screen',
+#        'stderr': 'screen',
+#        })
 
     lane_detection_node=Node(
             package='lane_detection_ros2',
@@ -139,7 +139,7 @@ def generate_launch_description():
     ld.add_action(rplidarA3_node)
 #    ld.add_action(rplidarS2_node)
     ld.add_action(laserfilter_node)
-    ld.add_action(object_node)
+#    ld.add_action(object_node)
     ld.add_action(control_node)
     ld.add_action(lrc_node)
     ld.add_action(opencr_node)
