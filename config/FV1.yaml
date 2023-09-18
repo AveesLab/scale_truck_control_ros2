@@ -13,6 +13,9 @@
     image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
+    threshold/box_size: 77   # 51 71 
+    threshold/box_offset: 35 # 50 43
+
     params/angle_degree: 0.0
     params/Kp_d: 2.0
     params/Ki_d: 0.2
