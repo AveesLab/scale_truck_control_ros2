@@ -42,9 +42,9 @@
     rss/a_max_brake: -0.472 #0.6 #2.136
     rss/response_time: 1.23 #0.160 # 0.059
 
-    icra/dist: 0.8 # FOR ICRA
+#icra/dist: 0.8 # FOR ICRA
 
-    image_view/enable_console_output: false
+    image_view/enable_console_output: true
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 

@@ -337,8 +337,8 @@ void ScaleTruckController::objectdetectInThread()
     }
 
     /* FOR ICRA  */
-    dist_tmp = ICRA_dist;
-    distance_ = dist_tmp;
+//    dist_tmp = ICRA_dist;
+//    distance_ = dist_tmp;
 
     if(ObjCircles_ != 0)
     {
@@ -418,7 +418,7 @@ void ScaleTruckController::objectdetectInThread()
   }
 
   /* FOR ICRA */
-  ResultVel_ = TargetVel_;
+//  ResultVel_ = TargetVel_;
 }
 
 void ScaleTruckController::isLaneChangeCommandReceived() {
@@ -663,48 +663,48 @@ void ScaleTruckController::spin()
     {
       std::scoped_lock lock(lane_mutex_, rep_mutex_);
       /* Lateral err FOR ICRA*/
-      if(lane_coef_.coef[0].a != 0) {
-        int car_position = 320; 
-        int i = 480; // height
-        double lane_length = 0;
-        double dot_lane_base = 0;
-        static double prev_lateral_err;
-        static double prev_origin_lateral_err;
-        struct timeval currentTime;
-        double sampling_time = 0;
-        static bool tmp_flag = false;
-
-        if (AngleDegree2 != 0 && lc_right_flag_) {
-          dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
-          tmp_flag = true;
-        }
-        else if (AngleDegree2 != 0 && lc_left_flag_) {
-          dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
-          tmp_flag = true;
-        }
-        else { // 왼쪽 레인에 존재. lc_right할때만 사용. lc_left할때는 coef[0]로 변경
-          dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
-        }
-
-        if(tmp_flag == true && lc_right_flag_ == false) {
-          dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
-        }
-
-        origin_lateral_err = car_position - dot_lane_base;
-        if (abs(origin_lateral_err - prev_origin_lateral_err) >= 100) origin_lateral_err = prev_origin_lateral_err;
-        prev_origin_lateral_err = origin_lateral_err;
-
-        gettimeofday(&currentTime, NULL);
-        sampling_time = ((currentTime.tv_sec - start_time.tv_sec)) + ((currentTime.tv_usec - start_time.tv_usec)/1000000.0);
-        lateral_err = lowPassFilter(sampling_time, origin_lateral_err, prev_lateral_err);
-        prev_lateral_err = lateral_err;
-
-
-        double Llane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
-        double Rlane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
-        double lane_base = Rlane_base - Llane_base;
-        RCLCPP_INFO(this->get_logger(), "lane_base        : %3.3f ms\n", lane_base);
-      } 
+//      if(lane_coef_.coef[0].a != 0) {
+//        int car_position = 320; 
+//        int i = 480; // height
+//        double lane_length = 0;
+//        double dot_lane_base = 0;
+//        static double prev_lateral_err;
+//        static double prev_origin_lateral_err;
+//        struct timeval currentTime;
+//        double sampling_time = 0;
+//        static bool tmp_flag = false;
+//
+//        if (AngleDegree2 != 0 && lc_right_flag_) {
+//          dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+//          tmp_flag = true;
+//        }
+//        else if (AngleDegree2 != 0 && lc_left_flag_) {
+//          dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+//          tmp_flag = true;
+//        }
+//        else { // 왼쪽 레인에 존재. lc_right할때만 사용. lc_left할때는 coef[0]로 변경
+//          dot_lane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+//        }
+//
+//        if(tmp_flag == true && lc_right_flag_ == false) {
+//          dot_lane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+//        }
+//
+//        origin_lateral_err = car_position - dot_lane_base;
+//        if (abs(origin_lateral_err - prev_origin_lateral_err) >= 100) origin_lateral_err = prev_origin_lateral_err;
+//        prev_origin_lateral_err = origin_lateral_err;
+//
+//        gettimeofday(&currentTime, NULL);
+//        sampling_time = ((currentTime.tv_sec - start_time.tv_sec)) + ((currentTime.tv_usec - start_time.tv_usec)/1000000.0);
+//        lateral_err = lowPassFilter(sampling_time, origin_lateral_err, prev_lateral_err);
+//        prev_lateral_err = lateral_err;
+//
+//
+//        double Llane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+//        double Rlane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+//        double lane_base = Rlane_base - Llane_base;
+//        RCLCPP_INFO(this->get_logger(), "lane_base        : %3.3f ms\n", lane_base);
+//      } 
       /* Lateral err end */
 
       /* LaneChange */
