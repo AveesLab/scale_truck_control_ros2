@@ -40,7 +40,11 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   /* Ros Topic Publish Option */
   /****************************/
   ros2_node->get_parameter_or("publishers/cmd_to_xavier/topic", XavPubTopicName, std::string("/cmd2xav_msg"));
-  ros2_node->get_parameter_or("publishers/cmd_to_xav/queue_size", XavPubQueueSize, 1);
+  ros2_node->get_parameter_or("publishers/cmd_to_xav/queue_size", XavPubQueueSize, 10);
+
+  rclcpp::QoS qos(XavPubQueueSize);
+  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  qos.durability(rclcpp::DurabilityPolicy::TransientLocal);
 
   /************************/
   /* Ros Topic Subscriber */
@@ -53,7 +57,7 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
-  XavPublisher_ = ros2_node->create_publisher<ros2_msg::msg::Cmd2xav>(XavPubTopicName, XavPubQueueSize);
+  XavPublisher_ = ros2_node->create_publisher<ros2_msg::msg::Cmd2xav>(XavPubTopicName, qos);
 
   /**********************************/
   /* Control & Communication Thread */

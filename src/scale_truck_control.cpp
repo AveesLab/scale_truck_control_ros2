@@ -127,11 +127,15 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
   this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
-  this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 1);
+  this->get_parameter_or("subscribers/cmd_to_xavier/queue_size", CmdSubQueueSize, 10);
   this->get_parameter_or("subscribers/yolo_to_xavier/topic", YoloSubTopicName, std::string("yolo_object_detection/Boundingbox"));
   this->get_parameter_or("subscribers/yolo_to_xavier/queue_size", YoloSubQueueSize, 1);
   this->get_parameter_or("subscribers/rearyolo_to_xavier/topic", RearYoloSubTopicName, std::string("rear_yolo_object_detection/Boundingbox"));
   this->get_parameter_or("subscribers/rearyolo_to_xavier/queue_size", RearYoloSubQueueSize, 1);
+
+  rclcpp::QoS qos(CmdSubQueueSize);
+  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  qos.durability(rclcpp::DurabilityPolicy::TransientLocal);
 
   /****************************/
   /* Ros Topic Publish Option */
@@ -150,7 +154,7 @@ void ScaleTruckController::init()
   /************************/
   LrcSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
 
-  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, CmdSubQueueSize, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
+  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, qos, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
   objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
