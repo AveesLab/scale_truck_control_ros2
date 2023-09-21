@@ -311,19 +311,21 @@ void Controller::updateData(CmdData cmd_data)
       display_Map(tmp).copyTo(frame);
       ui->LV_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
 
-      if (wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
-        wait_flag = true;
+      if (lv_wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
+        lv_wait_flag = true;
 
-      if (wait_flag == true) {
+      if (lv_wait_flag == true) {
         if(LV_lc_right == true) {
           if(tmp.lc_right_flag == false) {
-            wait_flag = false;
+            lv_wait_flag = false;
+            lv_lc_complete = true;
             ui->LV_Right_LC->toggle(); 
           } 
         }
         if(LV_lc_left == true) {
           if(tmp.lc_left_flag == false) {
-            wait_flag = false;
+            lv_wait_flag = false;
+            lv_lc_complete = true;
             ui->LV_Left_LC->toggle(); 
           } 
         }
@@ -357,22 +359,24 @@ void Controller::updateData(CmdData cmd_data)
       display_Map(tmp).copyTo(frame);
       ui->FV1_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
 
-      if (wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
-        wait_flag = true;
+      if (fv1_wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
+        fv1_wait_flag = true;
 
-      if (wait_flag == true) {
+      if (fv1_wait_flag == true) {
         if(FV1_lc_right == true) {
           if(tmp.lc_right_flag == false) {
-            wait_flag = false;
+            fv1_wait_flag = false;
+            fv1_lc_complete = true;
             ui->FV1_Right_LC->toggle(); 
-            ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
+//            ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
           } 
         }
         if(FV1_lc_left == true) {
           if(tmp.lc_left_flag == false) {
-            wait_flag = false;
+            fv1_wait_flag = false;
+            fv1_lc_complete = true;
             ui->FV1_Left_LC->toggle(); 
-            ui->LV_Left_LC->toggle(); // FV1 -> LV flag on 
+//            ui->LV_Left_LC->toggle(); // FV1 -> LV flag on 
           } 
         }
       }
@@ -406,22 +410,24 @@ void Controller::updateData(CmdData cmd_data)
       display_Map(tmp).copyTo(frame);
       ui->FV2_MAP->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)));
 
-      if (wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
-        wait_flag = true;
+      if (fv2_wait_flag == false && (tmp.lc_right_flag == true || tmp.lc_left_flag == true)) 
+        fv2_wait_flag = true;
 
-      if (wait_flag == true) {
+      if (fv2_wait_flag == true) {
         if(FV2_lc_right == true) { // Controller state -> lc_right flag on 
           if(tmp.lc_right_flag == false) { // FV2 state -> FV2 LC complete
-            wait_flag = false;
+            fv2_wait_flag = false;
+            fv2_lc_complete = true;
             ui->FV2_Right_LC->toggle(); 
-            ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 
+//            ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 
           } 
         }
         if(FV2_lc_left == true) {
           if(tmp.lc_left_flag == false) {
-            wait_flag = false;
+            fv2_wait_flag = false;
+            fv2_lc_complete = true;
             ui->FV2_Left_LC->toggle(); 
-            ui->FV1_Left_LC->toggle(); // FV2 -> FV1 flag on
+//            ui->FV1_Left_LC->toggle(); // FV2 -> FV1 flag on
           } 
         }
       }
@@ -437,6 +443,7 @@ void Controller::updateData(CmdData cmd_data)
       if(tmp.req_flag) replyData();
     }
   }
+  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
 }
 
 cv::Mat Controller::display_Map(CmdData value)
@@ -804,6 +811,11 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
   cmd_data.fv2_lc_left = FV2_lc_left;
   qDebug() << "FV2_lc_left: " << FV2_lc_left;
 
+  if(both_lc_flag == false) {
+    ui->FV1_Left_LC->toggle(); 
+    ui->LV_Left_LC->toggle();  
+    both_lc_flag = true;
+  }
   requestData(cmd_data);
 }
 
@@ -830,6 +842,12 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
   cmd_data.tar_dist = tar_dist;
   cmd_data.fv2_lc_right = FV2_lc_right;
   qDebug() << "FV2_lc_right: " << FV2_lc_right;
+
+  if(both_lc_flag == false) {
+    ui->FV1_Right_LC->toggle(); 
+    ui->LV_Right_LC->toggle();  
+    both_lc_flag = true;
+  }
 
   requestData(cmd_data);
 }

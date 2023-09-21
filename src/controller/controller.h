@@ -71,7 +71,16 @@ public:
     int MinDist;
     int MaxDist;
 
-    bool wait_flag = false;
+    bool both_lc_flag = false;
+//    bool wait_flag = false; 
+    bool lv_wait_flag = false; 
+    bool fv1_wait_flag = false; 
+    bool fv2_wait_flag = false;
+
+    bool lv_lc_complete = false;
+    bool fv1_lc_complete = false;
+    bool fv2_lc_complete = false;
+
     bool LV_lc_right = false;
     bool LV_lc_left = false;
     bool FV1_lc_right = false;
