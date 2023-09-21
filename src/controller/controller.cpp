@@ -26,11 +26,19 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   std::string XavPubTopicName;
   int XavPubQueueSize;
 
+  rclcpp::QoS XavPubQos(XavPubQueueSize);
+  XavPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  XavPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
+  rclcpp::QoS XavSubQos(LVSubQueueSize); // LV, FV1, FV2 same
+  XavSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  XavSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
   /******************************/
   /* Ros Topic Subscribe Option */
   /******************************/
   ros2_node->get_parameter_or("subscribers/lv_xavier_to_cmd/topic", LVSubTopicName, std::string("/LV/xav2cmd_msg"));
-  ros2_node->get_parameter_or("subscribers/lv_xavier_to_cmd/queue_size", LVSubQueueSize, 1);
+  ros2_node->get_parameter_or("subscribers/lv_xavier_to_cmd/queue_size", LVSubQueueSize, 10);
   ros2_node->get_parameter_or("subscribers/fv1_xavier_to_cmd/topic", FV1SubTopicName, std::string("/FV1/xav2cmd_msg"));
   ros2_node->get_parameter_or("subscribers/fv1_xavier_to_cmd/queue_size", FV1SubQueueSize, 1);
   ros2_node->get_parameter_or("subscribers/fv2_xavier_to_cmd/topic", FV2SubTopicName, std::string("/FV2/xav2cmd_msg"));
@@ -42,22 +50,17 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   ros2_node->get_parameter_or("publishers/cmd_to_xavier/topic", XavPubTopicName, std::string("/cmd2xav_msg"));
   ros2_node->get_parameter_or("publishers/cmd_to_xav/queue_size", XavPubQueueSize, 10);
 
-  rclcpp::QoS qos(XavPubQueueSize);
-  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  qos.durability(rclcpp::DurabilityPolicy::TransientLocal);
-
   /************************/
   /* Ros Topic Subscriber */
   /************************/
-  LVSubscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(LVSubTopicName, LVSubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
-  FV1Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV1SubTopicName, FV1SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
-  FV2Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV2SubTopicName, FV2SubQueueSize, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
-
+  LVSubscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(LVSubTopicName, XavSubQos, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+  FV1Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV1SubTopicName, XavSubQos, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
+  FV2Subscriber_ = ros2_node->create_subscription<ros2_msg::msg::Xav2cmd>(FV2SubTopicName, XavSubQos, std::bind(&Controller::XavSubCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
   /***********************/
-  XavPublisher_ = ros2_node->create_publisher<ros2_msg::msg::Cmd2xav>(XavPubTopicName, qos);
+  XavPublisher_ = ros2_node->create_publisher<ros2_msg::msg::Cmd2xav>(XavPubTopicName, XavPubQos);
 
   /**********************************/
   /* Control & Communication Thread */

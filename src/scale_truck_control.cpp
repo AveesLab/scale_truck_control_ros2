@@ -115,6 +115,14 @@ void ScaleTruckController::init()
   std::string runYoloPubTopicName;
   int runYoloPubQueueSize;
 
+  rclcpp::QoS CmdSubQos(CmdSubQueueSize);
+  CmdSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  CmdSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
+  rclcpp::QoS CmdPubQos(CmdPubQueueSize);
+  CmdPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  CmdPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
   /******************************/
   /* Ros Topic Subscribe Option */
   /******************************/
@@ -133,17 +141,13 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/rearyolo_to_xavier/topic", RearYoloSubTopicName, std::string("rear_yolo_object_detection/Boundingbox"));
   this->get_parameter_or("subscribers/rearyolo_to_xavier/queue_size", RearYoloSubQueueSize, 1);
 
-  rclcpp::QoS qos(CmdSubQueueSize);
-  qos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  qos.durability(rclcpp::DurabilityPolicy::TransientLocal);
-
   /****************************/
   /* Ros Topic Publish Option */
   /****************************/
   this->get_parameter_or("publishers/xavier_to_lrc/topic", LrcPubTopicName, std::string("xav2lrc_msg"));
   this->get_parameter_or("publishers/xavier_to_lrc/queue_size", LrcPubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_cmd/topic", CmdPubTopicName, std::string("xav2cmd_msg"));
-  this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 1);
+  this->get_parameter_or("publishers/xavier_to_cmd/queue_size", CmdPubQueueSize, 10);
   this->get_parameter_or("publishers/xavier_to_lane/topic", LanePubTopicName, std::string("xav2lane_msg"));
   this->get_parameter_or("publishers/xavier_to_lane/queue_size", LanePubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_Yolo/topic", runYoloPubTopicName, std::string("run_yolo_flag"));
@@ -154,7 +158,7 @@ void ScaleTruckController::init()
   /************************/
   LrcSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LrcSubTopicName, LrcSubQueueSize, std::bind(&ScaleTruckController::LrcSubCallback, this, std::placeholders::_1));
 
-  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, qos, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
+  CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, CmdSubQos, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
   objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
@@ -170,7 +174,7 @@ void ScaleTruckController::init()
   /* Ros Topic Publisher */
   /***********************/
   LrcPublisher_ = this->create_publisher<ros2_msg::msg::Xav2lrc>(LrcPubTopicName, LrcPubQueueSize);  
-  CmdPublisher_ = this->create_publisher<ros2_msg::msg::Xav2cmd>(CmdPubTopicName, CmdPubQueueSize);  
+  CmdPublisher_ = this->create_publisher<ros2_msg::msg::Xav2cmd>(CmdPubTopicName, CmdPubQos);  
   LanePublisher_=this->create_publisher<ros2_msg::msg::Xav2lane>(LanePubTopicName,LanePubQueueSize); 
   runYoloPublisher_=this->create_publisher<ros2_msg::msg::Yoloflag>(runYoloPubTopicName,runYoloPubQueueSize);  
 
