@@ -123,8 +123,8 @@ void ScaleTruckController::init()
   this->get_parameter_or("subscribers/lane_to_xavier/queue_size", LaneQueueSize, 1);
   this->get_parameter_or("subscribers/rearlane_to_xavier/topic", RearTopicName, std::string("rear2xav_msg"));
   this->get_parameter_or("subscribers/rearlane_to_xavier/queue_size", RearQueueSize, 1);
-  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("raw_obstacles"));
-  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 100);
+  this->get_parameter_or("subscribers/obstacle_reading/topic", objectTopicName, std::string("min_distance"));
+  this->get_parameter_or("subscribers/obstacle_reading/queue_size", objectQueueSize, 10);
   this->get_parameter_or("subscribers/lrc_to_xavier/topic", LrcSubTopicName, std::string("lrc2xav_msg"));
   this->get_parameter_or("subscribers/lrc_to_xavier/queue_size", LrcSubQueueSize, 1);
   this->get_parameter_or("subscribers/cmd_to_xavier/topic", CmdSubTopicName, std::string("/cmd2xav_msg"));
@@ -165,7 +165,7 @@ void ScaleTruckController::init()
 
   CmdSubscriber_ = this->create_subscription<ros2_msg::msg::Cmd2xav>(CmdSubTopicName, CmdSubQos, std::bind(&ScaleTruckController::CmdSubCallback, this, std::placeholders::_1));
 
-  objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
+//  objectSubscriber_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::objectCallback, this, std::placeholders::_1));
 
   LaneSubscriber_ = this->create_subscription<ros2_msg::msg::Lane2xav>(LaneTopicName, LaneQueueSize, std::bind(&ScaleTruckController::LaneSubCallback, this, std::placeholders::_1));
 
@@ -174,6 +174,8 @@ void ScaleTruckController::init()
   YoloSubscriber_ = this->create_subscription<ros2_msg::msg::Boundingbox>(YoloSubTopicName, YoloSubQueueSize, std::bind(&ScaleTruckController::YoloSubCallback, this, std::placeholders::_1));
 
   RearYoloSubscriber_ = this->create_subscription<ros2_msg::msg::Boundingbox>(RearYoloSubTopicName, RearYoloSubQueueSize, std::bind(&ScaleTruckController::RearYoloSubCallback, this, std::placeholders::_1));
+
+  DistSubscriber_ = this->create_subscription<ros2_msg::msg::Obj2xav>(objectTopicName, objectQueueSize, std::bind(&ScaleTruckController::DistCallback, this, std::placeholders::_1));
 
   /***********************/
   /* Ros Topic Publisher */
@@ -334,30 +336,37 @@ void ScaleTruckController::objectdetectInThread()
   /**************/
   {
     std::scoped_lock lock(object_mutex_);         
-    ObjCircles_ = Obstacle_.data.size();    
+//    ObjCircles_ = Obstacle_.data.size();    
 
-    for(int i=0; i < ObjCircles_; i+=3)
-    {
-      if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
-      {
-        //dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
-        dist = sqrt(pow(Obstacle_.data[i], 2));
-        if(dist_tmp >= dist)
-        {
-          dist_tmp = dist;
-        }
-      } 
-    }
+//    for(int i=0; i < ObjCircles_; i+=3)
+//    {
+//      if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
+//      {
+//        //dist = sqrt(pow(Obstacle_.data[i], 2)+pow(Obstacle_.data[i+1], 2));
+//        dist = sqrt(pow(Obstacle_.data[i], 2));
+//        if(dist_tmp >= dist)
+//        {
+//          dist_tmp = dist;
+//        }
+//      } 
+//    }
 
     /* FOR ICRA  */
 //    dist_tmp = ICRA_dist;
 //    distance_ = dist_tmp;
+    
+    if(dist_tmp >= mindist_)
+      {
+        dist_tmp = mindist_;
+      }
 
-    if(ObjCircles_ != 0)
-    {
-      std::scoped_lock lock(dist_mutex_);
-      distance_ = dist_tmp;
-    }
+    distance_ = dist_tmp;
+
+//    if(ObjCircles_ != 0)
+//    {
+//      std::scoped_lock lock(dist_mutex_);
+//      distance_ = dist_tmp;
+//    }
   }   
 
   /*****************************/
@@ -1003,12 +1012,18 @@ void ScaleTruckController::RearYoloSubCallback(const ros2_msg::msg::Boundingbox:
   }
 }
 
-void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray &msg) 
+//void ScaleTruckController::objectCallback(const std_msgs::msg::Float32MultiArray &msg) 
+//{
+//  {
+//    std::scoped_lock lock(object_mutex_);
+//    Obstacle_ = msg;
+//  }
+//}
+
+void ScaleTruckController::DistCallback(const ros2_msg::msg::Obj2xav::SharedPtr msg)
 {
-  {
     std::scoped_lock lock(object_mutex_);
-    Obstacle_ = msg;
-  }
+    mindist_ = msg->min_dist;
 }
 
 void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg)
