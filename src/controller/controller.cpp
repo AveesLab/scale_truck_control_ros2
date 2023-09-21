@@ -26,14 +26,6 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   std::string XavPubTopicName;
   int XavPubQueueSize;
 
-  rclcpp::QoS XavPubQos(XavPubQueueSize);
-  XavPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  XavPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
-
-  rclcpp::QoS XavSubQos(LVSubQueueSize); // LV, FV1, FV2 same
-  XavSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  XavSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
-
   /******************************/
   /* Ros Topic Subscribe Option */
   /******************************/
@@ -49,6 +41,17 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   /****************************/
   ros2_node->get_parameter_or("publishers/cmd_to_xavier/topic", XavPubTopicName, std::string("/cmd2xav_msg"));
   ros2_node->get_parameter_or("publishers/cmd_to_xav/queue_size", XavPubQueueSize, 10);
+
+  /******************/
+  /* Ros Qos Option */
+  /******************/
+  rclcpp::QoS XavPubQos(XavPubQueueSize);
+  XavPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  XavPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
+  rclcpp::QoS XavSubQos(LVSubQueueSize); // LV, FV1, FV2 same
+  XavSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  XavSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
 
   /************************/
   /* Ros Topic Subscriber */
