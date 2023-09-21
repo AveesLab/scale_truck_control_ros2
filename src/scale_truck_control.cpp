@@ -115,13 +115,6 @@ void ScaleTruckController::init()
   std::string runYoloPubTopicName;
   int runYoloPubQueueSize;
 
-  rclcpp::QoS CmdSubQos(CmdSubQueueSize);
-  CmdSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  CmdSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
-
-  rclcpp::QoS CmdPubQos(CmdPubQueueSize);
-  CmdPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  CmdPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
 
   /******************************/
   /* Ros Topic Subscribe Option */
@@ -152,6 +145,18 @@ void ScaleTruckController::init()
   this->get_parameter_or("publishers/xavier_to_lane/queue_size", LanePubQueueSize, 1);
   this->get_parameter_or("publishers/xavier_to_Yolo/topic", runYoloPubTopicName, std::string("run_yolo_flag"));
   this->get_parameter_or("publishers/xavier_to_Yolo/queue_size", runYoloPubQueueSize, 1);
+
+
+  /******************/
+  /* Ros Qos Option */
+  /******************/
+  rclcpp::QoS CmdSubQos(CmdSubQueueSize);
+  CmdSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  CmdSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+
+  rclcpp::QoS CmdPubQos(CmdPubQueueSize);
+  CmdPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
+  CmdPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
 
   /************************/
   /* Ros Topic Subscriber */

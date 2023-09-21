@@ -9,7 +9,7 @@
     subscribers/lrc_to_xavier/topic: lrc2xav_msg
     subscribers/lrc_to_xavier/queue_size: 1
     subscribers/cmd_to_xavier/topic: /cmd2xav_msg
-    subscribers/cmd_to_xavier/queue_size: 1
+    subscribers/cmd_to_xavier/queue_size: 10
     subscribers/yolo_to_xavier/topic: yolo_object_detection/Boundingbox
     subscribers/yolo_to_xavier/queue_size: 1
     subscribers/rearyolo_to_xavier/topic: rear_yolo_object_detection/Boundingbox
@@ -20,11 +20,11 @@
     publishers/xavier_to_lrc/topic: xav2lrc_msg
     publishers/xavier_to_lrc/queue_size: 1
     publishers/xavier_to_cmd/topic: xav2cmd_msg
-    publishers/xavier_to_cmd/queue_size: 1
+    publishers/xavier_to_cmd/queue_size: 10
     publishers/xavier_to_Yolo/topic: run_yolo_flag
     publishers/xavier_to_Yolo/queue_size: 1
     
-    params/index: 0 
+    params/index: 1 
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
@@ -64,7 +64,7 @@
     LrcPub/lv_to_fv/topic: /lv2fv_msg
     LrcPub/lv_to_fv/queue_size: 1
 
-    LrcParams/lrc_index: 10
+    LrcParams/lrc_index: 11
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 
