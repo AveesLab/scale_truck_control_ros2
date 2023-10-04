@@ -40,11 +40,11 @@
     ROI/height: 480
 
     ROI/front_cam/top_gap: 0.31
-    ROI/front_cam/bot_gap: -0.13
+    ROI/front_cam/bot_gap: -0.17
     ROI/front_cam/top_height: 0.99
-    ROI/front_cam/bot_height: 0.34
-    ROI/front_cam/extra_f: 12.00
-    ROI/front_cam/extra_b: 18.00
+    ROI/front_cam/bot_height: 0.28
+    ROI/front_cam/extra_f: 26.00
+    ROI/front_cam/extra_b: 22.00
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
