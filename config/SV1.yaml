@@ -8,8 +8,11 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
+    
+    threshold/box_size: 71   # 51 71
+    threshold/box_offset: 40 # 50 40 
 
     params/angle_degree: 0.0
     params/Kp_d: 2.0
@@ -45,7 +48,8 @@
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
-    params/K: 0.15
+    params/K1: 0.15 #e1
+    params/K2: 0.15 #eL
 
     LaneDetector/eL_height: 0.2
     LaneDetector/e1_height: 1.2563 

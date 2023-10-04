@@ -71,7 +71,7 @@ def generate_launch_description():
 
     ld = LaunchDescription()
     
-#    ld.add_action(csi_cam_node)
+    ld.add_action(csi_cam_node)
     ld.add_action(lane_detection_node)
     ld.add_action(control_node)
     ld.add_action(lrc_node)
