@@ -10,11 +10,11 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false # FOR ICRA
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
 
-    threshold/box_size:   99 # 51 71 99
-    threshold/box_offset: 52 # 50 43 52
+    threshold/box_size: 71  # 51 71 
+    threshold/box_offset: 40 # 50 40
 
     params/angle_degree: 0.0
     params/Kp_d: 2.0
@@ -109,8 +109,8 @@
     image_view/wait_key_delay: 1
     image_view/TEST: false
 
-    threshold/box_size:   51 # 51 71 
-    threshold/box_offset: 50 # 50 43
+    threshold/box_size: 71  # 51 71 
+    threshold/box_offset: 40 # 50 40
 
     Calibration/r_matrix/a: 326.31389227574556
     Calibration/r_matrix/b: 0.
