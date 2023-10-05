@@ -106,6 +106,7 @@ sudo make install -j12
 
 - Jetson Stats
 ```
+sudo apt-get install python3-pip
 sudo -H pip3 install jetson-stats
 jetson_release
 ```
@@ -155,7 +156,7 @@ mkdir -p ~/ros2_ws/src
 ```
 
 # 2. Install vision_opencv, cv_bridge
->- Create imgproc 4.4
+>- Create libopencv_imgproc.so.4.4.0
 >- No --allow-overriding 'packages'
  ```
  cd ~/ros2_ws/src
@@ -189,11 +190,6 @@ git clone https://github.com/micro-ROS/micro_ros_setup.git -b galactic
 sudo apt update && rosdep update
 cd ~/ros2_ws
 rosdep install --from-paths src --ignore-src -y
-```
-
-- pip 설치
-```
-sudo apt-get install python3-pip
 ```
 
 - micro-ROS tools 과 소스 빌드
