@@ -135,6 +135,7 @@ private:
 
     //RSS
     void RSS();
+    void clear_release();
     float a_max_accel = 0.0f;
     float a_min_brake = 0.0f; 
     float a_max_brake = 0.0f;

@@ -290,17 +290,14 @@ void ScaleTruckController::checkState() {
         if(cmd_fv2_lc_right_ == true) {
           cmd_fv2_lc_right_ = false;
           lc_right_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
         else if (cmd_fv1_lc_right_ == true) {
           cmd_fv1_lc_right_ = false;
           lc_right_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
         else {
           cmd_lv_lc_right_ = false;
           lc_right_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
         }
       }
       /* left lane change */
@@ -308,17 +305,14 @@ void ScaleTruckController::checkState() {
         if(cmd_fv2_lc_left_ == true) {
           cmd_fv2_lc_left_ = false;
           lc_left_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
         else if (cmd_fv1_lc_left_ == true) {
           cmd_fv1_lc_left_ = false;
           lc_left_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         }
         else {
           cmd_lv_lc_left_ = false;
           lc_left_flag_ = false;
-          //            yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = false; 
         }
       }
       runYoloPublisher_->publish(yolo_flag_msg);
@@ -336,8 +330,15 @@ void ScaleTruckController::objectdetectInThread()
   /**************/
   {
     std::scoped_lock lock(object_mutex_);         
-//    ObjCircles_ = Obstacle_.data.size();    
+    if(dist_tmp >= mindist_)
+    {
+      dist_tmp = mindist_;
+    }
 
+    distance_ = dist_tmp;
+
+//    ObjCircles_ = Obstacle_.data.size();    
+//
 //    for(int i=0; i < ObjCircles_; i+=3)
 //    {
 //      if(Obstacle_.data[i]!=0 || Obstacle_.data[i+1]!=0)
@@ -350,23 +351,16 @@ void ScaleTruckController::objectdetectInThread()
 //        }
 //      } 
 //    }
-
-    /* FOR ICRA  */
-//    dist_tmp = ICRA_dist;
-//    distance_ = dist_tmp;
-    
-    if(dist_tmp >= mindist_)
-      {
-        dist_tmp = mindist_;
-      }
-
-    distance_ = dist_tmp;
-
+//
 //    if(ObjCircles_ != 0)
 //    {
 //      std::scoped_lock lock(dist_mutex_);
 //      distance_ = dist_tmp;
 //    }
+
+    /* FOR ICRA  */
+//    dist_tmp = ICRA_dist;
+//    distance_ = dist_tmp;
   }   
 
   /*****************************/
@@ -443,6 +437,7 @@ void ScaleTruckController::objectdetectInThread()
 //  ResultVel_ = TargetVel_;
 }
 
+/* which car do lane change : LV, FV1, FV2 */
 void ScaleTruckController::isLaneChangeCommandReceived() {
   if(index_ == 2 && (cmd_fv2_lc_right_ || cmd_fv2_lc_left_)) isFV2Detected();
   else if(index_ == 1 && (cmd_fv1_lc_right_ || cmd_fv1_lc_left_)) isFV2Detected();
@@ -450,15 +445,15 @@ void ScaleTruckController::isLaneChangeCommandReceived() {
 }
 
 void ScaleTruckController::isFV2Detected() {
-  if (index_ == 2) { //FV2
+  if (index_ == 2) { 
     if(fv2_bbox_ready_ == 1 || fv2_r_bbox_ready_ == 1) isAreaSafe(2); 
     else if(fv2_bbox_ready_ == 2 && fv2_r_bbox_ready_ == 2) isFV1Detected();
-    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No front & rearYolo Msg\n", index_);
+    else RCLCPP_ERROR(this->get_logger(), "fv2_bbox,rbbox No msg\n");
   }
-  else if (index_ == 1) { //FV1
+  else if (index_ == 1) { 
     if(fv2_bbox_ready_ == 1) isAreaSafe(2);
     else if(fv2_bbox_ready_ == 2) isFV1Detected();
-    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "index:%d, FV2 No frontYolo Msg\n", index_);
+    else RCLCPP_ERROR(this->get_logger(), "fv2_bbox,rbbox No msg\n");
   }
 }
 
@@ -466,28 +461,28 @@ void ScaleTruckController::isFV1Detected() {
   if(index_ == 2) {
     if(fv1_r_bbox_ready_ == 1) isAreaSafe(1); 
     else if(fv1_r_bbox_ready_ == 2) setLaneChangeFlags();
-    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No rearYolo Msg\n");
+    else RCLCPP_ERROR(this->get_logger(), "fv1_rbbox No msg\n");
   }
   else if(index_ == 1) {
     if(fv1_bbox_ready_ == 1) isAreaSafe(1);
     else if(fv1_bbox_ready_ == 2) setLaneChangeFlags(); 
-    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
+    else RCLCPP_ERROR(this->get_logger(), "fv1_bbox No msg\n");
   }
-  else {
+  else if(index_ == 0){
     if(fv1_bbox_ready_ == 1) isAreaSafe(1);
     else if(fv1_bbox_ready_ == 2) isLVDetected(); 
-    else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "FV1 No frontYolo Msg\n");
+    else RCLCPP_ERROR(this->get_logger(), "fv1_bbox No msg\n");
   }
 }
 
 void ScaleTruckController::isLVDetected() {
   if(lv_bbox_ready_ == 1) isAreaSafe(0);
-  else if (lv_bbox_ready_ == 2) setLaneChangeFlags(); // LV LC
-  else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "LV No frontYolo Msg\n");
+  else if (lv_bbox_ready_ == 2) setLaneChangeFlags(); 
+  else RCLCPP_ERROR(this->get_logger(), "lv_bbox No msg\n");
 }
 
 void ScaleTruckController::isAreaSafe(int indexArea) {
-  // car_length_ = 1.15
+  // car_length_: 1.15
   int d1_ = fv2_cur_dist_ + 1.15f + 0.23f;  
   int d2_ = fv1_cur_dist_ + 1.15f + 0.23f; 
 
@@ -495,49 +490,62 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
   /* FV2 */
   /*******/
   if (index_ == 2) {
-    //FV1 Area is OK?
-    if(indexArea == 1) { 
+    /******************/
+    /* FV1 Rear Check */
+    /******************/
+    if(indexArea == 1) {  
       if(fv1_r_est_dist_ != 0 && fv2_cur_dist_ != 0) {
         if(fv1_r_est_dist_ <= d1_) {
           //adjustTargetVelocity();
+          RCLCPP_INFO(this->get_logger(), "fv1 r_est_dist long\n");
         }
-        else setLaneChangeFlags(); // FV2 LC
+        else setLaneChangeFlags(); 
       }
-      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_r_est, fv2_cur)_dist\n");
+      else RCLCPP_INFO(this->get_logger(), "fv1 dist No msg\n");
     } 
-    else if(indexArea == 2) { 
-      //FV2 Rear && Front Area is OK?
+    else if(indexArea == 2) {
+      /***************************/
+      /* FV2 Rear && Front Check */
+      /***************************/
       if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ == 1) {
-        if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0 && fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
+        if(fv2_r_est_dist_ !=0 && fv2_r_rss_dist_ != 0 && fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
           if(fv2_r_est_dist_ <= fv2_r_rss_dist_) {
             //adjustTargetVelocity();
+            RCLCPP_INFO(this->get_logger(), "fv2 r_est_dist long\n");
           }
           else if (fv2_est_dist_ <= fv2_rss_dist_) {
             //adjustTargetVelocity();
+            RCLCPP_INFO(this->get_logger(), "fv2 est_dist long\n");
           }
           else isFV1Detected();
         }
-        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_est, fv2_r_rss, fv2_rss)_dist\n");
+        else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
       }
-      //FV2 Rear Area is OK?
+      /******************/
+      /* FV2 Rear Check */
+      /******************/
       else if (fv2_r_bbox_ready_ == 1 && fv2_bbox_ready_ != 1) {
         if(fv2_r_est_dist_ != 0 && fv2_r_rss_dist_ != 0) {
           if(fv2_r_est_dist_ <= fv2_r_rss_dist_) {
             //adjustTargetVelocity();
+            RCLCPP_INFO(this->get_logger(), "fv2 r_est_dist long\n");
           }
           else isFV1Detected();
         }
-        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_r_est, fv2_r_rss)_dist\n");
+        else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
       }
-      //FV2 Front Area is OK?
+      /*******************/
+      /* FV2 Front Check */
+      /*******************/
       else if (fv2_r_bbox_ready_ != 1 && fv2_bbox_ready_ == 1) {
         if(fv2_est_dist_ != 0 && fv2_rss_dist_ != 0) {
           if(fv2_est_dist_ <= fv2_rss_dist_) {
             //adjustTargetVelocity();
+            RCLCPP_INFO(this->get_logger(), "fv2 est_dist long\n");
           }
           else isFV1Detected();
         }
-        else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_rss)_dist\n");
+        else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
       }
     } 
   }
@@ -549,21 +557,21 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
       if(fv1_est_dist_ != 0 && fv1_rss_dist_ != 0) {
         if(fv1_est_dist_ <= fv1_rss_dist_) {
           //adjustTargetVelocity();
+          RCLCPP_INFO(this->get_logger(), "fv1 est_dist long\n");
         }
-        else setLaneChangeFlags(); // FV1 LC
+        else setLaneChangeFlags(); 
       }
-      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_rss)_dist\n");
+      else RCLCPP_ERROR(this->get_logger(), "fv1 every dist No msg\n");
     } 
     else if(indexArea == 2) {
       if(fv2_est_dist_ != 0 && fv2_cur_dist_ != 0) {
         if(fv2_est_dist_ <= d1_) {
           //adjustTargetVelocity();
+          RCLCPP_INFO(this->get_logger(), "fv2 est_dist long\n");
         }
-        else {
-          isFV1Detected();
-        }
+        else isFV1Detected();
       } 
-      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv2_est, fv2_cur)_dist\n");
+      else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
     } 
   }
   /*******/
@@ -574,63 +582,65 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
       if(lv_est_dist_ != 0 && lv_rss_dist_ != 0) {
         if(lv_est_dist_ <= lv_rss_dist_) {
           //adjustTargetVelocity();
+          RCLCPP_INFO(this->get_logger(), "lv est_dist long\n");
         }
-        else setLaneChangeFlags(); // LV LC
+        else setLaneChangeFlags(); 
       }
-      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (lv_est, lv_rss)_dist\n");
+      else RCLCPP_ERROR(this->get_logger(), "lv every dist No msg\n");
     }
     else if(indexArea == 1) {
       if(fv1_est_dist_ != 0 && fv1_cur_dist_ != 0) {
         if(fv1_est_dist_ <= d2_) {
           //adjustTargetVelocity();
+          RCLCPP_INFO(this->get_logger(), "fv1 est_dist long\n");
         }
         else isLVDetected(); 
       }
-      else RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "No (fv1_est, fv1_cur)_dist\n");
+      else RCLCPP_ERROR(this->get_logger(), "fv1 every dist No msg\n");
     } 
   }
 }
 
-void ScaleTruckController::adjustTargetVelocity() {
-  std::scoped_lock lock(vel_mutex_);
-  if(index_ == 2) {
-    if (fv2_r_bbox_ready_ == 1) {
-      if(CurVel_ >= fv2_r_est_vel_) {
-        TargetVel_ += 0.01f;
-        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-      }
-      else {
-        TargetVel_ -= 0.01f;
-        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
-      }
-    }
-    else if (fv2_bbox_ready_ == 1) {
-      if(CurVel_ >= fv2_est_vel_) {
-        TargetVel_ += 0.01f;
-        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-      }
-      else {
-        TargetVel_ -= 0.01f;
-        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
-      }
-    }
-    else if (fv1_r_bbox_ready_ == 1) {
-      if(CurVel_ >= fv1_r_est_vel_ ) {
-        TargetVel_ += 0.01f;
-        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
-      }
-      else {
-        TargetVel_ -= 0.01f;
-        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
-      }
-
-    }
-  }
-  else if (index_ == 0 || index_ == 1) {
-    TargetVel_ -= 0.01;
-    if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
-  }
-}
+//void ScaleTruckController::adjustTargetVelocity() {
+//  std::scoped_lock lock(vel_mutex_);
+//  if(index_ == 2) {
+//    if (fv2_r_bbox_ready_ == 1) {
+//      if(CurVel_ >= fv2_r_est_vel_) {
+//        TargetVel_ += 0.01f;
+//        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+//      }
+//      else {
+//        TargetVel_ -= 0.01f;
+//        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
+//      }
+//    }
+//    else if (fv2_bbox_ready_ == 1) {
+//      if(CurVel_ >= fv2_est_vel_) {
+//        TargetVel_ += 0.01f;
+//        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+//      }
+//      else {
+//        TargetVel_ -= 0.01f;
+//        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
+//      }
+//    }
+//    else if (fv1_r_bbox_ready_ == 1) {
+//      if(CurVel_ >= fv1_r_est_vel_ ) {
+//        TargetVel_ += 0.01f;
+//        if(TargetVel_ >= FVmaxVel_) TargetVel_ = FVmaxVel_;
+//      }
+//      else {
+//        TargetVel_ -= 0.01f;
+//        if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
+//      }
+//
+//    }
+//  }
+//  else if (index_ == 0 || index_ == 1) {
+//    TargetVel_ -= 0.01;
+//    if(TargetVel_ <= SafetyVel_) TargetVel_ = SafetyVel_; 
+//  }
+//}
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
   ros2_msg::msg::Yoloflag yolo_flag_msg;
@@ -638,13 +648,38 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
   if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
     lc_right_flag_ = true;
     yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+    yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = false; 
   }
   else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
     lc_left_flag_ = true;
     yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+    yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = false; 
   }
 
+  clear_release();
+
   runYoloPublisher_->publish(yolo_flag_msg);
+}
+
+void ScaleTruckController::clear_release() {
+  lv_est_dist_ = 0; 
+  lv_rss_dist_ = 0;
+  lv_bbox_ready_ = 3;
+
+  fv1_est_dist_ = 0; 
+  fv1_cur_dist_ = 0;
+  fv1_rss_dist_ = 0;
+  fv1_r_est_dist_ = 0; 
+  fv1_bbox_ready_ = 3;
+  fv1_r_bbox_ready_ = 3;
+
+  fv2_est_dist_ = 0; 
+  fv2_cur_dist_ = 0;
+  fv2_rss_dist_ = 0;
+  fv2_r_est_dist_ = 0;
+  fv2_r_rss_dist_ = 0;
+  fv2_bbox_ready_ = 3;
+  fv2_r_bbox_ready_ = 3;
 }
 
 float ScaleTruckController::lowPassFilter(double sampling_time, float est_value, float prev_res){
@@ -679,7 +714,7 @@ void ScaleTruckController::spin()
       std::scoped_lock lock(rep_mutex_, rss_mutex_);
       if (lc_right_flag_== false || lc_left_flag_ == false) {
         RSS();
-//        isLaneChangeCommandReceived();  
+        isLaneChangeCommandReceived();  
       }
     }
     {
@@ -765,15 +800,6 @@ void ScaleTruckController::spin()
       rclcpp::shutdown();
     }
 
-    struct timeval currentTime;
-    static float prev_cur_vel;
-    double sampling_time = 0;
-
-    gettimeofday(&currentTime, NULL);
-    sampling_time = ((currentTime.tv_sec - start_time.tv_sec)) + ((currentTime.tv_usec - start_time.tv_usec)/1000000.0);
-    cur_vel = lowPassFilter(sampling_time, CurVel_, prev_cur_vel);
-    prev_cur_vel = cur_vel;
-
     if(CurVel_ != 0) recordData(init_);
 
     if(enableConsoleOutput_)
@@ -796,12 +822,11 @@ void ScaleTruckController::spin()
 void ScaleTruckController::RSS() {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
-    f_run_yolo_flag_ = true;
     if (f_run_yolo_flag_) {
-//      float cf_vel = est_vel_;
-//      float cr_vel = CurVel_;
-      float cf_vel = 0.f;
-      float cr_vel = 1.0f;
+      float cf_vel = est_vel_;
+      float cr_vel = CurVel_;
+//      float cf_vel = 0.f;
+//      float cr_vel = 1.0f;
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
       rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
@@ -812,10 +837,10 @@ void ScaleTruckController::RSS() {
       else if(index_ == 2) fv2_rss_dist_ = rss_min_dist_;
     }
     if (r_run_yolo_flag_) {
-//      float cf_vel = CurVel_;
-//      float cr_vel = r_est_vel_;
-      float cf_vel = 1.0f;
-      float cr_vel = 1.0f;
+      float cf_vel = CurVel_;
+      float cr_vel = r_est_vel_;
+//      float cf_vel = 1.0f;
+//      float cr_vel = 1.0f;
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
@@ -824,18 +849,7 @@ void ScaleTruckController::RSS() {
       else if(index_ == 1) fv1_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 2) fv2_r_rss_dist_ = rrss_min_dist_;
 
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "pow             : %.3f", pow((cr_vel+(p_*a_max_accel)),2));
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "pow/            : %.3f", (2*a_min_brake));
 //      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "rrss_min_dist   : %.3f", rrss_min_dist_);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "p_              : %.3f", p_);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_max_accel     : %.3f", a_max_accel);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_min_brake     : %.3f", a_min_brake);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "a_max_brake     : %.3f", a_max_brake);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "1               : %.3f", cr_vel*p_);
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "2               : %.3f",(a_max_accel*pow(p_,2)/2));
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "3               : %.3f",(pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)));
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "4               : %.3f",(pow(cf_vel,2)/(2*a_max_brake)));
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "==================================\n");
     }
   }
 }
@@ -900,15 +914,14 @@ void ScaleTruckController::recordData(struct timeval startTime){
       read_file.close();
     }
     //write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist,r_run_yolo_flag,y_run_yolo_flag" << std::endl; //seconds
-    write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag,CurVel" << std::endl; //seconds
+    write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
     std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_, rep_mutex_);
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
-    //sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f, %d, %d", diff_time, TargetVel_, CurVel_, est_vel_, TargetDist_, distance_, est_dist_, r_run_yolo_flag_, f_run_yolo_flag_);
-    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d, %.3f", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_, cur_vel);
+    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
@@ -1050,16 +1063,15 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       cmd_lv_lc_right_ = msg->lv_lc_right; 
 
       if(cmd_lv_lc_right_){
-        lc_right_flag_ = true;
+        //lc_right_flag_ = true;
       }
 
       cmd_lv_lc_left_ = msg->lv_lc_left;
       if(cmd_lv_lc_left_) {
-        lc_left_flag_ = true;
+        //lc_left_flag_ = true;
       }
 
-      if(msg->fv2_lc_right) {
-        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+      if(msg->fv1_lc_right || msg->fv1_lc_left) {
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
       }
     }
@@ -1069,21 +1081,17 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     else if(index_ == 1) {   
       cmd_fv1_lc_right_ = msg->fv1_lc_right; 
       if(cmd_fv1_lc_right_){
-        lc_right_flag_ = true;
+        //lc_right_flag_ = true;
       }
 
       cmd_fv1_lc_left_ = msg->fv1_lc_left;
       if(cmd_fv1_lc_left_) {
-        lc_left_flag_ = true;
+        //lc_left_flag_ = true;
       }
 
-      if(msg->fv2_lc_right) {
+      if(msg->fv2_lc_right || msg->fv2_lc_left) {
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
       }
-
-      if(msg->fv2_lc_left) {
-        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
-      } 
     }
     /*******/
     /* FV2 */
@@ -1108,6 +1116,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
 
     runYoloPublisher_->publish(yolo_flag_msg);
   }
+
   {
     std::scoped_lock lock(rss_mutex_);
     lv_cur_dist_ = msg->lv_cur_dist;
@@ -1137,7 +1146,6 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     lv_r_bbox_ready_ = msg->lv_r_bbox_ready;
     fv1_r_bbox_ready_ = msg->fv1_r_bbox_ready;
     fv2_r_bbox_ready_ = msg->fv2_r_bbox_ready;
-   
   }
 }
 

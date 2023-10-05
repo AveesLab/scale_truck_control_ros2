@@ -453,7 +453,7 @@ void Controller::updateData(CmdData cmd_data)
       if(tmp.req_flag) replyData();
     }
   }
-  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
+//  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
 }
 
 cv::Mat Controller::display_Map(CmdData value)
@@ -821,11 +821,11 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
   cmd_data.fv2_lc_left = FV2_lc_left;
   qDebug() << "FV2_lc_left: " << FV2_lc_left;
 
-  if(both_lc_flag == false) {
-    ui->FV1_Left_LC->toggle(); 
-    ui->LV_Left_LC->toggle();  
-    both_lc_flag = true;
-  }
+//  if(both_lc_flag == false) {
+//    ui->FV1_Left_LC->toggle(); 
+//    ui->LV_Left_LC->toggle();  
+//    both_lc_flag = true;
+//  }
   requestData(cmd_data);
 }
 
@@ -853,11 +853,11 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
   cmd_data.fv2_lc_right = FV2_lc_right;
   qDebug() << "FV2_lc_right: " << FV2_lc_right;
 
-  if(both_lc_flag == false) {
-    ui->FV1_Right_LC->toggle(); 
-    ui->LV_Right_LC->toggle();  
-    both_lc_flag = true;
-  }
+//  if(both_lc_flag == false) {
+//    ui->FV1_Right_LC->toggle(); 
+//    ui->LV_Right_LC->toggle();  
+//    both_lc_flag = true;
+//  }
 
   requestData(cmd_data);
 }
