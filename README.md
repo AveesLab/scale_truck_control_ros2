@@ -100,7 +100,7 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 sudo make install -j12
 ```
 
-# Jetson Stats
+- Jetson Stats
 ```
 sudo -H pip3 install jetson-stats
 jetson_release
@@ -280,11 +280,11 @@ ros2 bag file
 ```
 ros2 bag file
 ```
-
+- Rosbag run
 ```
 ros2 bag play -l [rosbag file name].bag
 ```
-
+- Ros launch
 ```
 ros2 launch scale_truck_control_ros2 [launch file name].py
 ```
