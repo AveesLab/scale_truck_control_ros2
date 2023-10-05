@@ -1,5 +1,25 @@
 # scale_truck_control_ros2
-scale_truck_control ros2 version
+ROS2 based scale_truck_control system
+
+# I. Hardware
+```
+High-level Controller - NVIDIA Jetson AGX Orin 64GB
+Low-level Controller  - OpenCR 1.0 (ARM Cortex-M7)
+two USB Camera        - ELP-USBFHD04H-BL180
+Lidar                 - RPLidar A3 & S2
+```
+
+# II. Software
+> Hige-level Controller
+```
+Jetpack : 5.1.1 version - Ubuntu 20.04 focal
+OpenCV  : 4.4.0 version - include options (GPU, CUDA, CUDNN)
+ROS 2   : galactic version
+```
+> Low-level Controller
+```
+ros2 libarary
+```
 
 # Develop History
 **2023.05.24**
@@ -11,8 +31,8 @@ Implemented dual ROI version for normal and lane-changing modes
 - Implemented controller button toggle upon completion of lane change.
 ```
 
-# Set OpenCV 4.4.0
-> If your device is notebook, click below link and install Opencv 4.4.0.
+# 0. Set OpenCV 4.4.0
+> If your device is laptop, click below link and install Opencv 4.4.0.
 > 
 > https://velog.io/@minukiki/Ubuntu-20.04%EC%97%90-OpenCV-4.4.0-%EC%84%A4%EC%B9%98
 > 
@@ -84,75 +104,80 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 sudo make install -j12
 ```
 
-# Jetson Stats
+- Jetson Stats
 ```
 sudo -H pip3 install jetson-stats
 jetson_release
 ```
 
 
-# Install ROS2 (Galactic)
+# 1. Install ROS2 (Galactic)
 https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
->## Set locale
->```
->locale  # check for UTF-8
->
->sudo apt update && sudo apt install locales
->sudo locale-gen en_US en_US.UTF-8
->sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
->export LANG=en_US.UTF-8
->
->locale  # verify settings
->```
->## Setup Sources
->```
->sudo apt install software-properties-common
->sudo add-apt-repository universe
->
->#Now add the ROS 2 GPG key with apt.
->sudo apt update && sudo apt install curl
->sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
->
->#Then add the repository to your sources list.
->echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
->```
->## Install ROS 2 packages
->```
->sudo apt update
->sudo apt upgrade
->sudo apt install ros-galactic-desktop
->```
->## colcon install
->```
->sudo apt install python3-colcon-common-extensions
->```
->## Environment setup
->```
-># Replace ".bash" with your shell if you're not using bash
-># Possible values are: setup.bash, setup.sh, setup.zsh
->source /opt/ros/galactic/setup.bash
->mkdir -p ~/ros2_ws/src
->```
+## Set locale
+```
+locale  # check for UTF-8
 
-# Install vision_opencv, cv_bridge
-> ```
-> cd ~/ros2_ws/src
-> git clone -b galactic https://github.com/ros-perception/vision_opencv.git
-> ```
-> ```
-> cd vision_opencv/cv_bridge
-> vim CMakeLists.txt
->
-> --find_package(OpenCV 4 QUIET
-> ++find_package(OpenCV 4.4 QUIET
-> ```
-> ```
-> cd ~/ros2_ws
-> colcon build --symlink-install && . install/setup.bash
-> ```
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
-# Install Micro-ros-Aruduino
-- 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
+locale  # verify settings
+```
+## Setup Sources
+```
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+
+#Now add the ROS 2 GPG key with apt.
+sudo apt update && sudo apt install curl
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+#Then add the repository to your sources list.
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
+## Install ROS 2 packages
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-galactic-desktop
+```
+## colcon install
+```
+sudo apt install python3-colcon-common-extensions
+```
+## Environment setup
+```
+# Replace ".bash" with your shell if you're not using bash
+# Possible values are: setup.bash, setup.sh, setup.zsh
+source /opt/ros/galactic/setup.bash
+mkdir -p ~/ros2_ws/src
+```
+
+# 2. Install vision_opencv, cv_bridge
+>- Create imgproc 4.4
+>- No --allow-overriding 'packages'
+ ```
+ cd ~/ros2_ws/src
+ git clone -b galactic https://github.com/ros-perception/vision_opencv.git
+ ```
+ ```
+ cd vision_opencv/cv_bridge
+ vim CMakeLists.txt
+
+ --find_package(OpenCV 4 QUIET
+ ++find_package(OpenCV 4.4 QUIET
+ ```
+ ```
+ cd ~/ros2_ws
+ colcon build --symlink-install && . install/setup.bash
+ #Then move package to other directory
+ cd ~/ros2_ws/src
+ mv vision_opencv ~/
+ ```
+
+# 3. Install Micro-ros-Aruduino
+> On your ros2 workspace
 ```
 source /opt/ros/galactic/setup.bash
 cd ~/ros2_ws/src 
@@ -192,68 +217,88 @@ sudo chmod 777 /dev/ttyACM0
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
-# ROS2 Packages Install
+# 4. ROS2 Packages Install
 - ros2_msg
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/ros2_msg.git
-> cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/ros2_msg.git
+ cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
+ ```
 
 - usb_cam
-> ```
-> sudo apt-get install ros-galactic-usb-cam
-> cd ~/ros2_ws/src
-> git clone https://github.com/ros-drivers/usb_cam.git -b ros2
-> ```
+ ```
+ sudo apt-get install ros-galactic-usb-cam
+ cd ~/ros2_ws/src
+ git clone https://github.com/ros-drivers/usb_cam.git -b ros2
+ ```
 
 - rplidar_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
+ ```
 
 - laser_filter
-> ```
-> sudo apt-get install ros-galactic-filters
-> sudo apt-get install ros-galactic-angles
-> sudo apt-get install ros-galactic-laser-geometry
-> sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
-> cd ~/ros2_ws/src
-> git clone https://github.com/wonseokkkk/laser_filters.git
-> ```
+ ```
+ sudo apt-get install ros-galactic-filters
+ sudo apt-get install ros-galactic-angles
+ sudo apt-get install ros-galactic-laser-geometry
+ sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
+ cd ~/ros2_ws/src
+ git clone https://github.com/wonseokkkk/laser_filters.git
+ ```
 
 - object_detection
-> ```
-> sudo apt-get install ros-galactic-perception-pcl
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/object_detection_ros2.git
-> ```
+ ```
+ sudo apt-get install ros-galactic-perception-pcl
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/object_detection_ros2.git
+ ```
 
 - lane_detection
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/lane_detection_ros2.git
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/lane_detection_ros2.git
+ ```
 
 - yolo_object_detection_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
-> cd yolo_object_detection_ros2/darknet
-> make -j8
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
+ cd yolo_object_detection_ros2/darknet
+ make -j12
+ ```
 
 - scale_truck_control_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/scale_truck_control_ros2.git
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/scale_truck_control_ros2.git
+ ```
 
-# alias
+# 5. Run
+- LV(Leading Vehicle) rosbag file download ()
+```
+ros2 bag file
+```
+- FV(Following Vehicle) rosbag file download ()
+```
+ros2 bag file
+```
+- Rosbag run
+```
+ros2 bag play -l [rosbag file name].bag
+```
+- Ros launch
+```
+ros2 launch scale_truck_control_ros2 [launch file name].py
+```
+
+
+# alias command Setup
 > ```
 > sudo vim ~/.bashrc
 > ```
+>- add the below
 > ```
 > alias cw='cd ~/ros2_ws/src'
 > alias cb='source ~/ros2_ws/install/setup.bash'
@@ -261,4 +306,10 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 > alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
 > alias eb='sudo vim ~/.bashrc'
 > ```
-> 
+> ```
+> source ~/.bashrc
+> ```
+# ROS packages build
+> ```
+> cm
+> ```
