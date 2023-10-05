@@ -145,7 +145,7 @@ mkdir -p ~/ros2_ws/src
 ```
 
 # 2. Install vision_opencv, cv_bridge
->- Create imgproc 4.4
+>- Create libopencv_imgproc.so.4.4.0
 >- No --allow-overriding 'packages'
  ```
  cd ~/ros2_ws/src
