@@ -271,6 +271,24 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
  git clone https://github.com/AveesLab/scale_truck_control_ros2.git
  ```
 
+# 5. Run
+- LV(Leading Vehicle) rosbag file download ()
+```
+ros2 bag file
+```
+- FV(Following Vehicle) rosbag file download ()
+```
+ros2 bag file
+```
+
+```
+ros2 bag play -l [rosbag file name].bag
+```
+
+```
+ros2 launch scale_truck_control_ros2 [launch file name].py
+```
+
 # alias
  ```
  sudo vim ~/.bashrc
