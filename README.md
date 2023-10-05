@@ -293,7 +293,8 @@ ros2 bag play -l [rosbag file name].bag
 ros2 launch scale_truck_control_ros2 [launch file name].py
 ```
 
-> # alias command Setup
+
+# alias command Setup
 > ```
 > sudo vim ~/.bashrc
 > ```
@@ -308,7 +309,7 @@ ros2 launch scale_truck_control_ros2 [launch file name].py
 > ```
 > source ~/.bashrc
 > ```
-> # ROS packages build
+# ROS packages build
 > ```
 > cm
 > ```
