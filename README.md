@@ -10,11 +10,15 @@ Lidar                 - RPLidar A3 & S2
 ```
 
 # II. Software
-> Hige-leve Controller
+> Hige-level Controller
 ```
 Jetpack : 5.1.1 version - Ubuntu 20.04 focal
 OpenCV  : 4.4.0 version - include options (GPU, CUDA, CUDNN)
 ROS 2   : galactic version
+```
+> Low-level Controller
+```
+ros2 libarary
 ```
 
 # Develop History
