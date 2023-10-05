@@ -1,6 +1,9 @@
 # scale_truck_control_ros2
-scale_truck_control ros2 version
-
+```
+ros2 based scale_truck_control system
+- NVIDIA Jetson AGX Orin (Jetpack 5.1.1)
+- Ubuntu 20.04 focal
+```
 # Develop History
 **2023.05.24**
 ```
@@ -12,7 +15,7 @@ Implemented dual ROI version for normal and lane-changing modes
 ```
 
 # Set OpenCV 4.4.0
-> If your device is notebook, click below link and install Opencv 4.4.0.
+> If your device is laptop, click below link and install Opencv 4.4.0.
 > 
 > https://velog.io/@minukiki/Ubuntu-20.04%EC%97%90-OpenCV-4.4.0-%EC%84%A4%EC%B9%98
 > 
