@@ -293,14 +293,22 @@ ros2 bag play -l [rosbag file name].bag
 ros2 launch scale_truck_control_ros2 [launch file name].py
 ```
 
-# alias
- ```
- sudo vim ~/.bashrc
- ```
- ```
- alias cw='cd ~/ros2_ws/src'
- alias cb='source ~/ros2_ws/install/setup.bash'
- alias sb='source ~/.bashrc'
- alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
- alias eb='sudo vim ~/.bashrc'
- ```
+> # alias command Setup
+> ```
+> sudo vim ~/.bashrc
+> ```
+>- add the below
+> ```
+> alias cw='cd ~/ros2_ws/src'
+> alias cb='source ~/ros2_ws/install/setup.bash'
+> alias sb='source ~/.bashrc'
+> alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
+> alias eb='sudo vim ~/.bashrc'
+> ```
+> ```
+> source ~/.bashrc
+> ```
+> # ROS packages build
+> ```
+> cm
+> ```
