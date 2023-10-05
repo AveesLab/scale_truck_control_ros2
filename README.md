@@ -166,6 +166,7 @@ mkdir -p ~/ros2_ws/src
  cd vision_opencv/cv_bridge
  vim CMakeLists.txt
 
+ # fix the below
  --find_package(OpenCV 4 QUIET
  ++find_package(OpenCV 4.4 QUIET
  ```
