@@ -27,7 +27,7 @@ Implemented dual ROI version for normal and lane-changing modes
 - Implemented controller button toggle upon completion of lane change.
 ```
 
-# Set OpenCV 4.4.0
+# 0. Set OpenCV 4.4.0
 > If your device is laptop, click below link and install Opencv 4.4.0.
 > 
 > https://velog.io/@minukiki/Ubuntu-20.04%EC%97%90-OpenCV-4.4.0-%EC%84%A4%EC%B9%98
@@ -107,7 +107,7 @@ jetson_release
 ```
 
 
-# Install ROS2 (Galactic)
+# 1. Install ROS2 (Galactic)
 https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
 ## Set locale
 ```
@@ -150,7 +150,7 @@ source /opt/ros/galactic/setup.bash
 mkdir -p ~/ros2_ws/src
 ```
 
-# Install vision_opencv, cv_bridge
+# 2. Install vision_opencv, cv_bridge
 >- Create imgproc 4.4
 >- No --allow-overriding 'packages'
  ```
@@ -172,7 +172,7 @@ mkdir -p ~/ros2_ws/src
  mv vision_opencv ~/
  ```
 
-# Install Micro-ros-Aruduino
+# 3. Install Micro-ros-Aruduino
 > On your ros2 workspace
 ```
 source /opt/ros/galactic/setup.bash
@@ -213,7 +213,7 @@ sudo chmod 777 /dev/ttyACM0
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
-# ROS2 Packages Install
+# 4. ROS2 Packages Install
 - ros2_msg
  ```
  cd ~/ros2_ws/src
