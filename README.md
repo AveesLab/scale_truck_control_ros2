@@ -1,6 +1,16 @@
 # scale_truck_control_ros2
 ROS2 based scale_truck_control system
 
+# Develop History
+**2023.05.24**
+```
+Implemented dual ROI version for normal and lane-changing modes
+
+- Added distinction between normal mode and lane change mode using two versions of ROI.
+- Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
+- Implemented controller button toggle upon completion of lane change.
+```
+
 # I. Hardware
 ```
 High-level Controller - NVIDIA Jetson AGX Orin 64GB
@@ -19,16 +29,6 @@ ROS 2   : galactic version
 > Low-level Controller
 ```
 ros2 libarary
-```
-
-# Develop History
-**2023.05.24**
-```
-Implemented dual ROI version for normal and lane-changing modes
-
-- Added distinction between normal mode and lane change mode using two versions of ROI.
-- Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
-- Implemented controller button toggle upon completion of lane change.
 ```
 
 # 0. Set OpenCV 4.4.0
