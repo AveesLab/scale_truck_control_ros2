@@ -214,7 +214,11 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
  git clone https://github.com/AveesLab/ros2_msg.git -b jetracer
  cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
  ```
-
+- csi_cam
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/wonseokkkk/ros2_camera.git
+ ``` 
 - lane_detection
  ```
  cd ~/ros2_ws/src
