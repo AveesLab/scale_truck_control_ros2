@@ -117,7 +117,6 @@
 
     image_view/enable_opencv: false 
     image_view/wait_key_delay: 1
-    image_view/TEST: false
 
     threshold/box_size: 71   # 51 71 
     threshold/box_offset: 40 # 50 40
@@ -150,14 +149,3 @@
     ROI/rear_cam/extra_b: 10.
     ROI/rear_cam/extra_up: 180 # 140
     ROI/rear_cam/extra_down: 220 # 180
-
-    ROI/test/width: 640
-    ROI/test/height: 480
-    ROI/test/top_gap: 0.41 
-    ROI/test/bot_gap: 0.17 
-    ROI/test/top_height: 0.99
-    ROI/test/bot_height: 0.42
-    ROI/test/extra_f: 12.00
-    ROI/test/extra_b: 10.00
-    ROI/test/extra_up: 80 # 140
-    ROI/test/extra_down: 120 # 180
