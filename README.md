@@ -1,8 +1,21 @@
 # scale_truck_control_ros2
 ROS2 based scale_truck_control system
-- NVIDIA Jetson AGX Orin (Jetpack 5.1.1)
-- Ubuntu 20.04 focal
-- ROS galactic version
+
+# I. Hardware
+```
+High-level Controller - NVIDIA Jetson AGX Orin 64GB
+Low-level Controller  - OpenCR 1.0 (ARM Cortex-M7)
+two USB Camera        - ELP-USBFHD04H-BL180
+Lidar                 - RPLidar A3 & S2
+```
+
+# II. Software
+> Hige-leve Controller
+```
+Jetpack : 5.1.1 version - Ubuntu 20.04 focal
+OpenCV  : 4.4.0 version - include options (GPU, CUDA, CUDNN)
+ROS 2   : galactic version
+```
 
 # Develop History
 **2023.05.24**
