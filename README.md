@@ -1,8 +1,9 @@
 # scale_truck_control_ros2
->ROS2 based scale_truck_control system
->- NVIDIA Jetson AGX Orin (Jetpack 5.1.1)
->- Ubuntu 20.04 focal
->
+ROS2 based scale_truck_control system
+- NVIDIA Jetson AGX Orin (Jetpack 5.1.1)
+- Ubuntu 20.04 focal
+- ROS galactic version
+
 # Develop History
 **2023.05.24**
 ```
@@ -268,4 +269,3 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
  alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
  alias eb='sudo vim ~/.bashrc'
  ```
-> 
