@@ -137,8 +137,8 @@ mkdir -p ~/ros2_ws/src
 ```
 
 # Install vision_opencv, cv_bridge
-> Create imgproc 4.4
-> No --allow-overriding 'packages'
+>- Create imgproc 4.4
+>- No --allow-overriding 'packages'
  ```
  cd ~/ros2_ws/src
  git clone -b galactic https://github.com/ros-perception/vision_opencv.git
@@ -201,71 +201,71 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 
 # ROS2 Packages Install
 - ros2_msg
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/ros2_msg.git
-> cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/ros2_msg.git
+ cd ~/ros2_ws && colcon build --symlink-install && . install/setup.bash
+ ```
 
 - usb_cam
-> ```
-> sudo apt-get install ros-galactic-usb-cam
-> cd ~/ros2_ws/src
-> git clone https://github.com/ros-drivers/usb_cam.git -b ros2
-> ```
+ ```
+ sudo apt-get install ros-galactic-usb-cam
+ cd ~/ros2_ws/src
+ git clone https://github.com/ros-drivers/usb_cam.git -b ros2
+ ```
 
 - rplidar_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/CarlDegio/rplidar_ros.git -b ros2
+ ```
 
 - laser_filter
-> ```
-> sudo apt-get install ros-galactic-filters
-> sudo apt-get install ros-galactic-angles
-> sudo apt-get install ros-galactic-laser-geometry
-> sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
-> cd ~/ros2_ws/src
-> git clone https://github.com/wonseokkkk/laser_filters.git
-> ```
+ ```
+ sudo apt-get install ros-galactic-filters
+ sudo apt-get install ros-galactic-angles
+ sudo apt-get install ros-galactic-laser-geometry
+ sudo ln -s /usr/include/eigen3/Eigen  /usr/include/Eigen
+ cd ~/ros2_ws/src
+ git clone https://github.com/wonseokkkk/laser_filters.git
+ ```
 
 - object_detection
-> ```
-> sudo apt-get install ros-galactic-perception-pcl
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/object_detection_ros2.git
-> ```
+ ```
+ sudo apt-get install ros-galactic-perception-pcl
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/object_detection_ros2.git
+ ```
 
 - lane_detection
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/lane_detection_ros2.git
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/lane_detection_ros2.git
+ ```
 
 - yolo_object_detection_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
-> cd yolo_object_detection_ros2/darknet
-> make -j12
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
+ cd yolo_object_detection_ros2/darknet
+ make -j12
+ ```
 
 - scale_truck_control_ros2
-> ```
-> cd ~/ros2_ws/src
-> git clone https://github.com/AveesLab/scale_truck_control_ros2.git
-> ```
+ ```
+ cd ~/ros2_ws/src
+ git clone https://github.com/AveesLab/scale_truck_control_ros2.git
+ ```
 
 # alias
-> ```
-> sudo vim ~/.bashrc
-> ```
-> ```
-> alias cw='cd ~/ros2_ws/src'
-> alias cb='source ~/ros2_ws/install/setup.bash'
-> alias sb='source ~/.bashrc'
-> alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
-> alias eb='sudo vim ~/.bashrc'
-> ```
+ ```
+ sudo vim ~/.bashrc
+ ```
+ ```
+ alias cw='cd ~/ros2_ws/src'
+ alias cb='source ~/ros2_ws/install/setup.bash'
+ alias sb='source ~/.bashrc'
+ alias cm='cd ~/ros2_ws && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug && . install/setup.bash'
+ alias eb='sudo vim ~/.bashrc'
+ ```
 > 
