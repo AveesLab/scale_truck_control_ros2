@@ -137,7 +137,7 @@ sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o
 #Then add the repository to your sources list.
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 ```
-## Install ROS 2 packages
+## Install ROS2 galactic
 ```
 sudo apt update
 sudo apt upgrade
@@ -213,7 +213,7 @@ sudo chmod 777 /dev/ttyACM0
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
-# 4. ROS2 Packages Install
+# 4. Install ROS2 Packages
 - ros2_msg
  ```
  cd ~/ros2_ws/src
@@ -305,7 +305,7 @@ ros2 launch scale_truck_control_ros2 [launch file name].py
 > ```
 > source ~/.bashrc
 > ```
-# ROS packages build
+# build ROS2 packages
 > ```
 > cm
 > ```
