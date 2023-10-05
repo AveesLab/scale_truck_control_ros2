@@ -95,66 +95,71 @@ jetson_release
 
 # Install ROS2 (Galactic)
 https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html
->## Set locale
->```
->locale  # check for UTF-8
->
->sudo apt update && sudo apt install locales
->sudo locale-gen en_US en_US.UTF-8
->sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
->export LANG=en_US.UTF-8
->
->locale  # verify settings
->```
->## Setup Sources
->```
->sudo apt install software-properties-common
->sudo add-apt-repository universe
->
->#Now add the ROS 2 GPG key with apt.
->sudo apt update && sudo apt install curl
->sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
->
->#Then add the repository to your sources list.
->echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
->```
->## Install ROS 2 packages
->```
->sudo apt update
->sudo apt upgrade
->sudo apt install ros-galactic-desktop
->```
->## colcon install
->```
->sudo apt install python3-colcon-common-extensions
->```
->## Environment setup
->```
-># Replace ".bash" with your shell if you're not using bash
-># Possible values are: setup.bash, setup.sh, setup.zsh
->source /opt/ros/galactic/setup.bash
->mkdir -p ~/ros2_ws/src
->```
+## Set locale
+```
+locale  # check for UTF-8
+
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+locale  # verify settings
+```
+## Setup Sources
+```
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+
+#Now add the ROS 2 GPG key with apt.
+sudo apt update && sudo apt install curl
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+#Then add the repository to your sources list.
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
+## Install ROS 2 packages
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-galactic-desktop
+```
+## colcon install
+```
+sudo apt install python3-colcon-common-extensions
+```
+## Environment setup
+```
+# Replace ".bash" with your shell if you're not using bash
+# Possible values are: setup.bash, setup.sh, setup.zsh
+source /opt/ros/galactic/setup.bash
+mkdir -p ~/ros2_ws/src
+```
 
 # Install vision_opencv, cv_bridge
-> ```
-> cd ~/ros2_ws/src
-> git clone -b galactic https://github.com/ros-perception/vision_opencv.git
-> ```
-> ```
-> cd vision_opencv/cv_bridge
-> vim CMakeLists.txt
->
-> --find_package(OpenCV 4 QUIET
-> ++find_package(OpenCV 4.4 QUIET
-> ```
-> ```
-> cd ~/ros2_ws
-> colcon build --symlink-install && . install/setup.bash
-> ```
+> Create imgproc 4.4
+> No --allow-overriding 'packages'
+ ```
+ cd ~/ros2_ws/src
+ git clone -b galactic https://github.com/ros-perception/vision_opencv.git
+ ```
+ ```
+ cd vision_opencv/cv_bridge
+ vim CMakeLists.txt
+
+ --find_package(OpenCV 4 QUIET
+ ++find_package(OpenCV 4.4 QUIET
+ ```
+ ```
+ cd ~/ros2_ws
+ colcon build --symlink-install && . install/setup.bash
+ #Then move package to other directory
+ cd ~/ros2_ws/src
+ mv vision_opencv ~/
+ ```
 
 # Install Micro-ros-Aruduino
-- 본인의 ROS2 워크스페이스에서 작업하면 됩니다.
+> On your ros2 workspace
 ```
 source /opt/ros/galactic/setup.bash
 cd ~/ros2_ws/src 
@@ -243,7 +248,7 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 > cd ~/ros2_ws/src
 > git clone https://github.com/AveesLab/yolo_object_detection_ros2.git
 > cd yolo_object_detection_ros2/darknet
-> make -j8
+> make -j12
 > ```
 
 - scale_truck_control_ros2
