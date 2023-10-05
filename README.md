@@ -1,5 +1,5 @@
 # scale_truck_control_ros2
->ros2 based scale_truck_control system
+>ROS2 based scale_truck_control system
 >- NVIDIA Jetson AGX Orin (Jetpack 5.1.1)
 >- Ubuntu 20.04 focal
 >
