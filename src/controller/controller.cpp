@@ -458,7 +458,7 @@ void Controller::updateData(CmdData cmd_data)
   }
 //  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
   
-  if(LV_Left_LC || FV1_Left_LC || FV2_Left_LC || LV_Right_LC || FV1_Right_LC || FV2_Right_LC) replyData();
+  if(LV_lc_left || FV1_lc_left || FV2_lc_left || LV_lc_right || FV1_lc_right || FV2_lc_right) replyData();
 }
 
 cv::Mat Controller::display_Map(CmdData value)
