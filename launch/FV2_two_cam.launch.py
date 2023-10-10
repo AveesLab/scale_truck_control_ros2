@@ -165,6 +165,14 @@ def generate_launch_description():
             output='screen',
             parameters = [yolo_param_file])
 
+    rear_yolo_node=Node(
+            package='yolo_object_detection_ros2',
+            namespace='FV2',
+            name='rear_yolo_object_detection_node',
+            executable='yolo_object_detection_ros2',
+            output='screen',
+            parameters = [yolo_param_file])
+
 ######################################### Node_list End #############################################
 
     ld = LaunchDescription()
@@ -181,6 +189,7 @@ def generate_launch_description():
     ld.add_action(lrc_node)
     ld.add_action(opencr_node)
     ld.add_action(yolo_node)
+    ld.add_action(rear_yolo_node)
 
     return ld
 
