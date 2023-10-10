@@ -1,6 +1,16 @@
 # scale_truck_control_ros2
 ROS2 based scale_truck_control system
 
+# Develop History
+**2023.05.24**
+```
+Implemented dual ROI version for normal and lane-changing modes
+
+- Added distinction between normal mode and lane change mode using two versions of ROI.
+- Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
+- Implemented controller button toggle upon completion of lane change.
+```
+
 # I. Hardware
 ```
 High-level Controller - NVIDIA Jetson AGX Orin 64GB
@@ -19,16 +29,6 @@ ROS 2   : galactic version
 > Low-level Controller
 ```
 ros2 libarary
-```
-
-# Develop History
-**2023.05.24**
-```
-Implemented dual ROI version for normal and lane-changing modes
-
-- Added distinction between normal mode and lane change mode using two versions of ROI.
-- Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
-- Implemented controller button toggle upon completion of lane change.
 ```
 
 # 0. Set OpenCV 4.4.0
@@ -137,7 +137,7 @@ sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o
 #Then add the repository to your sources list.
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 ```
-## Install ROS 2 packages
+## Install ROS2 galactic
 ```
 sudo apt update
 sudo apt upgrade
@@ -166,6 +166,7 @@ mkdir -p ~/ros2_ws/src
  cd vision_opencv/cv_bridge
  vim CMakeLists.txt
 
+ # fix the below
  --find_package(OpenCV 4 QUIET
  ++find_package(OpenCV 4.4 QUIET
  ```
@@ -213,7 +214,7 @@ sudo chmod 777 /dev/ttyACM0
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
 
-# 4. ROS2 Packages Install
+# 4. Install ROS2 Packages
 - ros2_msg
  ```
  cd ~/ros2_ws/src
@@ -305,7 +306,7 @@ ros2 launch scale_truck_control_ros2 [launch file name].py
 > ```
 > source ~/.bashrc
 > ```
-# ROS packages build
+# build ROS2 packages
 > ```
 > cm
 > ```
