@@ -246,6 +246,9 @@ void Controller::requestData(ros2_msg::msg::Cmd2xav cmd_data)
     fv2_mutex_.unlock();
     //recordData(&startTime_);
   }
+  else {  // LV, FV1, FV2 
+    XavPublisher_->publish(send_data);
+  }
 }
 
 void Controller::replyData()
@@ -458,7 +461,9 @@ void Controller::updateData(CmdData cmd_data)
   }
 //  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
   
-  if(LV_lc_left || FV1_lc_left || FV2_lc_left || LV_lc_right || FV1_lc_right || FV2_lc_right) replyData();
+  if(LV_lc_left || FV1_lc_left || FV2_lc_left || LV_lc_right || FV1_lc_right || FV2_lc_right){
+    replyData();
+  }
 }
 
 cv::Mat Controller::display_Map(CmdData value)
