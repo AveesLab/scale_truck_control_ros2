@@ -74,7 +74,7 @@ bool ScaleTruckController::readParameters() {
 
   /*******/
   /* RSS */
-  /******/
+  /*******/
   this->get_parameter_or("rss/a_max_accel", a_max_accel, 0.0f); 
   this->get_parameter_or("rss/a_max_brake", a_max_brake, 0.0f); 
   this->get_parameter_or("rss/a_min_brake", a_min_brake, 0.0f); 
@@ -146,13 +146,12 @@ void ScaleTruckController::init()
   this->get_parameter_or("publishers/xavier_to_Yolo/topic", runYoloPubTopicName, std::string("run_yolo_flag"));
   this->get_parameter_or("publishers/xavier_to_Yolo/queue_size", runYoloPubQueueSize, 1);
 
-
   /******************/
   /* Ros Qos Option */
   /******************/
   rclcpp::QoS CmdSubQos(CmdSubQueueSize);
   CmdSubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
-  CmdSubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
+  CmdSubQos.durability(rclcpp::DurabilityPolicy::Volatile);
 
   rclcpp::QoS CmdPubQos(CmdPubQueueSize);
   CmdPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
@@ -547,6 +546,7 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
         }
         else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
       }
+      else RCLCPP_ERROR(this->get_logger(), "NOTING bbox ready.\n");
     } 
   }
   /*******/
@@ -655,6 +655,7 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
     yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
     yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = false; 
   }
+  else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
 
   clear_release();
 
@@ -836,6 +837,13 @@ void ScaleTruckController::RSS() {
       else if(index_ == 1) fv1_rss_dist_ = rss_min_dist_;
       else if(index_ == 2) fv2_rss_dist_ = rss_min_dist_;
     }
+    else {
+      if(index_ == 0) lv_rss_dist_ = 0.0f;
+      else if(index_ == 1) fv1_rss_dist_ = 0.0f;
+      else if(index_ == 2) fv2_rss_dist_ = 0.0f;
+    
+    }
+
     if (r_run_yolo_flag_) {
       float cf_vel = CurVel_;
       float cr_vel = r_est_vel_;
@@ -848,8 +856,11 @@ void ScaleTruckController::RSS() {
       if(index_ == 0) lv_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 1) fv1_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 2) fv2_r_rss_dist_ = rrss_min_dist_;
-
-//      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "rrss_min_dist   : %.3f", rrss_min_dist_);
+    }
+    else {
+      if(index_ == 0) lv_r_rss_dist_ = 0.0f;
+      else if(index_ == 1) fv1_r_rss_dist_ = 0.0f;
+      else if(index_ == 2) fv2_r_rss_dist_ = 0.0f;
     }
   }
 }
@@ -1060,8 +1071,8 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     if(index_ == 0) {   
       TargetVel_ = msg->tar_vel;
       TargetDist_ = msg->tar_dist;
-      cmd_lv_lc_right_ = msg->lv_lc_right; 
 
+      cmd_lv_lc_right_ = msg->lv_lc_right; 
       if(cmd_lv_lc_right_){
         //lc_right_flag_ = true;
       }
@@ -1099,7 +1110,6 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     else if(index_ == 2) { 
       cmd_fv2_lc_right_ = msg->fv2_lc_right;
       if(cmd_fv2_lc_right_) {
-        req_flag_ = true;
         //lc_right_flag_ = true;
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
@@ -1107,7 +1117,6 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       
       cmd_fv2_lc_left_ = msg->fv2_lc_left;
       if(cmd_fv2_lc_left_) {
-        req_flag_ = true;
         //lc_left_flag_ = true;
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
