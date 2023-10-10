@@ -266,8 +266,17 @@ void Controller::replyData()
 
   //LV, FV1, FV2
   cmd_data.src_index = 20;
+  cmd_data.tar_index = 8080; 
   cmd_data.tar_vel = tar_vel;
   cmd_data.tar_dist = tar_dist;
+
+  cmd_data.lv_lc_left = LV_lc_left;
+  cmd_data.fv1_lc_left = FV1_lc_left;
+  cmd_data.fv2_lc_left = FV2_lc_left;
+
+  cmd_data.lv_lc_right = LV_lc_right;
+  cmd_data.fv1_lc_right = FV1_lc_right;
+  cmd_data.fv2_lc_right = FV2_lc_right;
 
   cmd_data.lv_cur_dist = lv_cur_dist_;
   cmd_data.fv1_cur_dist = fv1_cur_dist_;
@@ -347,8 +356,6 @@ void Controller::updateData(CmdData cmd_data)
       lv_r_est_vel_ = tmp.r_est_vel;
       lv_bbox_ready_ = tmp.bbox_ready;
       lv_r_bbox_ready_ = tmp.r_bbox_ready;
-
-      if(tmp.req_flag) replyData();
     }
     /*******/
     /* FV1 */
@@ -378,7 +385,7 @@ void Controller::updateData(CmdData cmd_data)
             fv1_wait_flag = false;
             fv1_lc_complete = true;
             ui->FV1_Right_LC->toggle(); 
-//            ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
+            ui->LV_Right_LC->toggle(); // FV1 -> LV flag on 
           } 
         }
         if(FV1_lc_left == true) {
@@ -386,7 +393,7 @@ void Controller::updateData(CmdData cmd_data)
             fv1_wait_flag = false;
             fv1_lc_complete = true;
             ui->FV1_Left_LC->toggle(); 
-//            ui->LV_Left_LC->toggle(); // FV1 -> LV flag on 
+            ui->LV_Left_LC->toggle(); // FV1 -> LV flag on 
           } 
         }
       }
@@ -398,8 +405,6 @@ void Controller::updateData(CmdData cmd_data)
       fv1_r_est_vel_ = tmp.r_est_vel;
       fv1_bbox_ready_ = tmp.bbox_ready;
       fv1_r_bbox_ready_ = tmp.r_bbox_ready;
-
-      if(tmp.req_flag) replyData();
     }
     /*******/
     /* FV2 */
@@ -429,7 +434,7 @@ void Controller::updateData(CmdData cmd_data)
             fv2_wait_flag = false;
             fv2_lc_complete = true;
             ui->FV2_Right_LC->toggle(); 
-//            ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 
+            ui->FV1_Right_LC->toggle(); // FV2 -> FV1 flag on 
           } 
         }
         if(FV2_lc_left == true) {
@@ -437,7 +442,7 @@ void Controller::updateData(CmdData cmd_data)
             fv2_wait_flag = false;
             fv2_lc_complete = true;
             ui->FV2_Left_LC->toggle(); 
-//            ui->FV1_Left_LC->toggle(); // FV2 -> FV1 flag on
+            ui->FV1_Left_LC->toggle(); // FV2 -> FV1 flag on
           } 
         }
       }
@@ -449,8 +454,6 @@ void Controller::updateData(CmdData cmd_data)
       fv2_r_est_vel_ = tmp.r_est_vel;
       fv2_bbox_ready_ = tmp.bbox_ready;
       fv2_r_bbox_ready_ = tmp.r_bbox_ready;
-
-      if(tmp.req_flag) replyData();
     }
   }
 //  if(lv_lc_complete && fv1_lc_complete && fv2_lc_complete) both_lc_flag = false;
@@ -713,6 +716,10 @@ void Controller::on_LV_Right_LC_toggled(bool checked)
   cmd_data.lv_lc_right = LV_lc_right;
   qDebug() << "LV_lc_right: " << LV_lc_right;
 
+  if(LV_lc_right) {
+    replyData();
+  }
+
   requestData(cmd_data);
 }
 
@@ -739,6 +746,10 @@ void Controller::on_LV_Left_LC_toggled(bool checked)
   cmd_data.tar_dist = tar_dist;
   cmd_data.lv_lc_left = LV_lc_left;
   qDebug() << "LV_lc_left: " << LV_lc_left;
+
+  if(LV_lc_left) {
+    replyData();
+  }
 
   requestData(cmd_data);
 }
@@ -767,6 +778,10 @@ void Controller::on_FV1_Right_LC_toggled(bool checked)
   cmd_data.fv1_lc_right = FV1_lc_right;
   qDebug() << "FV1_lc_right: " << FV1_lc_right;
 
+  if(FV1_lc_right) {
+    replyData();
+  }
+
   requestData(cmd_data);
 }
 
@@ -794,6 +809,10 @@ void Controller::on_FV1_Left_LC_toggled(bool checked)
   cmd_data.fv1_lc_left = FV1_lc_left;
   qDebug() << "FV1_lc_left: " << FV1_lc_left;
 
+  if(FV1_lc_left) {
+    replyData();
+  }
+
   requestData(cmd_data);
 }
 
@@ -820,6 +839,10 @@ void Controller::on_FV2_Left_LC_toggled(bool checked)
   cmd_data.tar_dist = tar_dist;
   cmd_data.fv2_lc_left = FV2_lc_left;
   qDebug() << "FV2_lc_left: " << FV2_lc_left;
+
+  if(FV2_lc_left) {
+    replyData();
+  }
 
 //  if(both_lc_flag == false) {
 //    ui->FV1_Left_LC->toggle(); 
@@ -852,6 +875,10 @@ void Controller::on_FV2_Right_LC_toggled(bool checked)
   cmd_data.tar_dist = tar_dist;
   cmd_data.fv2_lc_right = FV2_lc_right;
   qDebug() << "FV2_lc_right: " << FV2_lc_right;
+
+  if(FV2_lc_right) {
+    replyData();
+  }
 
 //  if(both_lc_flag == false) {
 //    ui->FV1_Right_LC->toggle(); 
