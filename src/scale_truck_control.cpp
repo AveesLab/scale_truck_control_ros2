@@ -314,7 +314,6 @@ void ScaleTruckController::checkState() {
           lc_left_flag_ = false;
         }
       }
-      runYoloPublisher_->publish(yolo_flag_msg);
     }
   }
 }
@@ -644,22 +643,24 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
   ros2_msg::msg::Yoloflag yolo_flag_msg;
+  static int tmp_cnt = 0;
+  tmp_cnt += 1;
 
-  if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
-    lc_right_flag_ = true;
-    yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-    yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = false; 
+  if(tmp_cnt >= 30) {
+    if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
+      lc_right_flag_ = true;
+      yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+      runYoloPublisher_->publish(yolo_flag_msg);
+    }
+    else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
+      lc_left_flag_ = true;
+      yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+      runYoloPublisher_->publish(yolo_flag_msg);
+    }
+    else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
+    clear_release();
   }
-  else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
-    lc_left_flag_ = true;
-    yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-    yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = false; 
-  }
-  else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
-
-  clear_release();
-
-  runYoloPublisher_->publish(yolo_flag_msg);
+  else RCLCPP_INFO(this->get_logger(), "tmp_cnt: %d\n", tmp_cnt);
 }
 
 void ScaleTruckController::clear_release() {
@@ -713,7 +714,9 @@ void ScaleTruckController::spin()
 
     {
       std::scoped_lock lock(rep_mutex_, rss_mutex_);
-      if (lc_right_flag_== false || lc_left_flag_ == false) {
+      if ((lc_right_flag_== false && lc_left_flag_ == false) && \
+          (isbboxReady_ != 3 || r_isbboxReady_ != 3)) 
+      {
         RSS();
         isLaneChangeCommandReceived();  
       }
@@ -823,7 +826,7 @@ void ScaleTruckController::spin()
 void ScaleTruckController::RSS() {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
-    if (f_run_yolo_flag_) {
+    if (isbboxReady_ == 1) {
       float cf_vel = est_vel_;
       float cr_vel = CurVel_;
 //      float cf_vel = 0.f;
@@ -844,7 +847,7 @@ void ScaleTruckController::RSS() {
     
     }
 
-    if (r_run_yolo_flag_) {
+    if (r_isbboxReady_ == 1) {
       float cf_vel = CurVel_;
       float cr_vel = r_est_vel_;
 //      float cf_vel = 1.0f;
@@ -1068,51 +1071,62 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     /******/
     /* LV */
     /******/
-    if(index_ == 0) {   
+    if(index_ == 0 && msg->tar_index == 0) {   
       TargetVel_ = msg->tar_vel;
       TargetDist_ = msg->tar_dist;
 
       cmd_lv_lc_right_ = msg->lv_lc_right; 
       if(cmd_lv_lc_right_){
         //lc_right_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       cmd_lv_lc_left_ = msg->lv_lc_left;
       if(cmd_lv_lc_left_) {
         //lc_left_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       if(msg->fv1_lc_right || msg->fv1_lc_left) {
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
     /*******/
     /* FV1 */
     /*******/
-    else if(index_ == 1) {   
+    else if(index_ == 1 && msg->tar_index == 1) {   
       cmd_fv1_lc_right_ = msg->fv1_lc_right; 
       if(cmd_fv1_lc_right_){
         //lc_right_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       cmd_fv1_lc_left_ = msg->fv1_lc_left;
       if(cmd_fv1_lc_left_) {
         //lc_left_flag_ = true;
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       if(msg->fv2_lc_right || msg->fv2_lc_left) {
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
     /*******/
     /* FV2 */
     /*******/
-    else if(index_ == 2) { 
+    else if(index_ == 2 && msg->tar_index == 2) { 
       cmd_fv2_lc_right_ = msg->fv2_lc_right;
       if(cmd_fv2_lc_right_) {
         //lc_right_flag_ = true;
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
       
       cmd_fv2_lc_left_ = msg->fv2_lc_left;
@@ -1120,10 +1134,10 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
         //lc_left_flag_ = true;
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
 
-    runYoloPublisher_->publish(yolo_flag_msg);
   }
 
   {
