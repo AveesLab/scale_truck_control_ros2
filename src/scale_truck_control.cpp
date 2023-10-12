@@ -647,6 +647,7 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
   tmp_cnt += 1;
 
   if(tmp_cnt >= 30) {
+    tmp_cnt = 0;
     if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
       lc_right_flag_ = true;
       yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
@@ -878,30 +879,42 @@ void ScaleTruckController::displayConsole() {
   printf("\033[3;1H");
   printf("lcAngle           : %2.3f degree", AngleDegree2);
   printf("\033[4;1H");
-  printf("center_select     : %d", center_select_);
+  printf("Center_select     : %d", center_select_);
   printf("\033[5;1H");
-  printf("E2/E1 lc_flag     : %d / %d", lc_left_flag_, lc_right_flag_);
+  if (index_ == 0) {
+    printf("Cmd_lc R|L        : %d / %d", cmd_lv_lc_right_, cmd_lv_lc_left_);
+  }  
+  else if (index_ == 1) {
+    printf("Cmd_lc R|L        : %d / %d", cmd_fv1_lc_right_, cmd_fv1_lc_left_);
+  }
+  else if (index_ == 2) {
+    printf("Cmd_lc R|L        : %d / %d", cmd_fv2_lc_right_, cmd_fv2_lc_left_);
+  }
   printf("\033[6;1H");
-  printf("lc_center_follow  : %d", lc_center_follow_);
+  printf("E2/E1 lc_flag     : %d / %d", lc_left_flag_, lc_right_flag_);
   printf("\033[7;1H");
-  printf("k1/k2             : %3.3f %3.3f", K1_, K2_);
+  printf("Lc_center_follow  : %d", lc_center_follow_);
   printf("\033[8;1H");
-  printf("e1/eL             : %3.3f %3.3f", e_values_[1], e_values_[0]);
+  printf("k1/k2             : %3.3f %3.3f", K1_, K2_);
   printf("\033[9;1H");
-  printf("Tar/Cur Vel       : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
+  printf("e1/eL             : %3.3f %3.3f", e_values_[1], e_values_[0]);
   printf("\033[10;1H");
-  printf("Tar/Cur Dist      : %3.3f / %3.3f m", TargetDist_, distance_);
+  printf("Tar/Cur Vel       : %3.3f / %3.3f m/s", TargetVel_, CurVel_);
   printf("\033[11;1H");
-  printf("F/R Est_Vel       : %3.3f / %3.3f m/s", est_vel_, r_est_vel_);
+  printf("Tar/Cur Dist      : %3.3f / %3.3f m", TargetDist_, distance_);
   printf("\033[12;1H");
-  printf("F/R Est_Dist      : %3.3f / %3.3f m", est_dist_, r_est_dist_);
+  printf("F/R Est_Vel       : %3.3f / %3.3f m/s", est_vel_, r_est_vel_);
   printf("\033[13;1H");
-  printf("F/R RSS_Dist      : %3.3f / %3.3f m", rss_min_dist_, rrss_min_dist_);
+  printf("F/R Est_Dist      : %3.3f / %3.3f m", est_dist_, r_est_dist_);
   printf("\033[14;1H");
-  printf("lane diff         : %d", lane_diff_);
+  printf("F/R RSS_Dist      : %3.3f / %3.3f m", rss_min_dist_, rrss_min_dist_);
   printf("\033[15;1H");
-  printf("lane diff cnt     : %d", lane_diff_cnt_);
+  printf("bboxReady         : %d / %d / %d", lv_bbox_ready_, fv1_bbox_ready_, fv2_bbox_ready_);
   printf("\033[16;1H");
+  printf("rbboxReady        : %d / %d / %d", lv_r_bbox_ready_, fv1_r_bbox_ready_, fv2_r_bbox_ready_);
+  printf("\033[17;1H");
+  printf("F/R boxReady      : %d / %d", isbboxReady_, r_isbboxReady_);
+  printf("\033[18;1H");
   printf("Cycle Time        : %3.3f ms\n", CycleTime_);
 }
 
@@ -1071,7 +1084,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     /******/
     /* LV */
     /******/
-    if(index_ == 0 && msg->tar_index == 0) {   
+    if(index_ == 0) {   
       TargetVel_ = msg->tar_vel;
       TargetDist_ = msg->tar_dist;
 
@@ -1097,7 +1110,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     /*******/
     /* FV1 */
     /*******/
-    else if(index_ == 1 && msg->tar_index == 1) {   
+    else if(index_ == 1) {   
       cmd_fv1_lc_right_ = msg->fv1_lc_right; 
       if(cmd_fv1_lc_right_){
         //lc_right_flag_ = true;
@@ -1120,7 +1133,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     /*******/
     /* FV2 */
     /*******/
-    else if(index_ == 2 && msg->tar_index == 2) { 
+    else if(index_ == 2) { 
       cmd_fv2_lc_right_ = msg->fv2_lc_right;
       if(cmd_fv2_lc_right_) {
         //lc_right_flag_ = true;
