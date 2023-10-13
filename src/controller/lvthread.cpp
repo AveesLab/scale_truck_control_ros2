@@ -21,6 +21,6 @@ void LVThread::run()
 
         emit setValue(lv_tmp);
 
-        msleep(100);
+        msleep(10);
     }
 }

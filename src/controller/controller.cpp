@@ -49,7 +49,7 @@ Controller::Controller(const std::shared_ptr<Ros2Node>& ros2_node, QWidget *pare
   XavPubQos.reliability(rclcpp::ReliabilityPolicy::Reliable);
   XavPubQos.durability(rclcpp::DurabilityPolicy::TransientLocal);
   XavPubQos.history(rclcpp::HistoryPolicy::KeepLast); 
-  XavPubQos.keep_last(10); // num of keeping msg
+  XavPubQos.keep_last(1); // num of keeping msg
   XavPubQos.deadline(std::chrono::milliseconds(10));
 
   rclcpp::QoS XavSubQos(LVSubQueueSize); // LV, FV1, FV2 same
