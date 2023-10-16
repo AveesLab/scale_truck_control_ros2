@@ -270,9 +270,9 @@ void Controller::replyData()
   }
   tar_dist = value_dist/100.0f;
 
-  //LV, FV1, FV2
+  // All: LV, FV1, FV2
   cmd_data.src_index = 20;
-  cmd_data.tar_index = 8080; 
+  cmd_data.tar_index = 140; 
   cmd_data.tar_vel = tar_vel;
   cmd_data.tar_dist = tar_dist;
 
