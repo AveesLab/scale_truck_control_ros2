@@ -827,11 +827,10 @@ void ScaleTruckController::spin()
 void ScaleTruckController::RSS() {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
-    if (isbboxReady_ == 1) {
+    if (est_dist_ != 0) {
       float cf_vel = est_vel_;
-      float cr_vel = CurVel_;
-//      float cf_vel = 0.f;
-//      float cr_vel = 1.0f;
+      //float cr_vel = CurVel_;
+      float cr_vel = 0.8f; // FV2 vel: 0.8 m/s
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
       rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
@@ -842,17 +841,16 @@ void ScaleTruckController::RSS() {
       else if(index_ == 2) fv2_rss_dist_ = rss_min_dist_;
     }
     else {
+      rss_min_dist_ = 0.0f;
       if(index_ == 0) lv_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_rss_dist_ = 0.0f;
-    
     }
 
-    if (r_isbboxReady_ == 1) {
-      float cf_vel = CurVel_;
+    if (r_est_dist_ != 0) {
+      //float cf_vel = CurVel_;
+      float cf_vel = 0.8f; // FV2 vel: 0.8 m/s
       float cr_vel = r_est_vel_;
-//      float cf_vel = 1.0f;
-//      float cr_vel = 1.0f;
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
@@ -862,6 +860,7 @@ void ScaleTruckController::RSS() {
       else if(index_ == 2) fv2_r_rss_dist_ = rrss_min_dist_;
     }
     else {
+      rrss_min_dist_ = 0.0f;
       if(index_ == 0) lv_r_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_r_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_r_rss_dist_ = 0.0f;
@@ -1150,7 +1149,6 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
         runYoloPublisher_->publish(yolo_flag_msg);
       }
     }
-
   }
 
   {
