@@ -1044,7 +1044,7 @@ void ScaleTruckController::RearYoloSubCallback(const ros2_msg::msg::Boundingbox:
       rh_ = msg->h;
       r_isbboxReady_ = 1;
     }
-    else if(name_ == "no_object") {
+    else if(r_name_ == "no_object") {
       r_isbboxReady_ = 2;
     }
     else r_isbboxReady_ = 3;
