@@ -12,6 +12,7 @@
 
     image_view/enable_opencv: false
     image_view/wait_key_delay: 1
+    image_view/TEST: false
 
     threshold/box_size: 71   # 51 71 
     threshold/box_offset: 40 # 50 40

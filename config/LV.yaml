@@ -12,6 +12,7 @@
 
     image_view/enable_opencv: false
     image_view/wait_key_delay: 1
+    image_view/TEST: false
 
     threshold/box_size: 71  # 51 71 
     threshold/box_offset: 40 # 50 40
@@ -72,6 +73,15 @@
     ROI/wide_left/extra_b: 0.00 # 0
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
+
+    ROI/test/top_gap: 0.41 # 0.35
+    ROI/test/bot_gap: 0.17 # 0.10
+    ROI/test/top_height: 0.99
+    ROI/test/bot_height: 0.47
+    ROI/test/extra_f: 16.0 # 30.0
+    ROI/test/extra_b: 8.0  # 30.0
+    ROI/test/extra_up: 140
+    ROI/test/extra_down: 180
 
     params/K: 0.15  #vel 0.6,   0.8,  1.0     # FOR ICRA 
     params/K3: 0.13 # e1 0.13,  0.08, 0.07   키우면 각도 커진다, 고개 오실레이션 -> 낮춰 

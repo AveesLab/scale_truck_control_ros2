@@ -10,8 +10,9 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
+    image_view/TEST: false
 
     threshold/box_size: 71   # 51 71 
     threshold/box_offset: 40 # 50 40 
@@ -40,8 +41,9 @@
     ROI/canny/thresh1: 100
     ROI/canny/thresh2: 200
 
-    ROI/front_cam/width: 640
-    ROI/front_cam/height: 480
+    ROI/width: 640
+    ROI/height: 480
+
     ROI/front_cam/top_gap: 0.41 # 0.35 
     ROI/front_cam/bot_gap: 0.17 # 0.10 
     ROI/front_cam/top_height: 0.99
@@ -51,8 +53,6 @@
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
-    ROI/wide_right/width: 640
-    ROI/wide_right/height: 480
     ROI/wide_right/top_gap: 0.40 # 0.28
     ROI/wide_right/bot_gap: 0.16 # 0.0
     ROI/wide_right/top_height: 0.99
@@ -62,8 +62,6 @@
     ROI/wide_right/extra_up: 180
     ROI/wide_right/extra_down: 220
 
-    ROI/wide_left/width: 640
-    ROI/wide_left/height: 480
     ROI/wide_left/top_gap: 0.40 # 0.28
     ROI/wide_left/bot_gap: 0.16 # 0.0
     ROI/wide_left/top_height: 0.99
@@ -72,6 +70,15 @@
     ROI/wide_left/extra_b: 8.00 # 0
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
+
+    ROI/test/top_gap: 0.41 # 0.35 
+    ROI/test/bot_gap: 0.17 # 0.10 
+    ROI/test/top_height: 0.99
+    ROI/test/bot_height: 0.40 
+    ROI/test/extra_f: 16.0 # 30.0 
+    ROI/test/extra_b: 8.0  # 30.0
+    ROI/test/extra_up: 180
+    ROI/test/extra_down: 220
 
     crop/x: 100
     crop/y: 0
