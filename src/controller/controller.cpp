@@ -296,6 +296,10 @@ void Controller::replyData()
   cmd_data.fv1_est_dist = fv1_est_dist_;
   cmd_data.fv2_est_dist = fv2_est_dist_;
 
+  cmd_data.lv_r_est_dist = lv_r_est_dist_;
+  cmd_data.fv1_r_est_dist = fv1_r_est_dist_;
+  cmd_data.fv2_r_est_dist = fv2_r_est_dist_;
+
   cmd_data.lv_bbox_ready = lv_bbox_ready_;
   cmd_data.fv1_bbox_ready = fv1_bbox_ready_;
   cmd_data.fv2_bbox_ready = fv2_bbox_ready_;
