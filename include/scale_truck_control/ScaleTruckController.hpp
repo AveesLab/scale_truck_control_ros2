@@ -95,6 +95,7 @@ private:
     void adjustTargetVelocity();
     void setLaneChangeFlags(bool no_object = false);
     float lowPassFilter(double sampling_time, float est_value, float prev_res);
+    float lowPassFilter2(double sampling_time, float est_value, float prev_res);
 
 
     // xav->cmd
@@ -134,7 +135,7 @@ private:
     float cur_vel = 0.0;
 
     //RSS
-    void RSS();
+    void RSS(double cycle_time);
     void clear_release();
     float a_max_accel = 0.0f;
     float a_min_brake = 0.0f; 

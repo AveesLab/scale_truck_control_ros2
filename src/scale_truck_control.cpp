@@ -697,6 +697,18 @@ float ScaleTruckController::lowPassFilter(double sampling_time, float est_value,
   return res;
 }
 
+float ScaleTruckController::lowPassFilter2(double sampling_time, float est_value, float prev_res){
+  float res = 0;
+  float tau = 0.03f; //0.10f
+  double st = 0.0;
+
+  if (sampling_time > 1.0) st = 1.0;
+  else st = sampling_time;
+  res = ((tau * prev_res) + (st * est_value)) / (tau + st);
+
+  return res;
+}
+
 void ScaleTruckController::spin() 
 {
   double diff_time=0.0;
@@ -707,6 +719,9 @@ void ScaleTruckController::spin()
 
   while(!controlDone_ && rclcpp::ok()) {
     struct timeval start_time, end_time;
+    static struct timeval startTime, endTime;
+    static bool flag = false;
+    double diffTime = 0.0;
     gettimeofday(&start_time, NULL);
 
 
@@ -718,8 +733,18 @@ void ScaleTruckController::spin()
       if ((lc_right_flag_== false && lc_left_flag_ == false) && \
           (isbboxReady_ != 3 || r_isbboxReady_ != 3)) 
       {
-        RSS();
-        isLaneChangeCommandReceived();  
+        gettimeofday(&endTime, NULL);
+        if (!flag){
+          diffTime = (endTime.tv_sec - init_.tv_sec) + (endTime.tv_usec - init_.tv_usec)/1000000.0;
+          flag = true;
+        }
+        else{
+          diffTime = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)/1000000.0;
+          startTime = endTime;
+        }
+
+        RSS(diffTime);
+        //isLaneChangeCommandReceived();  
       }
     }
     {
@@ -824,17 +849,22 @@ void ScaleTruckController::spin()
   }
 }
 
-void ScaleTruckController::RSS() {
+void ScaleTruckController::RSS(double cycle_time) {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
+    /* Front rss_dist */
     if (est_dist_ != 0) {
       float cf_vel = est_vel_;
-      //float cr_vel = CurVel_;
-      float cr_vel = 0.8f; // FV2 vel: 0.8 m/s
+      float cr_vel = CurVel_;
+      static float prev_rss_min_dist = 0.f;
+
+      p_ = 0.160f;
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
-      rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) + (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) - (pow(cf_vel,2)/(2*a_max_brake));
+      rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rss_min_dist_ = max(rss_min_dist_, 0.0f);
+      rss_min_dist_= lowPassFilter2(cycle_time, rss_min_dist_, prev_rss_min_dist);
+      prev_rss_min_dist = rss_min_dist_;
 
       if(index_ == 0) lv_rss_dist_ = rss_min_dist_;
       else if(index_ == 1) fv1_rss_dist_ = rss_min_dist_;
@@ -847,13 +877,16 @@ void ScaleTruckController::RSS() {
       else if(index_ == 2) fv2_rss_dist_ = 0.0f;
     }
 
+    /* Rear rss_dist */
     if (r_est_dist_ != 0) {
-      //float cf_vel = CurVel_;
-      float cf_vel = 0.8f; // FV2 vel: 0.8 m/s
+      float cf_vel = CurVel_;
       float cr_vel = r_est_vel_;
+      static float prev_rrss_min_dist = 0.f;
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
+      rrss_min_dist_= lowPassFilter2(cycle_time, rrss_min_dist_, prev_rrss_min_dist);
+      prev_rrss_min_dist = rrss_min_dist_;
 
       if(index_ == 0) lv_r_rss_dist_ = rrss_min_dist_;
       else if(index_ == 1) fv1_r_rss_dist_ = rrss_min_dist_;
@@ -939,15 +972,16 @@ void ScaleTruckController::recordData(struct timeval startTime){
       }
       read_file.close();
     }
-    //write_file << "time,tar_vel,cur_vel,est_vel,tar_dist,cur_dist,est_dist,r_run_yolo_flag,y_run_yolo_flag" << std::endl; //seconds
-    write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
+    //write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
+    write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
     flag = true;
   }
   if(flag){
     std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_, rep_mutex_);
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
-    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
+    //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
+    sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
@@ -1000,7 +1034,6 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
   {
     std::scoped_lock lock(rlane_mutex_);
     r_lane_coef_.coef = msg->coef;
-    //r_center_select_ = msg->center_select;
     r_est_dist_ = msg->est_dist;
     r_est_vel_ = msg->est_vel;
   }
@@ -1069,7 +1102,8 @@ void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPt
 {
   {
     std::scoped_lock lock(vel_mutex_, rep_mutex_);
-    CurVel_ = msg->cur_vel;
+    CurVel_ = 0.8f;
+    //CurVel_ = msg->cur_vel;
     TargetVel_ = msg->tar_vel;
     TargetDist_ = msg->tar_dist;
   }
