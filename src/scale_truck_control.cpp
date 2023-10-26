@@ -1139,6 +1139,13 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
+
+      // for ICRA
+      if(msg->fv2_lc_right || msg->fv2_lc_left) {
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true;  
+        yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
+        runYoloPublisher_->publish(yolo_flag_msg);
+      }
     }
     /*******/
     /* FV1 */
@@ -1159,6 +1166,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       }
 
       if(msg->fv2_lc_right || msg->fv2_lc_left) {
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; // for ICRA 
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
