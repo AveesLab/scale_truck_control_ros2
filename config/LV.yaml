@@ -74,14 +74,14 @@
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
 
-    ROI/test/top_gap: 0.41 # 0.35
-    ROI/test/bot_gap: 0.17 # 0.10
+    ROI/test/top_gap: 0.45
+    ROI/test/bot_gap: 0.17
     ROI/test/top_height: 0.99
-    ROI/test/bot_height: 0.47
-    ROI/test/extra_f: 16.0 # 30.0
-    ROI/test/extra_b: 8.0  # 30.0
-    ROI/test/extra_up: 140
-    ROI/test/extra_down: 180
+    ROI/test/bot_height: 0.34
+    ROI/test/extra_f: 27.0
+    ROI/test/extra_b: 20.0
+    ROI/test/extra_up: 180
+    ROI/test/extra_down: 220
 
     params/K: 0.15  #vel 0.6,   0.8,  1.0     # FOR ICRA 
     params/K3: 0.13 # e1 0.13,  0.08, 0.07   키우면 각도 커진다, 고개 오실레이션 -> 낮춰 
@@ -137,11 +137,12 @@
     Calibration/r_dist_coef/d: 0.
     Calibration/r_dist_coef/e: -0.022565312043601477
 
-    ROI/rear_cam/top_gap: 0.455
-    ROI/rear_cam/bot_gap: 0.22
+    ROI/rear_cam/top_gap: 0.45
+    ROI/rear_cam/bot_gap: 0.20
     ROI/rear_cam/top_height: 0.99
-    ROI/rear_cam/bot_height: 0.4
-    ROI/rear_cam/extra_f: 10.0
-    ROI/rear_cam/extra_b: 5.0
-    ROI/rear_cam/extra_up: 140
-    ROI/rear_cam/extra_down: 180
+    ROI/rear_cam/bot_height: 0.40
+    ROI/rear_cam/extra_f: -14.0
+    ROI/rear_cam/extra_b: -40.0
+    ROI/rear_cam/extra_up: 180
+    ROI/rear_cam/extra_down: 220
+

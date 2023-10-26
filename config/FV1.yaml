@@ -72,21 +72,18 @@
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
 
-    ROI/test/width: 640
-    ROI/test/height: 480
-    ROI/test/top_gap: 0.40 # 0.28
-    ROI/test/bot_gap: 0.16 # 0.0
+    ROI/test/top_gap: 0.45
+    ROI/test/bot_gap: 0.17
     ROI/test/top_height: 0.99
-    ROI/test/bot_height: 0.485
-    ROI/test/extra_f: 8.00 # 0
-    ROI/test/extra_b: 8.00 # 0
+    ROI/test/bot_height: 0.34
+    ROI/test/extra_f: 27.0
+    ROI/test/extra_b: 20.0
     ROI/test/extra_up: 180
     ROI/test/extra_down: 220
 
     params/K: 0.15   #vel  0.6,  0.8,  1.0
     params/K3: 0.15  # el  0.15  0.1  0.045
     params/K4: 0.185  # eL  0.185 0.165 0.13  
-
 
     params/a/a: 0.
     params/a/b: -0.22027
@@ -142,12 +139,11 @@
     ROI/width: 640
     ROI/height: 480
 
-    ROI/rear_cam/top_gap: 0.44
-    ROI/rear_cam/bot_gap: 0.19
+    ROI/rear_cam/top_gap: 0.45
+    ROI/rear_cam/bot_gap: 0.20
     ROI/rear_cam/top_height: 0.99
-    ROI/rear_cam/bot_height: 0.4
-    ROI/rear_cam/extra_f: -5.0
-    ROI/rear_cam/extra_b: -10.0
+    ROI/rear_cam/bot_height: 0.40
+    ROI/rear_cam/extra_f: -14.0
+    ROI/rear_cam/extra_b: -40.0
     ROI/rear_cam/extra_up: 180
     ROI/rear_cam/extra_down: 220
-
