@@ -41,7 +41,7 @@
     ROI/width: 640
     ROI/height: 480
 
-    ROI/frontRoi_ratio: 204.0
+    ROI/frontRoi_ratio: 202.0
 
     ROI/front_cam/top_gap: 0.41 
     ROI/front_cam/bot_gap: 0.17 
@@ -74,12 +74,12 @@
     ROI/wide_left/extra_up: 180
     ROI/wide_left/extra_down: 220
 
-    ROI/test/top_gap: 0.45
+    ROI/test/top_gap: 0.447
     ROI/test/bot_gap: 0.17
     ROI/test/top_height: 0.99
     ROI/test/bot_height: 0.34
-    ROI/test/extra_f: 27.0
-    ROI/test/extra_b: 20.0
+    ROI/test/extra_f: 10.0
+    ROI/test/extra_b: 10.0
     ROI/test/extra_up: 180
     ROI/test/extra_down: 220
 
@@ -141,13 +141,13 @@
     ROI/width: 640
     ROI/height: 480
 
-    ROI/rearRoi_ratio: 210.0
+    ROI/rearRoi_ratio: 208.0
 
-    ROI/rear_cam/top_gap: 0.45
-    ROI/rear_cam/bot_gap: 0.20
+    ROI/rear_cam/top_gap: 0.445
+    ROI/rear_cam/bot_gap: 0.21
     ROI/rear_cam/top_height: 0.99
     ROI/rear_cam/bot_height: 0.40
-    ROI/rear_cam/extra_f: -14.0
-    ROI/rear_cam/extra_b: -40.0
+    ROI/rear_cam/extra_f: -8.0
+    ROI/rear_cam/extra_b: -13.0
     ROI/rear_cam/extra_up: 180
     ROI/rear_cam/extra_down: 220
