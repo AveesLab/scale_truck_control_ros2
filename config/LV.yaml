@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: true 
     image_view/wait_key_delay: 1
     image_view/TEST: true
 
@@ -117,7 +117,7 @@
     publishers/lane_to_xavier/topic: rear2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
 
     threshold/box_size: 71  # 51 71 
@@ -141,7 +141,7 @@
 
     ROI/rearRoi_ratio: 210.0
 
-    ROI/rear_cam/top_gap: 0.447
+    ROI/rear_cam/top_gap: 0.455
     ROI/rear_cam/bot_gap: 0.205
     ROI/rear_cam/top_height: 0.99
     ROI/rear_cam/bot_height: 0.40
