@@ -147,7 +147,7 @@
     ROI/rear_cam/bot_gap: 0.21
     ROI/rear_cam/top_height: 0.99
     ROI/rear_cam/bot_height: 0.39
-    ROI/rear_cam/extra_f: -5.0
+    ROI/rear_cam/extra_f: -15.0
     ROI/rear_cam/extra_b: -5.0
     ROI/rear_cam/extra_up: 180
     ROI/rear_cam/extra_down: 220

@@ -857,8 +857,14 @@ void ScaleTruckController::RSS(double cycle_time) {
       float cf_vel = est_vel_;
       float cr_vel = CurVel_;
       static float prev_rss_min_dist = 0.f;
-
       p_ = 0.160f;
+
+    /* for blind spot graph */
+      sv_flag_ = true; 
+      if(lv_est_dist_ != 0) {
+        lv_sv_flag_ = true;
+      }
+      else lv_sv_flag_ = false;
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
       rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
@@ -875,6 +881,12 @@ void ScaleTruckController::RSS(double cycle_time) {
       if(index_ == 0) lv_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_rss_dist_ = 0.0f;
+    /* for blind spot graph */
+      sv_flag_ = false;
+      if(lv_est_dist_ != 0) {
+        lv_sv_flag_ = true;
+      }
+      else lv_sv_flag_ = false;
     }
 
     /* Rear rss_dist */
@@ -882,6 +894,7 @@ void ScaleTruckController::RSS(double cycle_time) {
       float cf_vel = CurVel_;
       float cr_vel = r_est_vel_;
       static float prev_rrss_min_dist = 0.f;
+      r_sv_flag_ = true; //for blind spot graph
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
@@ -897,6 +910,10 @@ void ScaleTruckController::RSS(double cycle_time) {
       if(index_ == 0) lv_r_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_r_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_r_rss_dist_ = 0.0f;
+      if(fv2_est_dist_ != 0) {
+        r_sv_flag_ = true;
+      }
+      else r_sv_flag_ = false;
     }
   }
 }
@@ -941,12 +958,14 @@ void ScaleTruckController::displayConsole() {
   printf("\033[14;1H");
   printf("F/R RSS_Dist      : %3.3f / %3.3f m", rss_min_dist_, rrss_min_dist_);
   printf("\033[15;1H");
-  printf("bboxReady         : %d / %d / %d", lv_bbox_ready_, fv1_bbox_ready_, fv2_bbox_ready_);
+  printf("F/R sv_flag       : %d / %d ", sv_flag_, r_sv_flag_);
   printf("\033[16;1H");
-  printf("rbboxReady        : %d / %d / %d", lv_r_bbox_ready_, fv1_r_bbox_ready_, fv2_r_bbox_ready_);
+  printf("bboxReady         : %d / %d / %d", lv_bbox_ready_, fv1_bbox_ready_, fv2_bbox_ready_);
   printf("\033[17;1H");
-  printf("F/R boxReady      : %d / %d", isbboxReady_, r_isbboxReady_);
+  printf("rbboxReady        : %d / %d / %d", lv_r_bbox_ready_, fv1_r_bbox_ready_, fv2_r_bbox_ready_);
   printf("\033[18;1H");
+  printf("F/R boxReady      : %d / %d", isbboxReady_, r_isbboxReady_);
+  printf("\033[19;1H");
   printf("Cycle Time        : %3.3f ms\n", CycleTime_);
 }
 
@@ -973,7 +992,8 @@ void ScaleTruckController::recordData(struct timeval startTime){
       read_file.close();
     }
     //write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
-    write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
+    //write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
+    write_file << "time,front_est_dist_, lv_f_est_dist_, front_sv_flag, lv_sv_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
@@ -981,7 +1001,8 @@ void ScaleTruckController::recordData(struct timeval startTime){
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
     //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
-    sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
+    //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
+    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, est_dist_, lv_est_dist_, sv_flag_, lv_sv_flag_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }

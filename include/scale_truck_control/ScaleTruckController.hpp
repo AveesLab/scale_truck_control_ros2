@@ -179,6 +179,10 @@ private:
     float fv2_r_rss_dist_ = 0.0f;
 
     bool req_flag_ = false;
+    bool sv_flag_ = false;
+    bool r_sv_flag_ = false;
+    bool lv_sv_flag_ = false;
+
 
     //bbox
     std::string name_;
