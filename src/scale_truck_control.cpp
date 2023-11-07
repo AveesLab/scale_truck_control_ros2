@@ -1005,17 +1005,9 @@ void ScaleTruckController::recordData(struct timeval startTime){
       }
       read_file.close();
     }
-<<<<<<< HEAD
-    //write_file << "time,lateral_err,est_lateral_err, lc_left_flag,lc_right_flag" << std::endl; //seconds
-    //write_file << "diff_time, , est_dist_, r_est_dist_, CurVel_, r_est_vel_, rss_min_dist_, rrss_min_dist_, fv1_r_est_dist_" << std::endl; //seconds
-    //write_file << "time,rear_est_dist_,front_est_dist,fv1_est_dist" << std::endl; //rss performance
-    write_file << "time,front_est_dist,fv1_est_dist" << std::endl; //rss performance
-    //write_file << "diff_time, rear_est_dist_, lc_flag" << std::endl; //gap performance
-=======
     //write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
     //write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
     write_file << "time,front_est_dist_, lv_f_est_dist_, front_sv_flag, lv_sv_flag" << std::endl; //seconds
->>>>>>> bc9e63f0468ba864645be3ccb650e7957a460eeb
     flag = true;
   }
   if(flag){
@@ -1023,15 +1015,12 @@ void ScaleTruckController::recordData(struct timeval startTime){
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
     //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
-<<<<<<< HEAD
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", diff_time, est_dist_, r_est_dist_, CurVel_, r_est_vel_, rss_min_dist_, rrss_min_dist_, fv1_r_est_dist_);
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f", diff_time, r_est_dist_, est_dist_, fv1_r_est_dist_); //rss performance
     sprintf(buf, "%.10e, %.3f, %.3f", diff_time, est_dist_, fv1_est_dist_); //rss performance
     //sprintf(buf, "%.10e, %.3f, %d", diff_time, r_est_dist_, cmd_fv2_lc_left_); //gap performance
-=======
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
-    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, est_dist_, lv_est_dist_, sv_flag_, lv_sv_flag_);
->>>>>>> bc9e63f0468ba864645be3ccb650e7957a460eeb
+    //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, est_dist_, lv_est_dist_, sv_flag_, lv_sv_flag_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
