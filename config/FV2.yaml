@@ -141,14 +141,14 @@
     Calibration/r_dist_coef/d: 0.
     Calibration/r_dist_coef/e: -4.0688891786494791e-02
 
-    ROI/rearRoi_ratio: 210.0 # 215.7
+    ROI/rearRoi_ratio: 200.0 # 215.7
 
-    ROI/rear_cam/top_gap: 0.44
+    ROI/rear_cam/top_gap: 0.45
     ROI/rear_cam/bot_gap: 0.20
     ROI/rear_cam/top_height: 0.99
-    ROI/rear_cam/bot_height: 0.39
-    ROI/rear_cam/extra_f: -20.0
-    ROI/rear_cam/extra_b: -35.0
+    ROI/rear_cam/bot_height: 0.40
+    ROI/rear_cam/extra_f: -14.0
+    ROI/rear_cam/extra_b: -30.0
     ROI/rear_cam/extra_up: 180
     ROI/rear_cam/extra_down: 220
 
