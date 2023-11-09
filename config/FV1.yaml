@@ -10,9 +10,9 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: true
+    image_view/enable_opencv: false
     image_view/wait_key_delay: 1
-    image_view/TEST: true
+    image_view/TEST: false
 
     threshold/box_size: 71   # 51 71 
     threshold/box_offset: 40 # 50 40
@@ -52,12 +52,12 @@
     
     ROI/wide_right/width: 640
     ROI/wide_right/height: 480
-    ROI/wide_right/top_gap: 0.40 # 0.28
+    ROI/wide_right/top_gap: 0.38 # 0.28
     ROI/wide_right/bot_gap: 0.16 # 0.0
     ROI/wide_right/top_height: 0.99
     ROI/wide_right/bot_height: 0.485
-    ROI/wide_right/extra_f: 8.00 # 0
-    ROI/wide_right/extra_b: 8.00 # 0
+    ROI/wide_right/extra_f: 15.00 # 8
+    ROI/wide_right/extra_b: 15.00 # 8
     ROI/wide_right/extra_up: 180
     ROI/wide_right/extra_down: 220
 
