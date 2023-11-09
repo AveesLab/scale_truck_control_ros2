@@ -79,7 +79,7 @@ bool ScaleTruckController::readParameters() {
   this->get_parameter_or("rss/a_max_brake", a_max_brake, 0.0f); 
   this->get_parameter_or("rss/a_min_brake", a_min_brake, 0.0f); 
   this->get_parameter_or("rss/response_time", p_, 0.0f); 
-//  this->get_parameter_or("rss/SV_Vel_", SV_Vel_, 0.0f); 
+  this->get_parameter_or("rss/SV_Vel_", SV_Vel_, 0.0f); 
 //  this->get_parameter_or("rss/Truck_Vel_", Truck_Vel_, 0.0f); 
 
   /* ICRA  */
@@ -482,9 +482,9 @@ void ScaleTruckController::isLVDetected() {
 }
 
 void ScaleTruckController::isAreaSafe(int indexArea) {
-  // car_length_: 1.15
-  int d1_ = fv2_cur_dist_ + 1.15f + 0.23f;  
-  int d2_ = fv1_cur_dist_ + 1.15f + 0.23f; 
+  int car_length_ = 1.23;
+  int d1_ = fv2_cur_dist_ + car_length_ + 0.3f;  
+  int d2_ = fv1_cur_dist_ + car_length_ + 0.3f; 
 
   /*******/
   /* FV2 */
@@ -644,7 +644,6 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 //}
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
-  ros2_msg::msg::Yoloflag yolo_flag_msg;
   static int tmp_cnt = 0;
   tmp_cnt += 1;
 
@@ -652,13 +651,9 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
     tmp_cnt = 0;
     if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
       lc_right_flag_ = true;
-      yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-      runYoloPublisher_->publish(yolo_flag_msg);
     }
     else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
       lc_left_flag_ = true;
-      yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-      runYoloPublisher_->publish(yolo_flag_msg);
     }
     else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
     clear_release();
@@ -732,25 +727,21 @@ void ScaleTruckController::spin()
 
     {
       std::scoped_lock lock(rep_mutex_, rss_mutex_);
-
-      gettimeofday(&endTime, NULL);
-      if (!flag){
-        diffTime = (endTime.tv_sec - init_.tv_sec) + (endTime.tv_usec - init_.tv_usec)/1000000.0;
-        flag = true;
-      }
-      else{
-        diffTime = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)/1000000.0;
-        startTime = endTime;
-      }
-
-      RSS(diffTime); // TEST
-
       if ((lc_right_flag_== false && lc_left_flag_ == false) && \
           (isbboxReady_ != 3 || r_isbboxReady_ != 3)) 
       {
+        gettimeofday(&endTime, NULL);
+        if (!flag){
+          diffTime = (endTime.tv_sec - init_.tv_sec) + (endTime.tv_usec - init_.tv_usec)/1000000.0;
+          flag = true;
+        }
+        else{
+          diffTime = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)/1000000.0;
+          startTime = endTime;
+        }
 
-        //RSS(diffTime);
-        //isLaneChangeCommandReceived();  
+        RSS(diffTime);
+        isLaneChangeCommandReceived();  
       }
     }
     {
@@ -861,9 +852,9 @@ void ScaleTruckController::RSS(double cycle_time) {
     /* Front rss_dist */
 //    est_dist_ = 0.8f;
     if (est_dist_ != 0) {
-      float cf_vel = est_vel_; // SV 속도
+//      float cf_vel = est_vel_; // SV 속도
       float cr_vel = CurVel_; // 트럭 속도
-//      float cf_vel = SV_Vel_; // SV 속도
+      float cf_vel = SV_Vel_; // SV 속도
 //      float cr_vel = Truck_Vel_; // 트럭 속도 
       static float prev_rss_min_dist = 0.f;
       p_ = 0.160f;
@@ -902,8 +893,8 @@ void ScaleTruckController::RSS(double cycle_time) {
 //    r_est_dist_ = 0.8f;
     if (r_est_dist_ != 0) {
       float cf_vel = CurVel_;
-      float cr_vel = r_est_vel_;
-//      float cr_vel = SV_Vel_; // SV 속도
+//      float cr_vel = r_est_vel_;
+      float cr_vel = SV_Vel_; // SV 속도
 //      float cf_vel = Truck_Vel_; // 트럭 속도
       static float prev_rrss_min_dist = 0.f;
       r_sv_flag_ = true; //for blind spot graph
@@ -1142,8 +1133,7 @@ void ScaleTruckController::LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPt
 {
   {
     std::scoped_lock lock(vel_mutex_, rep_mutex_);
-    CurVel_ = 0.8f;
-    //CurVel_ = msg->cur_vel;
+    CurVel_ = msg->cur_vel;
     TargetVel_ = msg->tar_vel;
     TargetDist_ = msg->tar_dist;
   }
@@ -1164,20 +1154,11 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       cmd_lv_lc_right_ = msg->lv_lc_right; 
       if(cmd_lv_lc_right_){
         //lc_right_flag_ = true;
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       cmd_lv_lc_left_ = msg->lv_lc_left;
       if(cmd_lv_lc_left_) {
         //lc_left_flag_ = true;
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-        runYoloPublisher_->publish(yolo_flag_msg);
-      }
-
-      if(msg->fv1_lc_right || msg->fv1_lc_left) {
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       // for ICRA
@@ -1194,19 +1175,16 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
       cmd_fv1_lc_right_ = msg->fv1_lc_right; 
       if(cmd_fv1_lc_right_){
         //lc_right_flag_ = true;
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
       cmd_fv1_lc_left_ = msg->fv1_lc_left;
       if(cmd_fv1_lc_left_) {
         //lc_left_flag_ = true;
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
-        runYoloPublisher_->publish(yolo_flag_msg);
       }
 
+      // for ICRA
       if(msg->fv2_lc_right || msg->fv2_lc_left) {
-        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; // for ICRA 
+        yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true;  
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }

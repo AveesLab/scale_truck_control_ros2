@@ -143,7 +143,7 @@ private:
     float p_ = 0.0f;
     float rss_min_dist_= 0.0f;
     float rrss_min_dist_= 0.0f;
-//    float SV_Vel_= 0.0f;
+    float SV_Vel_= 0.0f;
 //    float Truck_Vel_= 0.0f;
     
 
