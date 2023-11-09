@@ -24,7 +24,7 @@
     publishers/xavier_to_Yolo/topic: run_yolo_flag
     publishers/xavier_to_Yolo/queue_size: 1
     
-    params/index: 1
+    params/index: 2
     params/xav_log_path: /home/avees/ros2_ws/logfiles/
 
     params/target_vel: 0.00
@@ -41,10 +41,12 @@
     rss/a_min_brake: -0.225 #3.22 #-0.083
     rss/a_max_brake: -0.472 #0.6 #2.136
     rss/response_time: 1.23 #0.160 # 0.059
+#    rss/SV_Vel_: 0.5
+#    rss/Truck_Vel_: 1.0
 
 #    icra/dist: 0.8 # FOR ICRA
 
-    image_view/enable_console_output: true 
+    image_view/enable_console_output: true
     image_view/lane_change_right: false # cmd lane change
     image_view/lane_change_left: false 
 
@@ -64,7 +66,7 @@
     LrcPub/lv_to_fv/topic: /lv2fv_msg
     LrcPub/lv_to_fv/queue_size: 1
 
-    LrcParams/lrc_index: 11
+    LrcParams/lrc_index: 12
     LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
     LrcParams/enable_console_output: false
 

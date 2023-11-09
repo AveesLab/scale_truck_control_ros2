@@ -79,6 +79,8 @@ bool ScaleTruckController::readParameters() {
   this->get_parameter_or("rss/a_max_brake", a_max_brake, 0.0f); 
   this->get_parameter_or("rss/a_min_brake", a_min_brake, 0.0f); 
   this->get_parameter_or("rss/response_time", p_, 0.0f); 
+//  this->get_parameter_or("rss/SV_Vel_", SV_Vel_, 0.0f); 
+//  this->get_parameter_or("rss/Truck_Vel_", Truck_Vel_, 0.0f); 
 
   /* ICRA  */
   this->get_parameter_or("icra/dist", ICRA_dist, 10.1f); 
@@ -699,7 +701,7 @@ float ScaleTruckController::lowPassFilter(double sampling_time, float est_value,
 
 float ScaleTruckController::lowPassFilter2(double sampling_time, float est_value, float prev_res){
   float res = 0;
-  float tau = 0.03f; //0.10f
+  float tau = 0.03f; //0.03f
   double st = 0.0;
 
   if (sampling_time > 1.0) st = 1.0;
@@ -730,20 +732,24 @@ void ScaleTruckController::spin()
 
     {
       std::scoped_lock lock(rep_mutex_, rss_mutex_);
+
+      gettimeofday(&endTime, NULL);
+      if (!flag){
+        diffTime = (endTime.tv_sec - init_.tv_sec) + (endTime.tv_usec - init_.tv_usec)/1000000.0;
+        flag = true;
+      }
+      else{
+        diffTime = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)/1000000.0;
+        startTime = endTime;
+      }
+
+      RSS(diffTime); // TEST
+
       if ((lc_right_flag_== false && lc_left_flag_ == false) && \
           (isbboxReady_ != 3 || r_isbboxReady_ != 3)) 
       {
-        gettimeofday(&endTime, NULL);
-        if (!flag){
-          diffTime = (endTime.tv_sec - init_.tv_sec) + (endTime.tv_usec - init_.tv_usec)/1000000.0;
-          flag = true;
-        }
-        else{
-          diffTime = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)/1000000.0;
-          startTime = endTime;
-        }
 
-        RSS(diffTime);
+        //RSS(diffTime);
         //isLaneChangeCommandReceived();  
       }
     }
@@ -853,9 +859,12 @@ void ScaleTruckController::RSS(double cycle_time) {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
     /* Front rss_dist */
+//    est_dist_ = 0.8f;
     if (est_dist_ != 0) {
-      float cf_vel = est_vel_;
-      float cr_vel = CurVel_;
+      float cf_vel = est_vel_; // SV 속도
+      float cr_vel = CurVel_; // 트럭 속도
+//      float cf_vel = SV_Vel_; // SV 속도
+//      float cr_vel = Truck_Vel_; // 트럭 속도 
       static float prev_rss_min_dist = 0.f;
       p_ = 0.160f;
 
@@ -891,12 +900,16 @@ void ScaleTruckController::RSS(double cycle_time) {
     }
 
     /* Rear rss_dist */
+//    r_est_dist_ = 0.8f;
     if (r_est_dist_ != 0) {
       float cf_vel = CurVel_;
       float cr_vel = r_est_vel_;
+//      float cr_vel = SV_Vel_; // SV 속도
+//      float cf_vel = Truck_Vel_; // 트럭 속도
       static float prev_rrss_min_dist = 0.f;
       r_sv_flag_ = true; //for blind spot graph
 
+      p_ = 1.23f;
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
@@ -1004,6 +1017,10 @@ void ScaleTruckController::recordData(struct timeval startTime){
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
     //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
+    //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", diff_time, est_dist_, r_est_dist_, CurVel_, r_est_vel_, rss_min_dist_, rrss_min_dist_, fv1_r_est_dist_);
+    //sprintf(buf, "%.10e, %.3f, %.3f, %.3f", diff_time, r_est_dist_, est_dist_, fv1_r_est_dist_); //rss performance
+    sprintf(buf, "%.10e, %.3f, %.3f", diff_time, est_dist_, fv1_est_dist_); //rss performance
+    //sprintf(buf, "%.10e, %.3f, %d", diff_time, r_est_dist_, cmd_fv2_lc_left_); //gap performance
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
     sprintf(buf, "%.10e, %.3f, %.3f, %d", diff_time, r_est_dist_, est_dist_, cmd_fv2_lc_left_);
     write_file.open(file, std::ios::out | std::ios::app);
