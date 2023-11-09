@@ -101,6 +101,14 @@
     params/b/d: -4.9047
     params/b/e: 1.6722
 
+    params/a2/a: 0.5
+    params/a2/a: -0.95
+    params/a2/c: 0.52
+
+    params/b2/a: -0.0875
+    params/b2/b: 0.0575
+    params/b2/c: 0.17
+
     LaneDetector/eL_height: 0.2
     LaneDetector/e1_height: 1.1852 # 1.2563 1.1852
     LaneDetector/trust_height: 0.6667
