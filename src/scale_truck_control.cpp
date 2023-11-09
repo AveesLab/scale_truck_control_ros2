@@ -662,22 +662,25 @@ void ScaleTruckController::setLaneChangeFlags(bool no_object) {
 }
 
 void ScaleTruckController::clear_release() {
-  lv_est_dist_ = 0; 
-  lv_rss_dist_ = 0;
+  rss_min_dist_ = 0.0f;
+  rrss_min_dist_ = 0.0f;
+
+  lv_est_dist_ = 0.0f; 
+  lv_rss_dist_ = 0.0f;
   lv_bbox_ready_ = 3;
 
-  fv1_est_dist_ = 0; 
-  fv1_cur_dist_ = 0;
-  fv1_rss_dist_ = 0;
-  fv1_r_est_dist_ = 0; 
+  fv1_est_dist_ = 0.0f; 
+  fv1_cur_dist_ = 0.0f;
+  fv1_rss_dist_ = 0.0f;
+  fv1_r_est_dist_ = 0.0f; 
   fv1_bbox_ready_ = 3;
   fv1_r_bbox_ready_ = 3;
 
-  fv2_est_dist_ = 0; 
-  fv2_cur_dist_ = 0;
-  fv2_rss_dist_ = 0;
-  fv2_r_est_dist_ = 0;
-  fv2_r_rss_dist_ = 0;
+  fv2_est_dist_ = 0.0f; 
+  fv2_cur_dist_ = 0.0f;
+  fv2_rss_dist_ = 0.0f;
+  fv2_r_est_dist_ = 0.0f;
+  fv2_r_rss_dist_ = 0.0f;
   fv2_bbox_ready_ = 3;
   fv2_r_bbox_ready_ = 3;
 }
@@ -775,7 +778,7 @@ void ScaleTruckController::spin()
 //        }
 //
 //        origin_lateral_err = car_position - dot_lane_base;
-//        if (abs(origin_lateral_err - prev_origin_lateral_err) >= 100) origin_lateral_err = prev_origin_lateral_err;
+//        //if (abs(origin_lateral_err - prev_origin_lateral_err) >= 100) origin_lateral_err = prev_origin_lateral_err;
 //        prev_origin_lateral_err = origin_lateral_err;
 //
 //        gettimeofday(&currentTime, NULL);
@@ -783,11 +786,10 @@ void ScaleTruckController::spin()
 //        lateral_err = lowPassFilter(sampling_time, origin_lateral_err, prev_lateral_err);
 //        prev_lateral_err = lateral_err;
 //
-//
-//        double Llane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
-//        double Rlane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
-//        double lane_base = Rlane_base - Llane_base;
-//        RCLCPP_INFO(this->get_logger(), "lane_base        : %3.3f ms\n", lane_base);
+////        double Llane_base = (lane_coef_.coef[0].a * pow(i, 2)) + (lane_coef_.coef[0].b * i) + lane_coef_.coef[0].c;
+////        double Rlane_base = (lane_coef_.coef[1].a * pow(i, 2)) + (lane_coef_.coef[1].b * i) + lane_coef_.coef[1].c;
+////        double lane_base = Rlane_base - Llane_base;
+////        RCLCPP_INFO(this->get_logger(), "lane_base        : %3.3f ms\n", lane_base);
 //      } 
       /* Lateral err end */
 
@@ -850,15 +852,13 @@ void ScaleTruckController::RSS(double cycle_time) {
   {
     std::scoped_lock lock(lane_mutex_, vel_mutex_);
     /* Front rss_dist */
-//    est_dist_ = 0.8f;
     if (est_dist_ != 0) {
-//      float cf_vel = est_vel_; // SV 속도
-      float cr_vel = CurVel_; // 트럭 속도
-      float cf_vel = SV_Vel_; // SV 속도
-//      float cr_vel = Truck_Vel_; // 트럭 속도 
+//      float cf_vel = est_vel_; 
+//      float cr_vel = Truck_Vel_;  
+      float cr_vel = CurVel_; 
+      float cf_vel = SV_Vel_; 
       static float prev_rss_min_dist = 0.f;
       p_ = 0.160f;
-
 
 //    /* for blind spot graph */
 //      sv_flag_ = true; 
@@ -891,12 +891,11 @@ void ScaleTruckController::RSS(double cycle_time) {
     }
 
     /* Rear rss_dist */
-//    r_est_dist_ = 0.8f;
     if (r_est_dist_ != 0) {
-      float cf_vel = CurVel_;
 //      float cr_vel = r_est_vel_;
-      float cr_vel = SV_Vel_; // SV 속도
-//      float cf_vel = Truck_Vel_; // 트럭 속도
+//      float cf_vel = Truck_Vel_;
+      float cr_vel = SV_Vel_; 
+      float cf_vel = CurVel_;
       static float prev_rrss_min_dist = 0.f;
       r_sv_flag_ = true; //for blind spot graph
 
@@ -997,23 +996,23 @@ void ScaleTruckController::recordData(struct timeval startTime){
       }
       read_file.close();
     }
-    //write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
+//    write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
     //write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
     //write_file << "time,front_est_dist_, lv_f_est_dist_, front_sv_flag, lv_sv_flag" << std::endl; //seconds
-    write_file << "time,rear_est_dist_,est_dist_,lc_flag" << std::endl; //seconds
+    //write_file << "time,rear_est_dist_,est_dist_,lc_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
     std::scoped_lock lock(lane_mutex_, rlane_mutex_, vel_mutex_, dist_mutex_, rep_mutex_);
     gettimeofday(&currentTime, NULL);
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
-    //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
+//    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", diff_time, est_dist_, r_est_dist_, CurVel_, r_est_vel_, rss_min_dist_, rrss_min_dist_, fv1_r_est_dist_);
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f", diff_time, r_est_dist_, est_dist_, fv1_r_est_dist_); //rss performance
-    sprintf(buf, "%.10e, %.3f, %.3f", diff_time, est_dist_, fv1_est_dist_); //rss performance
+    //sprintf(buf, "%.10e, %.3f, %.3f", diff_time, est_dist_, fv1_est_dist_); //rss performance
     //sprintf(buf, "%.10e, %.3f, %d", diff_time, r_est_dist_, cmd_fv2_lc_left_); //gap performance
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
-    sprintf(buf, "%.10e, %.3f, %.3f, %d", diff_time, r_est_dist_, est_dist_, cmd_fv2_lc_left_);
+    //sprintf(buf, "%.10e, %.3f, %.3f, %d", diff_time, r_est_dist_, est_dist_, cmd_fv2_lc_left_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
