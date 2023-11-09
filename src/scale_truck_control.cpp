@@ -859,12 +859,13 @@ void ScaleTruckController::RSS(double cycle_time) {
       static float prev_rss_min_dist = 0.f;
       p_ = 0.160f;
 
-    /* for blind spot graph */
-      sv_flag_ = true; 
-      if(lv_est_dist_ != 0) {
-        lv_sv_flag_ = true;
-      }
-      else lv_sv_flag_ = false;
+
+//    /* for blind spot graph */
+//      sv_flag_ = true; 
+//      if(lv_est_dist_ != 0) {
+//        lv_sv_flag_ = true;
+//      }
+//      else lv_sv_flag_ = false;
 
       /*이때는 a_max_accel = 0으로 해도 무방*/
       rss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+p_*a_max_accel),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
@@ -881,12 +882,12 @@ void ScaleTruckController::RSS(double cycle_time) {
       if(index_ == 0) lv_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_rss_dist_ = 0.0f;
-    /* for blind spot graph */
-      sv_flag_ = false;
-      if(lv_est_dist_ != 0) {
-        lv_sv_flag_ = true;
-      }
-      else lv_sv_flag_ = false;
+//    /* for blind spot graph */
+//      sv_flag_ = false;
+//      if(lv_est_dist_ != 0) {
+//        lv_sv_flag_ = true;
+//      }
+//      else lv_sv_flag_ = false;
     }
 
     /* Rear rss_dist */
@@ -895,6 +896,7 @@ void ScaleTruckController::RSS(double cycle_time) {
       float cr_vel = r_est_vel_;
       static float prev_rrss_min_dist = 0.f;
       r_sv_flag_ = true; //for blind spot graph
+
 
       rrss_min_dist_ = cr_vel*p_ + (a_max_accel*pow(p_,2)/2) - (pow((cr_vel+(p_*a_max_accel)),2)/(2*a_min_brake)) + (pow(cf_vel,2)/(2*a_max_brake));
       rrss_min_dist_ = max(rrss_min_dist_, 0.0f);
@@ -910,10 +912,10 @@ void ScaleTruckController::RSS(double cycle_time) {
       if(index_ == 0) lv_r_rss_dist_ = 0.0f;
       else if(index_ == 1) fv1_r_rss_dist_ = 0.0f;
       else if(index_ == 2) fv2_r_rss_dist_ = 0.0f;
-      if(fv2_est_dist_ != 0) {
-        r_sv_flag_ = true;
-      }
-      else r_sv_flag_ = false;
+//      if(fv2_est_dist_ != 0) {
+//        r_sv_flag_ = true;
+//      }
+//      else r_sv_flag_ = false;
     }
   }
 }
@@ -993,7 +995,8 @@ void ScaleTruckController::recordData(struct timeval startTime){
     }
     //write_file << "time,lateral_err,est_lateral_err,lc_left_flag,lc_right_flag" << std::endl; //seconds
     //write_file << "time,r_est_dist_,r_est_vel_, rrss_min_dist_,fv1_r_est_dist_" << std::endl; //seconds
-    write_file << "time,front_est_dist_, lv_f_est_dist_, front_sv_flag, lv_sv_flag" << std::endl; //seconds
+    //write_file << "time,front_est_dist_, lv_f_est_dist_, front_sv_flag, lv_sv_flag" << std::endl; //seconds
+    write_file << "time,rear_est_dist_,est_dist_,lc_flag" << std::endl; //seconds
     flag = true;
   }
   if(flag){
@@ -1002,7 +1005,7 @@ void ScaleTruckController::recordData(struct timeval startTime){
     diff_time = ((currentTime.tv_sec - startTime.tv_sec)) + ((currentTime.tv_usec - startTime.tv_usec)/1000000.0);
     //sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, origin_lateral_err, lateral_err, lc_left_flag_, lc_right_flag_);
     //sprintf(buf, "%.10e, %.3f, %.3f, %.3f, %.3f", diff_time, r_est_dist_, r_est_vel_, rrss_min_dist_, fv1_r_est_dist_);
-    sprintf(buf, "%.10e, %.3f, %.3f, %d, %d", diff_time, est_dist_, lv_est_dist_, sv_flag_, lv_sv_flag_);
+    sprintf(buf, "%.10e, %.3f, %.3f, %d", diff_time, r_est_dist_, est_dist_, cmd_fv2_lc_left_);
     write_file.open(file, std::ios::out | std::ios::app);
     write_file << buf << std::endl;
   }
@@ -1029,6 +1032,11 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     est_vel_ = msg->est_vel;
     wroi_flag_ = msg->wroi_flag;
     
+    if(est_dist_ != 0){ 
+      if(index_ == 0) est_dist_ += 5.29; 
+      else if(index_ == 1) est_dist_ += 3.26; 
+      else if(index_ == 2) est_dist_ += 1.23;
+    }
 //    stamp_time_sec = msg->stamp_sec;
 //    stamp_time_usec = msg->stamp_usec;
 //
@@ -1057,6 +1065,11 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
     r_lane_coef_.coef = msg->coef;
     r_est_dist_ = msg->est_dist;
     r_est_vel_ = msg->est_vel;
+    
+    if(r_est_dist_ != 0){
+      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06;
+      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03;
+    }
   }
 }
 
@@ -1174,7 +1187,7 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
     else if(index_ == 1) {   
       cmd_fv1_lc_right_ = msg->fv1_lc_right; 
       if(cmd_fv1_lc_right_){
-        //lc_right_flag_ = true;
+        lc_right_flag_ = true;
         yolo_flag_msg.f_run_yolo = f_run_yolo_flag_ = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
@@ -1191,6 +1204,9 @@ void ScaleTruckController::CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPt
         yolo_flag_msg.r_run_yolo = r_run_yolo_flag_ = true; 
         runYoloPublisher_->publish(yolo_flag_msg);
       }
+      
+      cmd_fv2_lc_left_ = msg->fv2_lc_left;
+
     }
     /*******/
     /* FV2 */
