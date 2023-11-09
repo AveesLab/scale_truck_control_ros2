@@ -644,21 +644,23 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 //}
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
-  static int tmp_cnt = 0;
-  tmp_cnt += 1;
+  if(est_dist_ > distance_) {
+    static int tmp_cnt = 0;
+    tmp_cnt += 1;
 
-  if(tmp_cnt >= 30) {
-    tmp_cnt = 0;
-    if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
-      lc_right_flag_ = true;
+    if(tmp_cnt >= 30) {
+      tmp_cnt = 0;
+      if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
+        lc_right_flag_ = true;
+      }
+      else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
+        lc_left_flag_ = true;
+      }
+      else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
+      clear_release();
     }
-    else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
-      lc_left_flag_ = true;
-    }
-    else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
-    clear_release();
+    else RCLCPP_INFO(this->get_logger(), "tmp_cnt: %d\n", tmp_cnt);
   }
-  else RCLCPP_INFO(this->get_logger(), "tmp_cnt: %d\n", tmp_cnt);
 }
 
 void ScaleTruckController::clear_release() {
