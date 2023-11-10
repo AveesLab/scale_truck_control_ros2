@@ -41,8 +41,8 @@
     rss/a_min_brake: -0.225 #3.22 #-0.083
     rss/a_max_brake: -0.472 #0.6 #2.136
     rss/response_time: 1.23 #0.160 # 0.059
-#    rss/SV_Vel_: 0.5
-#    rss/Truck_Vel_: 1.0
+    rss/SV_Vel_: 0.7  # 0.7 0.8 0.9
+#    rss/Truck_Vel_: # 0.6 0.8 1.0
 
 #    icra/dist: 0.8 # FOR ICRA
 
