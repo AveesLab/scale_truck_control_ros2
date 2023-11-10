@@ -483,9 +483,11 @@ void ScaleTruckController::isLVDetected() {
 }
 
 void ScaleTruckController::isAreaSafe(int indexArea) {
-  int car_length_ = 1.23;
-  int d1_ = fv2_cur_dist_ + car_length_ + 0.3f;  
-  int d2_ = fv1_cur_dist_ + car_length_ + 0.3f; 
+  int car_length_ = 1.25f;
+  //int d1_ = fv2_cur_dist_ + car_length_ + 0.3f;  
+  //int d2_ = fv1_cur_dist_ + car_length_ + 0.3f; 
+  int d1_ = 2.5f;  
+  int d2_ = 2.5f; 
 
   /*******/
   /* FV2 */
@@ -645,7 +647,7 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 //}
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
-  if(est_dist_ > distance_) {
+  if(((est_dist_ != 0) && (est_dist_ > distance_)) || (est_dist_ == 0)) {
     static int tmp_cnt = 0;
     tmp_cnt += 1;
 
