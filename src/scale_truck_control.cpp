@@ -359,7 +359,8 @@ void ScaleTruckController::objectdetectInThread()
 //    }
 
     /* FOR ICRA  */
-//    dist_tmp = ICRA_dist;
+    //dist_tmp = ICRA_dist;
+//    dist_tmp = 0.8f;
 //    distance_ = dist_tmp;
   }   
 
@@ -1041,11 +1042,12 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     est_vel_ = msg->est_vel;
     wroi_flag_ = msg->wroi_flag;
     
-    if(est_dist_ != 0){ 
-      if(index_ == 0) est_dist_ += 5.29; 
-      else if(index_ == 1) est_dist_ += 3.26; 
-      else if(index_ == 2) est_dist_ += 1.23;
-    }
+//    if(est_dist_ != 0){ 
+//      if(index_ == 0) est_dist_ += 5.29; 
+//      else if(index_ == 1) est_dist_ += 3.26; 
+//      else if(index_ == 2) est_dist_ += 1.23;
+//    }
+
 //    stamp_time_sec = msg->stamp_sec;
 //    stamp_time_usec = msg->stamp_usec;
 //
@@ -1075,10 +1077,10 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
     r_est_dist_ = msg->est_dist;
     r_est_vel_ = msg->est_vel;
     
-    if(r_est_dist_ != 0){
-      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06;
-      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03;
-    }
+//    if(r_est_dist_ != 0){
+//      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06;
+//      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03;
+//    }
   }
 }
 
