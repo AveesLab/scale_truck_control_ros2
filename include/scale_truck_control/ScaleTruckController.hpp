@@ -128,6 +128,8 @@ private:
     bool lc_center_follow_ = true;
     double origin_lateral_err = 0;
     double lateral_err = 0;
+    bool tmp_record_ = false; // 차선 변경 후 일부 데이터만 기록하기 위함. 
+    bool tmp_record2_ = false; // 차선 변경 후 일부 데이터만 기록하기 위함. 
 
     // FOR ICRA
     float ICRA_dist = 10.1;
