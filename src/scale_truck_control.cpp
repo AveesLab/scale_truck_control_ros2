@@ -371,7 +371,7 @@ void ScaleTruckController::objectdetectInThread()
     std::scoped_lock lock(lane_mutex_, vel_mutex_, rep_mutex_);
     if(dist_tmp < 1.24f && dist_tmp > 0.30f) // 1.26 ~ 0.28
     {
-      Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f);
+      Lane_.cur_dist = (int)((1.24f - dist_tmp)*490.0f) + 25;
     }
     else {
       Lane_.cur_dist = 0;
@@ -1057,6 +1057,8 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     est_vel_ = msg->est_vel;
     wroi_flag_ = msg->wroi_flag;
     
+    if(est_dist_ != 0 && isbboxReady_ == 2) est_dist_ = 0.0f;  
+
 //    if(est_dist_ != 0){ 
 //      if(index_ == 0) est_dist_ += 5.29; 
 //      else if(index_ == 1) est_dist_ += 3.26; 
@@ -1092,6 +1094,8 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
     r_est_dist_ = msg->est_dist;
     r_est_vel_ = msg->est_vel;
     
+    if(r_est_dist_ != 0 && r_isbboxReady_ == 2) r_est_dist_ = 0.0f;  
+
 //    if(r_est_dist_ != 0){
 //      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06;
 //      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03;
