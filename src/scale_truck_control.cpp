@@ -647,22 +647,35 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
 //}
 
 void ScaleTruckController::setLaneChangeFlags(bool no_object) {
-  if(((est_dist_ != 0) && (est_dist_ > distance_)) || (est_dist_ == 0)) {
-    static int tmp_cnt = 0;
-    tmp_cnt += 1;
+  int i = 480, j = 0; 
+  double lane_diff = 999.0; 
+  double center_bottom = 0, center_top = 0;
 
-    if(tmp_cnt >= 30) {
-      tmp_cnt = 0;
-      if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
-        lc_right_flag_ = true;
+  if(sizeof(lane_coef_.coef) != 0) 
+  {
+    center_top =  (lane_coef_.coef[2].a * pow(j, 2)) + (lane_coef_.coef[2].b * j) + lane_coef_.coef[2].c;
+    center_bottom =  (lane_coef_.coef[2].a * pow(i, 2)) + (lane_coef_.coef[2].b * i) + lane_coef_.coef[2].c;
+    lane_diff = abs(center_bottom - center_top); 
+  }
+
+  if(lane_diff <= 50 && lane_diff >= 0) {
+    if(((est_dist_ != 0) && (est_dist_ > distance_)) || (est_dist_ == 0)) {
+      static int tmp_cnt = 0;
+      tmp_cnt += 1;
+
+      if(tmp_cnt >= 150) {
+        tmp_cnt = 0;
+        if(cmd_fv2_lc_right_ || cmd_fv1_lc_right_ || cmd_lv_lc_right_) {
+          lc_right_flag_ = true;
+        }
+        else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
+          lc_left_flag_ = true;
+        }
+        else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
+        clear_release();
       }
-      else if(cmd_fv2_lc_left_ || cmd_fv1_lc_left_ || cmd_lv_lc_left_) {
-        lc_left_flag_ = true;
-      }
-      else RCLCPP_ERROR(this->get_logger(), "No LC CMD MSG\n");
-      clear_release();
+      else RCLCPP_INFO(this->get_logger(), "tmp_cnt: %d\n", tmp_cnt);
     }
-    else RCLCPP_INFO(this->get_logger(), "tmp_cnt: %d\n", tmp_cnt);
   }
 }
 
