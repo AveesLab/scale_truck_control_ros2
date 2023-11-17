@@ -10,7 +10,7 @@
     publishers/lane_to_xavier/topic: lane2xav_msg
     publishers/lane_to_xavier/queue_size: 1
 
-    image_view/enable_opencv: false
+    image_view/enable_opencv: true
     image_view/wait_key_delay: 1
     image_view/TEST: false
 
@@ -141,7 +141,7 @@
     Calibration/r_dist_coef/d: 0.
     Calibration/r_dist_coef/e: -4.0688891786494791e-02
 
-    ROI/rearRoi_ratio: 200.0 # 215.7
+    ROI/rearRoi_ratio: 213.0 # 215.7
 
     ROI/rear_cam/top_gap: 0.45
     ROI/rear_cam/bot_gap: 0.20
