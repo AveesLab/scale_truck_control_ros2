@@ -337,17 +337,17 @@ void ScaleTruckController::objectdetectInThread()
 
     distance_ = dist_tmp;
 
-    if(distance_ != 0){
-      if(index_ == 0){
-        distance_ = dist_tmp;
-      }
-      else if(index_ == 1){
-        distance_ = dist_tmp + 2.5f + 2.46f + dist_tmp;
-      }
-      else if(index_ == 2){
-        distance_ = dist_tmp + 2.5f + 1.23f;  
-      }
-    }    
+//    if(distance_ != 0){
+//      if(index_ == 0){
+//        distance_ = dist_tmp;
+//      }
+//      else if(index_ == 1){
+//        distance_ = dist_tmp + 2.5f + 2.46f + dist_tmp;
+//      }
+//      else if(index_ == 2){
+//        distance_ = dist_tmp + 2.5f + 1.23f;  
+//      }
+//    }    
 
 //    ObjCircles_ = Obstacle_.data.size();    
 //
@@ -560,7 +560,10 @@ void ScaleTruckController::isAreaSafe(int indexArea) {
           }
           else isFV1Detected();
         }
-        else RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
+        else { 
+          RCLCPP_ERROR(this->get_logger(), "fv2 every dist No msg\n");
+        }
+
       }
       else RCLCPP_ERROR(this->get_logger(), "NOTING bbox ready.\n");
     } 
@@ -910,15 +913,15 @@ void ScaleTruckController::RSS(double cycle_time) {
 
       if(index_ == 0) {
         lv_rss_dist_ = rss_min_dist_;
-        rss_min_dist_ = rss_min_dist_ + 5.29f + 2.5f; // 상대거리
+        //rss_min_dist_ = rss_min_dist_ + 5.29f + 2.5f; // 상대거리
       }
       else if(index_ == 1) {
         fv1_rss_dist_ = rss_min_dist_;
-        rss_min_dist_ = rss_min_dist_ + 3.26f + 2.5f;
+        //rss_min_dist_ = rss_min_dist_ + 3.26f + 2.5f;
       }
       else if(index_ == 2) {
         fv2_rss_dist_ = rss_min_dist_;
-        rss_min_dist_ = rss_min_dist_ + 1.23 + 2.5f;
+        //rss_min_dist_ = rss_min_dist_ + 1.23 + 2.5f;
       }
     }
     else {
@@ -954,15 +957,15 @@ void ScaleTruckController::RSS(double cycle_time) {
 
       if(index_ == 0) {
         lv_r_rss_dist_ = rrss_min_dist_;
-        rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 4.06f + 2.5f; // 상대거리 
+        //rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 4.06f + 2.5f; // 상대거리 
       }
       else if(index_ == 1) {
         fv1_r_rss_dist_ = rrss_min_dist_;
-        rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 2.03f + 2.5f;
+        //rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 2.03f + 2.5f;
       }
       else if(index_ == 2) {
         fv2_r_rss_dist_ = rrss_min_dist_;
-        rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 2.5f;
+        //rrss_min_dist_ = (-1.0f)*rrss_min_dist_ + 2.5f;
       }
     }
     else {
@@ -1106,11 +1109,11 @@ void ScaleTruckController::LaneSubCallback(const ros2_msg::msg::Lane2xav::Shared
     
     if(est_dist_ != 0 && isbboxReady_ == 2) est_dist_ = 0.0f;  
 
-    if(est_dist_ != 0){ 
-      if(index_ == 0) est_dist_ += 5.29f + 2.5f; 
-      else if(index_ == 1) est_dist_ += 3.26f + 2.5f; 
-      else if(index_ == 2) est_dist_ += 1.23f + 2.5f;
-    }
+//    if(est_dist_ != 0){ 
+//      if(index_ == 0) est_dist_ += 5.29f + 2.5f; 
+//      else if(index_ == 1) est_dist_ += 3.26f + 2.5f; 
+//      else if(index_ == 2) est_dist_ += 1.23f + 2.5f;
+//    }
 
 //    stamp_time_sec = msg->stamp_sec;
 //    stamp_time_usec = msg->stamp_usec;
@@ -1143,11 +1146,11 @@ void ScaleTruckController::RearSubCallback(const ros2_msg::msg::Lane2xav::Shared
     
     if(r_est_dist_ != 0 && r_isbboxReady_ == 2) r_est_dist_ = 0.0f;  
 
-    if(r_est_dist_ != 0){
-      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06f + 2.5f;
-      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03f + 2.5f;
-      else if(index_ == 2) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.5f;
-    }
+//    if(r_est_dist_ != 0){
+//      if(index_ == 0)  r_est_dist_ = (-1.0f) * r_est_dist_ + 4.06f + 2.5f;
+//      else if(index_ == 1) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.03f + 2.5f;
+//      else if(index_ == 2) r_est_dist_ = (-1.0f) * r_est_dist_ + 2.5f;
+//    }
   }
 }
 
