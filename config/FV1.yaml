@@ -52,12 +52,12 @@
     
     ROI/wide_right/width: 640
     ROI/wide_right/height: 480
-    ROI/wide_right/top_gap: 0.38 # 0.28
+    ROI/wide_right/top_gap: 0.37 # 0.28
     ROI/wide_right/bot_gap: 0.16 # 0.0
     ROI/wide_right/top_height: 0.99
     ROI/wide_right/bot_height: 0.485
-    ROI/wide_right/extra_f: 15.00 # 8
-    ROI/wide_right/extra_b: 15.00 # 8
+    ROI/wide_right/extra_f: 8.00 # 0
+    ROI/wide_right/extra_b: 8.00 # 0
     ROI/wide_right/extra_up: 180
     ROI/wide_right/extra_down: 220
 

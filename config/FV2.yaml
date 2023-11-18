@@ -53,7 +53,7 @@
     ROI/front_cam/extra_up: 140
     ROI/front_cam/extra_down: 180
 
-    ROI/wide_right/top_gap: 0.40 # 0.28
+    ROI/wide_right/top_gap: 0.38 # 0.28
     ROI/wide_right/bot_gap: 0.16 # 0.0
     ROI/wide_right/top_height: 0.99
     ROI/wide_right/bot_height: 0.47
