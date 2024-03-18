@@ -11,7 +11,7 @@ Implemented dual ROI version for normal and lane-changing modes
 - Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
 - Implemented controller button toggle upon completion of lane change.
 - Lane change of Scale truck platooning system for RSS 2024.
-- Developed from 'Cyclops: Open Platform for Scale Truck Platooning'
+- Developed from 'Cyclops: Open Platform for Scale Truck Platooning'.
 ```
 
 # I. Hardware
