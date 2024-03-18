@@ -1,79 +1,79 @@
 #pragma once
 
-//C++
+#include <stdio.h>
 #include <iostream>
 #include <pthread.h>
 #include <thread>
 #include <mutex>
-#include <chrono>
-#include <boost/thread/thread.hpp>
-#include <vector>
-#include <sys/time.h>
-#include <condition_variable>
-#include <functional>
-#include <memory>
+#include <ros/ros.h>
+#include <cmath>
 #include <fstream>
+#include <sys/time.h>
 #include <string>
 
-//ROS2
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include "std_msgs/msg/string.hpp"
-#include "sensor_msgs/msg/image.hpp"
+#include "zmq_class/zmq_class.h"
 
-//custom msgs
-#include "ros2_msg/msg/lrc2ocr.hpp"
-#include "ros2_msg/msg/ocr2lrc.hpp"
-#include "ros2_msg/msg/xav2lrc.hpp"
-#include "ros2_msg/msg/lrc2xav.hpp"
+#include <scale_truck_control/xav2lrc.h>
+#include <scale_truck_control/ocr2lrc.h>
+#include <scale_truck_control/lrc2xav.h>
+#include <scale_truck_control/lrc2ocr.h>
 
-using namespace std::chrono_literals;
+using namespace std;
 
 namespace LocalResiliencyCoordinator{
 
-class LocalRC : public rclcpp::Node
-{
-public:
-    LocalRC();
-
+class LocalRC{
+  public:
+    LocalRC(ros::NodeHandle nh);
     ~LocalRC();
 
-private:
-    void init();
-
-    //Subscriber
-    rclcpp::Subscription<ros2_msg::msg::Ocr2lrc>::SharedPtr OcrSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Xav2lrc>::SharedPtr XavSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LVSubscriber_;
-
-    //Publisher
-    rclcpp::Publisher<ros2_msg::msg::Lrc2ocr>::SharedPtr OcrPublisher_;
-    rclcpp::Publisher<ros2_msg::msg::Lrc2xav>::SharedPtr XavPublisher_;
-    rclcpp::TimerBase::SharedPtr OcrPublishTimer_;
-    rclcpp::Publisher<ros2_msg::msg::Lrc2xav>::SharedPtr FVPublisher_;
-
-    //Callback
-    void Lrc2ocrCallback(void);
-    void OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg);
-    void XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg);
-    void LVCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);
-
-    bool isNodeRunning();
-    void rosPub();
-    void recordData(struct timeval *startTime);
-    void printStatus();
     void communicate();
-    void radio();
+
+  private:
+    ZMQ_CLASS ZMQ_SOCKET_;
+
+    ros::NodeHandle nodeHandle_;
+    ros::Subscriber XavSubscriber_;  
+    ros::Subscriber OcrSubscriber_;  
+    ros::Publisher XavPublisher_;
+    ros::Publisher OcrPublisher_;
 
     int index_;
-    bool isNodeRunning_;
+    ZmqData* lrc_data_;
+    uint8_t lrc_mode_;
+    uint8_t crc_mode_;
+
+    void init();
+    bool isNodeRunning();
+    void XavCallback(const scale_truck_control::xav2lrc &msg);
+    void OcrCallback(const scale_truck_control::ocr2lrc &msg);
+    void rosPub();
+    void radio(ZmqData* zmq_data);
+    void dish();
+    void request(ZmqData* zmq_data);
+    void encoderCheck();
+    void updateMode(uint8_t crc_mode);
+    void updateData(ZmqData* zmq_data);
+    void recordData(struct timeval *startTime);
+    void printStatus();
+
+    bool is_node_running_;
     bool EnableConsoleOutput_;
     std::string log_path_;
     float a_, b_, l_;
     float epsilon_;
     float rotation_angle_ = 0.0f;
     float lateral_offset_ = 0.0f;
+    bool fi_encoder_ = false;
+    bool fi_camera_ = false;
+    bool fi_lidar_ = false;
+    bool alpha_ = false;
+    bool beta_ = false;
+    bool gamma_ = false;
+    bool send_rear_camera_image_ = false;
 
+    float rcm_vel_ = 0;
+    float rcm_dist_ = 0;
     float angle_degree_ = 0;
     float cur_dist_ = 0.8f;
     float tar_dist_ = 0.8f;
@@ -83,6 +83,7 @@ private:
     float est_vel_ = 0;
     float hat_vel_ = 0;
     float sat_vel_ = 0;
+    float preceding_truck_vel_ = 0;
     double time_ = 0;
     double req_time_ = 0;
 

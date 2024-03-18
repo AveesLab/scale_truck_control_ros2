@@ -1,16 +1,9 @@
-#include "scale_truck_control/ScaleTruckController.hpp"
+#include <scale_truck_control/ScaleTruckController.hpp>
 
-int main(int argc, char** argv){
-    rclcpp::init(argc, argv);
-    rclcpp::NodeOptions options;
-    options.allow_undeclared_parameters(true);
-    options.automatically_declare_parameters_from_overrides(true);
-
-    std::shared_ptr<rclcpp::Node> node = std::make_shared<scale_truck_control::ScaleTruckController>();
-    
-    rclcpp::spin(node);
-    
-    rclcpp::shutdown();
-
-    return 0;
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "scale_truck_control_node");
+  ros::NodeHandle nodeHandle("~");
+  scale_truck_control::ScaleTruckController STC(nodeHandle);  
+  ros::spin();
+  return 0;
 }

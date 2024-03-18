@@ -1,3 +1,4 @@
+etc/Controller/crc/build/*
 *.exe
 *.o
 *.swp

@@ -1,161 +1,119 @@
-/**/LaneDetector:
-  ros__parameters:
-    subscribers/image_to_lane/topic: usb_cam/image_raw
-    subscribers/image_to_lane/queue_size: 1
-    subscribers/rearImage_to_lane/topic: null 
-    subscribers/rearImage_to_lane/queue_size: 1
-    subscribers/xavier_to_lane/topic: xav2lane_msg
-    subscribers/xavier_to_lane/queue_size: 1
+tcp_ip:
+  ip_addr_server: "tcp://*"
+  ip_addr_client: "tcp://192.168.0.30"
+  interface_name: "wlan0"
+  req_port: "5555"
+  rep_port: "8888"
+  zipcode: "00001"
 
-    publishers/lane_to_xavier/topic: lane2xav_msg
-    publishers/lane_to_xavier/queue_size: 1
+tcpimg_ip:
+  ip_addr_server: "tcp://*"
+  ip_addr_client: "tcp://192.168.0.12"
+  req_port: ""
+  rep_port: "50000"
 
-    image_view/enable_opencv: false
-    image_view/wait_key_delay: 1
-    image_view/TEST: false
+udp_ip:
+  ip_addr: "udp://239.255.255.251"
+  port: "9091"
+  send_group: "FV"
+  recv_group: "LV"
 
-    threshold/box_size: 71   # 51 71 
-    threshold/box_offset: 40 # 50 40
+socket:
+  rad_flag: false
+  dsh_flag: false
+  req_flag: false
+  rep_flag: true
+  req_img_flag: false
+  rep_img_flag: true
 
-    params/angle_degree: 0.0
-    params/Kp_d: 2.0
-    params/Ki_d: 0.2
+params:
+  index: 1
+  target_vel: 0.00
+  safety_vel: 0.45
+  fv_max_vel: 1.20
+  lv_stop_dist: 0.5
+  fv_stop_dist: 0.4
+  safety_dist: 0.8
+  target_dist: 0.8
+  angle_degree: 0.0
+  Kp_d: 2.0
+  Kd_d: 0.4
+  K: 0.15
+  a:
+    a: 0.
+    b: -0.22027
+    c: 0.847
+    d: -1.1516
+    e: 0.60261
+  b:
+    a: 0.
+    b: -1.3982
+    c: 4.1189
+    d: -4.0208
+    e: 1.41
+  K3: 0.20 # 0.25 
+  K4: 0.30 # 0.51
+  Lw: 0.34
+  LdOffset: 0 # -0.37 35 ~ 38-0.5
+  LdOffset2: -0.5 # -0.5
+  
+Calibration:
+  f_matrix:
+    a: 325.45672218217680
+    b: 0.
+    c: 320. 
+    d: 0. 
+    e: 325.45672218217680
+    f: 240. 
+    g: 0. 
+    h: 0. 
+    i: 1.
+  f_dist_coef:
+    a: -0.35139098089507653
+    b: 0.15748570446604712
+    c: 0.
+    d: 0. 
+    e: -0.037408338000060472
+  r_matrix:
+    a: 326.31389227574556
+    b: 0.
+    c: 320. 
+    d: 0. 
+    e: 326.31389227574556
+    f: 240. 
+    g: 0. 
+    h: 0. 
+    i: 1.
+  r_dist_coef:
+    a: -0.33295846454356126
+    b: 0.12386827336557986
+    c: 0.
+    d: 0. 
+    e: -0.022565312043601477
 
-    Calibration/f_matrix/a: 325.45672218217680
-    Calibration/f_matrix/b: 0.
-    Calibration/f_matrix/c: 320.
-    Calibration/f_matrix/d: 0.
-    Calibration/f_matrix/e: 325.45672218217680
-    Calibration/f_matrix/f: 240. 
-    Calibration/f_matrix/g: 0.
-    Calibration/f_matrix/h: 0.
-    Calibration/f_matrix/i: 1.
+ROI:
+  front_cam:
+    width: 640
+    height: 480
+    top_gap: 0.413
+    bot_gap: 0.185
+    top_height: 0.99
+    bot_height: 0.485
+    extra_f: 8.00
+    extra_b: 8.00
+    extra_up: 140
+    extra_down: 180
+  rear_cam:
+    width: 640
+    height: 480
+    top_gap: 0.405
+    bot_gap: 0.17
+    top_height: 0.99
+    bot_height: 0.47
+    extra_f: 1
+    extra_b: 10
+    extra_up: 140
+    extra_down: 180
 
-    Calibration/f_dist_coef/a: -0.35139098089507653
-    Calibration/f_dist_coef/b: 0.15748570446604712
-    Calibration/f_dist_coef/c: 0.
-    Calibration/f_dist_coef/d: 0.
-    Calibration/f_dist_coef/e: -0.037408338000060472
-
-    ROI/dynamic_roi: true
-    ROI/width: 640
-    ROI/height: 480
-
-    ROI/front_cam/top_gap: 0.41 
-    ROI/front_cam/bot_gap: 0.17 
-    ROI/front_cam/top_height: 0.99
-    ROI/front_cam/bot_height: 0.47
-    ROI/front_cam/extra_f: 12.00
-    ROI/front_cam/extra_b: 18.00
-    ROI/front_cam/extra_up: 140
-    ROI/front_cam/extra_down: 180
-    
-    ROI/wide_right/width: 640
-    ROI/wide_right/height: 480
-    ROI/wide_right/top_gap: 0.37 # 0.28
-    ROI/wide_right/bot_gap: 0.16 # 0.0
-    ROI/wide_right/top_height: 0.99
-    ROI/wide_right/bot_height: 0.485
-    ROI/wide_right/extra_f: 8.00 # 0
-    ROI/wide_right/extra_b: 8.00 # 0
-    ROI/wide_right/extra_up: 180
-    ROI/wide_right/extra_down: 220
-
-    ROI/wide_left/width: 640
-    ROI/wide_left/height: 480
-    ROI/wide_left/top_gap: 0.40 # 0.28
-    ROI/wide_left/bot_gap: 0.16 # 0.0
-    ROI/wide_left/top_height: 0.99
-    ROI/wide_left/bot_height: 0.485
-    ROI/wide_left/extra_f: 8.00 # 0
-    ROI/wide_left/extra_b: 8.00 # 0
-    ROI/wide_left/extra_up: 180
-    ROI/wide_left/extra_down: 220
-
-    ROI/frontRoi_ratio: 204.0
-
-    ROI/test/top_gap: 0.454
-    ROI/test/bot_gap: 0.16
-    ROI/test/top_height: 0.99
-    ROI/test/bot_height: 0.3812 # 0.34
-    ROI/test/extra_f: 13.0
-    ROI/test/extra_b: 17.0
-    ROI/test/extra_up: 180
-    ROI/test/extra_down: 220
-
-    params/K: 0.15   #vel  0.6,  0.8,  1.0
-    params/K3: 0.15  # el  0.15  0.1  0.045
-    params/K4: 0.185  # eL  0.185 0.165 0.13  
-
-    params/a/a: 0.
-    params/a/b: -0.22027
-    params/a/c: 0.847
-    params/a/d: -1.1516
-    params/a/e: 0.60261
-
-    params/b/a: 0.
-    params/b/b: -1.3982
-    params/b/c: 4.1189
-    params/b/d: -4.0208
-    params/b/e: 1.41
-
-    params/a2/a: -0.0625
-    params/a2/a: -0.1625
-    params/a2/c: 0.27
-
-    params/b2/a: -0.1875
-    params/b2/b: 0.1625
-    params/b2/c: 0.155
-
-    LaneDetector/eL_height: 0.2
-    LaneDetector/e1_height: 1.2563 
-    LaneDetector/trust_height: 0.6667
-    LaneDetector/lp: 609.3 
-    LaneDetector/steer_angle: 0.0
-
-/**/RearLaneDetector:
-  ros__parameters:
-    subscribers/image_to_lane/topic: null 
-    subscribers/image_to_lane/queue_size: 1
-    subscribers/rearImage_to_lane/topic: rear_cam/image_raw
-    subscribers/rearImage_to_lane/queue_size: 1
-
-    publishers/lane_to_xavier/topic: rear2xav_msg
-    publishers/lane_to_xavier/queue_size: 1
-
-    image_view/enable_opencv: false
-    image_view/wait_key_delay: 1
-
-    threshold/box_size: 71   # 51 71 
-    threshold/box_offset: 40 # 50 40
-
-    Calibration/r_matrix/a: 3.2594106815630045e+02
-    Calibration/r_matrix/b: 0.
-    Calibration/r_matrix/c: 320.
-    Calibration/r_matrix/d: 0.
-    Calibration/r_matrix/e: 3.2594106815630045e+02
-    Calibration/r_matrix/f: 240. 
-    Calibration/r_matrix/g: 0.
-    Calibration/r_matrix/h: 0.
-    Calibration/r_matrix/i: 1.
-
-    Calibration/r_dist_coef/a: -3.5237998609606364e-01
-    Calibration/r_dist_coef/b: 1.5852034332472692e-01
-    Calibration/r_dist_coef/c: 0.
-    Calibration/r_dist_coef/d: 0.
-    Calibration/r_dist_coef/e: -3.9136397985952330e-02
-
-    ROI/dynamic_roi: true
-    ROI/width: 640
-    ROI/height: 480
-
-    ROI/rearRoi_ratio: 210.0 #208
-
-    ROI/rear_cam/top_gap: 0.455
-    ROI/rear_cam/bot_gap: 0.21
-    ROI/rear_cam/top_height: 0.99
-    ROI/rear_cam/bot_height: 0.39
-    ROI/rear_cam/extra_f: -15.0
-    ROI/rear_cam/extra_b: -5.0
-    ROI/rear_cam/extra_up: 180
-    ROI/rear_cam/extra_down: 220
+rear_camera_usage:
+  use: false

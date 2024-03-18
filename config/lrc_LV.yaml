@@ -1,0 +1,43 @@
+tcp_ip:
+  ip_addr_server: "tcp://*"
+  ip_addr_client: "tcp://192.168.0.30"
+  interface_name: "wlan0"
+  req_port: "4444"
+  rep_port: "7777"
+
+udp_ip:
+  ip_addr: "udp://239.255.255.250"
+  port: "9090"
+  send_group: "FV"
+  recv_group: ""
+
+socket:
+  rad_flag: true
+  dsh_flag: false
+  req_flag: true 
+  rep_flag: false
+  req_img_flag: false
+  rep_img_flag: false
+
+LrcSubPub:
+  xavier_to_lrc:
+    topic: /xav2lrc_msg
+    queue_size: 1
+  ocr_to_lrc:
+    topic: /ocr2lrc_msg
+    queue_size: 1
+  lrc_to_xavier:
+    topic: /lrc2xav_msg
+    queue_size: 1
+  lrc_to_ocr:
+    topic: /lrc2ocr_msg
+    queue_size: 1
+
+LrcParams:
+  lrc_index: 10
+  lrc_log_path: /home/jetson/catkin_ws/logfiles/
+  epsilon: 3.0
+  lu_ob_A: 0.6817
+  lu_ob_B: 0.3183
+  lu_ob_L: 0.1183
+  enable_console_output: false 

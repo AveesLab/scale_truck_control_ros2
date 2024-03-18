@@ -1,9 +1,9 @@
 #include "lrc/lrc.hpp"
 
-int main(int argc, char* argv[]){
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<LocalResiliencyCoordinator::LocalRC>());
-    rclcpp::shutdown();
-    return 0;
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "lrc_node");
+  ros::NodeHandle nodeHandle("~");
+  LocalResiliencyCoordinator::LocalRC LocalRC(nodeHandle);  
+  ros::spin();
+  return 0;
 }
-

@@ -1,3 +1,11 @@
+/*
+ * ScaleTruckController.h
+ *
+ *  Created on: June 2, 2020
+ *      Author: Hyeongyu Lee
+ *   Institute: KMU, Avees Lab
+ */
+
 #pragma once
 
 //C++
@@ -9,269 +17,195 @@
 #include <boost/thread/thread.hpp>
 #include <vector>
 #include <sys/time.h>
-#include <condition_variable>
-#include <functional>
-#include <memory>
-#include <fstream>
 #include <string>
+#include <condition_variable>
 
-//ROS2
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include "std_msgs/msg/string.hpp"
-#include "sensor_msgs/msg/image.hpp"
-#include "std_msgs/msg/float32_multi_array.hpp"
-#include "std_msgs/msg/float32.hpp"
+//ROS
+#include <geometry_msgs/Twist.h>
+#include <ros/ros.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/UInt32.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <obstacle_detector/Obstacles.h>
+#include <image_transport/image_transport.h>
+
+//OpenCV
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgcodecs.hpp>
+
+#include "lane_detect/lane_detect.hpp"
+#include "zmq_class/zmq_class.h"
+
+#include <pcl_ros/point_cloud.h>
+#include <sensor_msgs/PointCloud.h>
 
 //custom msgs
-#include "ros2_msg/msg/xav2lrc.hpp"
-#include "ros2_msg/msg/xav2lane.hpp"
-#include "ros2_msg/msg/xav2cmd.hpp"
-#include "ros2_msg/msg/lrc2ocr.hpp"
-#include "ros2_msg/msg/lrc2xav.hpp"
-#include "ros2_msg/msg/ocr2lrc.hpp"
-#include "ros2_msg/msg/lane2xav.hpp"
-#include "ros2_msg/msg/cmd2xav.hpp"
-#include "ros2_msg/msg/lane.hpp"
-#include "ros2_msg/msg/boundingbox.hpp"
-#include "ros2_msg/msg/yoloflag.hpp"
-#include "ros2_msg/msg/obj2xav.hpp"
+#include <scale_truck_control/lrc2xav.h>
+#include <scale_truck_control/xav2lrc.h>
+#include <scale_truck_control/yolo_flag.h>
+#include <yolo_object_detection/bounding_box.h>
 
-using namespace std;
-using namespace std::chrono_literals;
+namespace scale_truck_control {
 
-namespace scale_truck_control 
-{
+class ScaleTruckController {
+  public:
+    explicit ScaleTruckController(ros::NodeHandle nh);
 
-class ScaleTruckController : public rclcpp::Node 
-{
-public:
-    ScaleTruckController();
-    
     ~ScaleTruckController();
 
-private:
+  private:
     bool readParameters();
 
     void init();
- 
-    //Publisher 
-    rclcpp::Publisher<ros2_msg::msg::Xav2lrc>::SharedPtr LrcPublisher_;
-    rclcpp::Publisher<ros2_msg::msg::Xav2cmd>::SharedPtr CmdPublisher_;
-    rclcpp::Publisher<ros2_msg::msg::Xav2lane>::SharedPtr LanePublisher_;
-    rclcpp::Publisher<ros2_msg::msg::Yoloflag>::SharedPtr runYoloPublisher_;
 
-    //Subscriber 
-    rclcpp::Subscription<ros2_msg::msg::Lrc2xav>::SharedPtr LrcSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Cmd2xav>::SharedPtr CmdSubscriber_;
-//    rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr objectSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr LaneSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Lane2xav>::SharedPtr RearSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr YoloSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Boundingbox>::SharedPtr RearYoloSubscriber_;
-    rclcpp::Subscription<ros2_msg::msg::Obj2xav>::SharedPtr DistSubscriber_;
-
-    //Callback Func
-    void Lrc2ocrCallback(void);
-    void LrcSubCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg);  
-    void CmdSubCallback(const ros2_msg::msg::Cmd2xav::SharedPtr msg);  
-    void objectCallback(const std_msgs::msg::Float32MultiArray &msg);
-    void LaneSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
-    void RearSubCallback(const ros2_msg::msg::Lane2xav::SharedPtr msg);
-    void YoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
-    void RearYoloSubCallback(const ros2_msg::msg::Boundingbox::SharedPtr msg);
-    void DistCallback(const ros2_msg::msg::Obj2xav::SharedPtr msg); 
-
+    void imageCallback(const sensor_msgs::ImageConstPtr &msg);
+    void rearImageCallback(const sensor_msgs::ImageConstPtr &msg);
+    void objectCallback(const obstacle_detector::Obstacles &msg);
+    void XavSubCallback(const scale_truck_control::lrc2xav &msg);
+    void ScanErrorCallback(const std_msgs::UInt32::ConstPtr &msg);
+    void bboxCallback(const yolo_object_detection::bounding_box &msg);
+    void recordData(struct timeval startTime);
+    void imageCompress(cv::Mat camImage, std::vector<uchar> *compImage);
+    void reply(ZmqData* zmq_data);
+    void requestImage(ImgData* img_data);
+    void replyImage(); 
+    void displayConsole();
     void spin();
     bool getImageStatus(void);
-    void displayConsole();
-    void recordData(struct timeval startTime);
-    void reply(ros2_msg::msg::Xav2cmd* cmd);
-    void isLaneChangeCommandReceived();
-    void isFV2Detected();
-    void isFV1Detected();
-    void isLVDetected();
-    void isAreaSafe(int indexArea);
-    void adjustTargetVelocity();
-    void setLaneChangeFlags(bool no_object = false);
-    float lowPassFilter(double sampling_time, float est_value, float prev_res);
-    float lowPassFilter2(double sampling_time, float est_value, float prev_res);
 
+    void clusterCallback(const sensor_msgs::PointCloud &msg);
+    ros::Subscriber clusterSubscriber_;
+    sensor_msgs::PointCloud preceding_truck_point_;
+    float pc_distance_ = 0.0f;
 
-    // xav->cmd
-    ros2_msg::msg::Xav2cmd* cmd_data_;
+    ros::NodeHandle nodeHandle_;
+    ros::Subscriber imageSubscriber_;
+    ros::Subscriber rearImageSubscriber_;
+    ros::Subscriber objectSubscriber_;
+    ros::Subscriber XavSubscriber_;
+    ros::Subscriber ScanSubError;	
+    ros::Subscriber bboxSubscriber_;	
+    ros::Publisher XavPublisher_;
+    ros::Publisher runYoloPublisher_;
 
-    //.cpp config
+    image_transport::ImageTransport imageTransport_;
+    image_transport::Publisher imgPublisher_;
+
     double CycleTime_ = 0.0;
     int index_;
-    float CurVel_ = 0.0f;
-    float RefVel_ = 0.0f;
-    bool isNodeRunning_ = true;
-    bool controlDone_ = false;
-    bool droi_ready_ = false;
-    std::string log_path_;
-    struct timeval init_;
-
-    //LaneChange  
-    float laneChange();
-    void checkState();
-    bool lc_right_flag_ = false;
-    bool lc_left_flag_ = false;
-    bool cmd_lv_lc_right_ = false;
-    bool cmd_lv_lc_left_ = false;
-    bool cmd_fv1_lc_right_ = false;
-    bool cmd_fv1_lc_left_ = false;
-    bool cmd_fv2_lc_right_ = false;
-    bool cmd_fv2_lc_left_ = false;
-    int lane_diff_cnt_ = 150;
-    int lane_diff_ = 0;
-    bool lc_center_follow_ = true;
-    double origin_lateral_err = 0;
-    double lateral_err = 0;
-    bool tmp_record_ = false; // 차선 변경 후 일부 데이터만 기록하기 위함. 
-    bool tmp_record2_ = false; // 차선 변경 후 일부 데이터만 기록하기 위함. 
-
-    // FOR ICRA
-    float ICRA_dist = 10.1;
-    bool  wroi_flag_ = false;
-    float cur_vel = 0.0;
-
-    //RSS
-    void RSS(double cycle_time);
-    void clear_release();
-    float a_max_accel = 0.0f;
-    float a_min_brake = 0.0f; 
-    float a_max_brake = 0.0f;
-    float p_ = 0.0f;
-    float rss_min_dist_= 0.0f;
-    float rrss_min_dist_= 0.0f;
-    float SV_Vel_= 0.0f;
-//    float Truck_Vel_= 0.0f;
-    
-
-
-    float est_vel_ = 0.0f;
-    float r_est_vel_ = 0.0f;
-
-    float lv_est_vel_ = 0.0f;
-    float fv1_est_vel_ = 0.0f;
-    float fv2_est_vel_ = 0.0f;
-
-    float lv_r_est_vel_ = 0.0f;
-    float fv1_r_est_vel_ = 0.0f;
-    float fv2_r_est_vel_ = 0.0f;
-
-    float est_dist_ = 0.0f; 
-    float r_est_dist_ = 0.0f;
-
-    float lv_cur_dist_ = 0.0f;
-    float fv1_cur_dist_ = 0.0f;
-    float fv2_cur_dist_ = 0.0f;
-
-    float lv_est_dist_ = 0.0f;
-    float fv1_est_dist_ = 0.0f;
-    float fv2_est_dist_ = 0.0f;
-
-    float lv_rss_dist_ = 0.0f;
-    float fv1_rss_dist_ = 0.0f;
-    float fv2_rss_dist_ = 0.0f;
-
-    float lv_r_est_dist_ = 0.0f;
-    float fv1_r_est_dist_ = 0.0f;
-    float fv2_r_est_dist_ = 0.0f;
-
-    float lv_r_rss_dist_ = 0.0f;
-    float fv1_r_rss_dist_ = 0.0f;
-    float fv2_r_rss_dist_ = 0.0f;
-
-    bool req_flag_ = false;
-    bool sv_flag_ = false;
-    bool r_sv_flag_ = false;
-    bool lv_sv_flag_ = false;
-
-
-    //bbox
-    std::string name_;
-    std::string r_name_;
-    uint32_t x_ = 0;
-    uint32_t y_ = 0;
-    uint32_t w_ = 0;
-    uint32_t h_ = 0;
-    uint32_t rx_ = 0;
-    uint32_t ry_ = 0;
-    uint32_t rw_ = 0;
-    uint32_t rh_ = 0;
-
-    int isbboxReady_ = 3;   //isbboxObject? 1:Yes,  2:No, 3:No_Msg 
-    int r_isbboxReady_ = 3;
-
-    int lv_bbox_ready_ = 3;
-    int fv1_bbox_ready_ = 3;
-    int fv2_bbox_ready_ = 3;
-
-    int lv_r_bbox_ready_ = 3;
-    int fv1_r_bbox_ready_ = 3;
-    int fv2_r_bbox_ready_ = 3;
-
-    bool f_run_yolo_flag_ = false;
-    bool r_run_yolo_flag_ = false;
+    float RCMVel_;
+    float RCMDist_;
+    bool fi_encoder_ = false;
+    bool alpha_ = false;
+    bool send_rear_camera_image_ = false;
+    uint8_t lrc_mode_ = 0;
+    uint8_t crc_mode_ = 0;
 
     //image
+    LaneDetect::LaneDetector laneDetector_;
+    bool viewImage_;
+    bool rear_camera_;
+    int waitKeyDelay_;
     bool enableConsoleOutput_;
-    bool imageStatus_ = false;
-    ros2_msg::msg::Lane2xav lane_coef_, r_lane_coef_;
-    ros2_msg::msg::Lane2xav prev_lane_coef_;
+    int sync_flag_;
+    bool fi_camera_ = false;
+    bool beta_ = false;
 
-    float AngleDegree_ = 0.0f; 
-    float AngleDegree = 0.0f; 
-    float AngleDegree2 = 0.0f; 
-    float ppAngle_ = 0.0f; 
-    int center_select_ = 0; 
-    int r_center_select_ = 0; 
-    float TargetVel_ = 0.0f; 
+    float AngleDegree_; // -1 ~ 1  - Twist msg angular.z
+    float TargetVel_ = 0.0f; // -1 ~ 1  - Twist msg linear.x
     float SafetyVel_;
     float ResultVel_;
     float FVmaxVel_;
-    vector<float> e_values_;
-    float K1_ = 0.0f, K2_ = 0.0f;
 
     //object
     int ObjSegments_;
     int ObjCircles_;
     float distance_ = 0.8f;
     float distAngle_ = 0.0f;
+    float ampersand_ = 0.0f;
+    float ampersand2_ = 0.0f;
     float LVstopDist_;
     float FVstopDist_;
     float TargetDist_;
     float SafetyDist_;
-    std_msgs::msg::Float32MultiArray Obstacle_;
-    float mindist_ = 10.1f;
+    uint32_t LdrErrMsg_;
+    bool fi_lidar_ = false;
+    bool gamma_ = false;
+    float log_est_dist_ = 0.0f;
+    float AngleDegree2_ = 0.0f;
+    float actAngleDegree_ = 0.0f;
+    float Lw_ = 0.34f;
+    float Ld_offset_ = 0.0f;
+    float Ld_offset2_ = 0.0f;
+    float actDist_ = 0.8f;
+    float estimatedDist_;
+    float ppAngle_ = 0.0f;
+    float x_coord_ = 0.0f;
+    float y_coord_ = 0.0f;
 
-    void lanedetectInThread();
-    void objectdetectInThread();
+    //bbox
+    std::string name_;
+    uint32_t x_ = 0;
+    uint32_t y_ = 0;
+    uint32_t w_ = 0;
+    uint32_t h_ = 0;
     
+    //ZMQ
+    ZMQ_CLASS ZMQ_SOCKET_;
+    ZmqData* zmq_data_;
+    ImgData* img_data_;
+    ImgData* backup_data_;
+
     //Thread
     std::thread controlThread_;
     std::thread laneDetectThread_;
     std::thread objectDetectThread_;
     std::thread tcpThread_;
-    
-    //mutex
+    std::thread tcpImgReqThread_;
+    std::thread tcpImgRepThread_;
+
     std::mutex image_mutex_;
+    std::mutex rear_image_mutex_;
     std::mutex object_mutex_;
-    std::mutex lane_mutex_; 
-    std::mutex rlane_mutex_;
+    std::mutex lane_mutex_;
     std::mutex vel_mutex_;
     std::mutex dist_mutex_;
     std::mutex rep_mutex_;
+    std::mutex mode_mutex_;
     std::mutex bbox_mutex_;
-    std::mutex rbbox_mutex_;
-    std::mutex rss_mutex_;
 
-    std::condition_variable cv_; // cv_.wait() 용도-> ROI거리 파악 후 Lane 그리기
+    std::condition_variable cv_;
 
+    obstacle_detector::Obstacles Obstacle_;
+    boost::shared_mutex mutexObjectCallback_;
 
-}; /*end of class*/
+    bool imageStatus_ = false;
+    std_msgs::Header imageHeader_;
+    cv::Mat camImageCopy_, camImageTmp_;
+    cv::Mat rearImageCopy_, rearImageTmp_, rearImageJPEG_, rearImageBackup_;
+    bool droi_ready_ = false;
+
+    bool isNodeRunning_ = true;
+    bool controlDone_ = false;
+
+    float CurVel_ = 0.0f;
+    float RefVel_ = 0.0f;
+     
+    void* lanedetectInThread();
+    void* objectdetectInThread();
+
+    bool req_lv_ = false;
+    bool run_yolo_ = false;
+    bool tcp_img_req_ = false;
+    bool tcp_img_rep_ = false;
+    int req_check_ = 0;
+    int rep_check_ = 0;
+    double time_ = 0.0;
+    double DelayTime_ = 0.0;
+    std::vector<uchar> compImageSend_;
+    std::vector<uchar> compImageRecv_;
+    std::vector<uchar> compImageBackup_;
+};
 
 } /* namespace scale_truck_control */
-
