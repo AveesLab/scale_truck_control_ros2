@@ -1,4 +1,5 @@
-# Scale Truck Control
+# scale_truck_control_ros1
+ROS1 based scale_truck_control system
 
 [![Video Label](http://img.youtube.com/vi/wKmWD8BPldw/0.jpg)](https://youtu.be/wKmWD8BPldw?t=0s)
 
