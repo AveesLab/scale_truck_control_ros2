@@ -1,16 +1,17 @@
 # scale_truck_control_ros2
 ROS2 based scale_truck_control system
-Lane change of Scale truck platooning system for RSS 2024
 ![image](https://github.com/AveesLab/scale_truck_control_ros2/assets/117966644/526e20f6-ff5d-49fc-a815-7d3c8befac7a)
 
 # Develop History
-**2023.05.24**
+**2024.02.03**
 ```
 Implemented dual ROI version for normal and lane-changing modes
 
 - Added distinction between normal mode and lane change mode using two versions of ROI.
 - Established lane change process: CMD -> FV2 lane change command -> FV2 lane change complete -> CMD -> FV1 lane change command -> FV1 lane change complete -> CMD -> LV lane change command -> LV lane change complete -> CMD.
 - Implemented controller button toggle upon completion of lane change.
+- Lane change of Scale truck platooning system for RSS 2024.
+- Developed from 'Cyclops: Open Platform for Scale Truck Platooning'
 ```
 
 # I. Hardware
