@@ -1,143 +1,307 @@
 #include "lrc/lrc.hpp"
 
-using namespace std::chrono_literals;
+#define PATH "/home/avees/catkin_ws/logfiles/"
+
+using namespace std;
 
 namespace LocalResiliencyCoordinator{
 
-LocalRC::LocalRC(void) 
-  : Node("LRC", rclcpp::NodeOptions()
-                      .allow_undeclared_parameters(true)
-          .automatically_declare_parameters_from_overrides(true))
-{
-  init();
-
+LocalRC::LocalRC(ros::NodeHandle nh)
+  : nodeHandle_(nh), ZMQ_SOCKET_(nh){
+  
+  init();  
 }
 
 LocalRC::~LocalRC(){
-  isNodeRunning_ = false; 
+  is_node_running_ = false; 
   udpThread_.join();
+
+  delete lrc_data_;
 }
 
 void LocalRC::init(){
-
-  isNodeRunning_ = true;
+  is_node_running_ = true;
 
   std::string XavSubTopicName;
   int XavSubQueueSize;
   std::string OcrSubTopicName;
   int OcrSubQueueSize;
-  std::string LVSubTopicName;
-  int LVSubQueueSize;
   std::string XavPubTopicName;
   int XavPubQueueSize;
   std::string OcrPubTopicName;
   int OcrPubQueueSize;
-  std::string FVPubTopicName;
-  int FVPubQueueSize;
 
-  this->get_parameter_or("LrcParams/lrc_index", index_, 10);
-  this->get_parameter_or("LrcParams/lrc_log_path", log_path_, std::string("/home/jetson/catkin_ws/logfiles/"));
-  this->get_parameter_or("LrcParams/enable_console_output", EnableConsoleOutput_, true);
+  nodeHandle_.param("LrcParams/lrc_index", index_, 10);
+  nodeHandle_.param("LrcParams/lrc_log_path", log_path_, std::string("/home/jetson/catkin_ws/logfiles/"));
+  nodeHandle_.param("LrcParams/epsilon", epsilon_, 1.0f);
+  nodeHandle_.param("LrcParams/lu_ob_A", a_, 0.6817f);
+  nodeHandle_.param("LrcParams/lu_ob_B", b_, 0.3183f);
+  nodeHandle_.param("LrcParams/lu_ob_L", l_, 0.2817f);
+  nodeHandle_.param("LrcParams/rcm_vel", rcm_vel_, 0.6f);
+  nodeHandle_.param("LrcParams/rcm_dist", rcm_dist_, 0.8f);
+  nodeHandle_.param("LrcParams/enable_console_output", EnableConsoleOutput_, true);
+
   /******************************/
   /* ROS Topic Subscribe Option */
   /******************************/
-  this->get_parameter_or("LrcSub/xavier_to_lrc/topic", XavSubTopicName, std::string("xav2lrc_msg"));
-  this->get_parameter_or("LrcSub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
-  this->get_parameter_or("LrcSub/ocr_to_lrc/topic", OcrSubTopicName, std::string("ocr2lrc_msg"));
-  this->get_parameter_or("LrcSub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
-  this->get_parameter_or("LrcSub/lv_to_fv/topic", LVSubTopicName, std::string("/lv2fv_msg"));
-  this->get_parameter_or("LrcSub/lv_to_fv/queue_size", LVSubQueueSize, 1);
+  nodeHandle_.param("LrcSubPub/xavier_to_lrc/topic", XavSubTopicName, std::string("/xav2lrc_msg"));
+  nodeHandle_.param("LrcSubPub/xavier_to_lrc/queue_size", XavSubQueueSize, 1);
+  nodeHandle_.param("LrcSubPub/ocr_to_lrc/topic", OcrSubTopicName, std::string("/ocr2lrc_msg"));
+  nodeHandle_.param("LrcSubPub/ocr_to_lrc/queue_size", OcrSubQueueSize, 1);
 
   /******************************/
   /* ROS Topic Publish Option */
   /******************************/
-  this->get_parameter_or("LrcPub/lrc_to_xavier/topic", XavPubTopicName, std::string("lrc2xav_msg"));
-  this->get_parameter_or("LrcPub/lrc_to_xavier/queue_size", XavPubQueueSize, 1);
-  this->get_parameter_or("LrcPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("lrc2ocr_msg"));
-  this->get_parameter_or("LrcPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
-  this->get_parameter_or("LrcPub/lv_to_fv/topic", FVPubTopicName, std::string("/lv2fv_msg"));
-  this->get_parameter_or("LrcPub/lv_to_fv/queue_size", FVPubQueueSize, 1);
+  nodeHandle_.param("LrcSubPub/lrc_to_xavier/topic", XavPubTopicName, std::string("/lrc2xav_msg"));
+  nodeHandle_.param("LrcSubPub/lrc_to_xavier/queue_size", XavSubQueueSize, 1);
+  nodeHandle_.param("LrcSubPub/lrc_to_ocr/topic", OcrPubTopicName, std::string("/lrc2ocr_msg"));
+  nodeHandle_.param("LrcSubPub/lrc_to_ocr/queue_size", OcrPubQueueSize, 1);
 
   /************************/
-  /* ROS Topic Subscriber */
+  /* ROS Topic Subscriber */ 
   /************************/
-  OcrSubscriber_ = this->create_subscription<ros2_msg::msg::Ocr2lrc>(OcrSubTopicName, OcrSubQueueSize, std::bind(&LocalRC::OcrCallback, this, std::placeholders::_1));
-
-  XavSubscriber_ = this->create_subscription<ros2_msg::msg::Xav2lrc>(XavSubTopicName, XavSubQueueSize, std::bind(&LocalRC::XavCallback, this, std::placeholders::_1));
-
-  if (index_ == 11 || index_ == 12){
-    LVSubscriber_ = this->create_subscription<ros2_msg::msg::Lrc2xav>(LVSubTopicName, LVSubQueueSize, std::bind(&LocalRC::LVCallback, this, std::placeholders::_1));
-  }
+  XavSubscriber_ = nodeHandle_.subscribe(XavSubTopicName, XavSubQueueSize, &LocalRC::XavCallback, this);
+  OcrSubscriber_ = nodeHandle_.subscribe(OcrSubTopicName, OcrSubQueueSize, &LocalRC::OcrCallback, this);
 
   /************************/
-  /* ROS Topic Publisher */
+  /* ROS Topic Publisher */ 
   /************************/
-  XavPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2xav>(XavPubTopicName, XavPubQueueSize);  
-  OcrPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
-  if (index_ == 10) {
-    FVPublisher_ = this->create_publisher<ros2_msg::msg::Lrc2xav>(FVPubTopicName, FVPubQueueSize);
-  }
+  XavPublisher_ = nodeHandle_.advertise<scale_truck_control::lrc2xav>(XavPubTopicName, XavPubQueueSize);
+  OcrPublisher_ = nodeHandle_.advertise<scale_truck_control::lrc2ocr>(OcrPubTopicName, OcrPubQueueSize);
 
-  /*********************/
-  /* spin & udp thread */
-  /*********************/
+  lrc_mode_ = 0;
+  crc_mode_ = 0;
+  lrc_data_ = new ZmqData;
+  lrc_data_->src_index = index_;
+  lrc_data_->tar_index = 30;  //CRC
+
   lrcThread_ = std::thread(&LocalRC::communicate, this);
+  tcpThread_ = std::thread(&LocalRC::request, this, lrc_data_);
   if (index_ == 10){
-    udpThread_ = std::thread(&LocalRC::radio, this);
+    udpThread_ = std::thread(&LocalRC::radio, this, lrc_data_);
   }
-
+  else if (index_ == 11 || index_ == 12){
+    udpThread_ = std::thread(&LocalRC::dish, this);
+  }
 }
 
 bool LocalRC::isNodeRunning(){
-  return isNodeRunning_;
+  return is_node_running_;
 }
 
-/****************/
-/* FVs Publish  */
-/****************/
-void LocalRC::radio()
-{
-  ros2_msg::msg::Lrc2xav lv_data_;
-  while(isNodeRunning()){
-    {
-      std::scoped_lock lock(data_mutex_);
-      lv_data_.tar_vel = tar_vel_;
-      lv_data_.tar_dist = tar_dist_;
-    }
 
-    FVPublisher_->publish(lv_data_); 
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+void LocalRC::XavCallback(const scale_truck_control::xav2lrc &msg){
+/* time delay check */
+//  static struct timeval start_time, end_time;
+//  static bool flag = false;
+//  static double diff_time = 0.0;
+//  double avg_time = 0.0;
+//  static int cnt = 0;
+//  if (!flag){
+//    gettimeofday(&start_time, NULL);
+//    flag = true;
+//  }
+//  else{
+//    gettimeofday(&end_time, NULL);
+//    diff_time += ((end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_usec - start_time.tv_usec) / 1000.0); 
+//    cnt++;
+//    avg_time = diff_time / cnt;
+//    if (cnt > 3000){
+//      diff_time = 0.0;
+//      cnt = 0;
+//    }
+//    printf("2 - LRC sub from STC cycle time:\t %.3f\n", avg_time); 
+//    gettimeofday(&start_time, NULL);
+//  }
+
+  std::scoped_lock lock(data_mutex_);
+  angle_degree_ = msg.steer_angle;
+  cur_dist_ = msg.cur_dist;
+  if(index_ == 10){  //only LV LRC
+    tar_dist_ = msg.tar_dist;
+    tar_vel_ = msg.tar_vel;
   }
+  fi_encoder_ = msg.fi_encoder;
+  fi_camera_ = msg.fi_camera;
+  fi_lidar_ = msg.fi_lidar;
+  alpha_ = msg.alpha;
+  beta_ = msg.beta;
+  gamma_ = msg.gamma;
+}
+
+void LocalRC::OcrCallback(const scale_truck_control::ocr2lrc &msg){
+/* time delay check */
+//  static struct timeval start_time, end_time;
+//  static bool flag = false;
+//  static double diff_time = 0.0;
+//  double avg_time = 0.0;
+//  static int cnt = 0;
+//  if (!flag){
+//    gettimeofday(&start_time, NULL);
+//    flag = true;
+//  }
+//  else{
+//    gettimeofday(&end_time, NULL);
+//    diff_time += ((end_time.tv_sec - start_time.tv_sec) * 1000.0 + (end_time.tv_usec - start_time.tv_usec) / 1000.0); 
+//    cnt++;
+//    avg_time = diff_time / cnt;
+//    if (cnt > 3000){
+//      diff_time = 0.0;
+//      cnt = 0;
+//    }
+//    printf("1 - LRC sub from OpenCR cycle time:\t %.3f\n", avg_time); 
+//    gettimeofday(&start_time, NULL);
+//  }
+
+  std::scoped_lock lock(data_mutex_);
+  ref_vel_ = msg.ref_vel;
+  cur_vel_ = msg.cur_vel;
+  sat_vel_ = msg.u_k;  //saturated velocity
 }
 
 void LocalRC::rosPub(){
-  ros2_msg::msg::Lrc2xav xav;
-  ros2_msg::msg::Lrc2ocr ocr;
+  scale_truck_control::lrc2xav xav;
+  scale_truck_control::lrc2ocr ocr;
   { 
     std::scoped_lock lock(data_mutex_);
     xav.cur_vel = cur_vel_;
-    xav.tar_vel = tar_vel_; // xav에 목표 속도,간격 보내는 이유: 
-    xav.tar_dist = tar_dist_; // FV는 LV LRC에서 전달 받기 때문
+    xav.tar_vel = tar_vel_;
+    xav.tar_dist = tar_dist_;
+    xav.alpha = alpha_;
+    xav.send_rear_camera_image = send_rear_camera_image_;
+    xav.lrc_mode = lrc_mode_;
+    xav.crc_mode = crc_mode_;
     ocr.index = index_;
     ocr.steer_angle = angle_degree_;
     ocr.cur_dist = cur_dist_;
     ocr.tar_dist = tar_dist_;
     ocr.tar_vel = tar_vel_;
     ocr.est_vel = est_vel_;
+    ocr.preceding_truck_vel = preceding_truck_vel_;
+    ocr.fi_encoder = fi_encoder_;
+    ocr.alpha = alpha_;
   }
-  XavPublisher_->publish(xav);
-  OcrPublisher_->publish(ocr);
+  XavPublisher_.publish(xav);
+  OcrPublisher_.publish(ocr);
 }
+
+void LocalRC::radio(ZmqData* zmq_data)
+{
+  while(isNodeRunning()){
+    {
+      std::scoped_lock lock(data_mutex_);
+      zmq_data->tar_vel = tar_vel_;
+      zmq_data->tar_dist = tar_dist_;
+    }
+    ZMQ_SOCKET_.radioZMQ(zmq_data);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+  }
+}
+
+void LocalRC::dish()
+{
+  while(isNodeRunning()){
+    ZMQ_SOCKET_.dishZMQ();
+    updateData(ZMQ_SOCKET_.dsh_recv_);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+  }
+}
+
+void LocalRC::request(ZmqData* zmq_data){
+  struct timeval startTime, endTime;
+  double diff_time = 0.0;
+  while(isNodeRunning()){
+    {
+      std::scoped_lock lock(data_mutex_);
+      zmq_data->tar_vel = tar_vel_;
+      zmq_data->ref_vel = ref_vel_;
+      zmq_data->cur_vel = cur_vel_;
+      zmq_data->tar_dist = tar_dist_;
+      zmq_data->cur_dist = cur_dist_;
+      zmq_data->alpha = alpha_;
+      zmq_data->beta = beta_;
+      zmq_data->gamma = gamma_;
+      zmq_data->lrc_mode = lrc_mode_;
+    }
+    ZMQ_SOCKET_.requestZMQ(zmq_data);
+    updateData(ZMQ_SOCKET_.req_recv_);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+  }
+}
+
+void LocalRC::encoderCheck(){
+  std::scoped_lock lock(data_mutex_);
+  if(!fi_encoder_){
+//    hat_vel_ = a_ * hat_vel_ + b_ * sat_vel_ - l_ * (cur_vel_ - hat_vel_);
+//    if(fabs(cur_vel_ - hat_vel_) > epsilon_){
+//      alpha_ = true;
+//    }
+  }
+  else{
+    hat_vel_ = a_ * hat_vel_ + b_ * 2.0f - l_ * (0.0f - hat_vel_);
+    if(fabs(0.0f - hat_vel_) > epsilon_){
+      alpha_ = true;
+    }
+  }
+}
+
+void LocalRC::updateMode(uint8_t crc_mode){
+  std::scoped_lock lock(data_mutex_);
+  if(index_ == 10){  //LV
+//    if(beta_ || gamma_){  //Camera sensor failure
+//      lrc_mode_ = 2;  //GDM
+//    }
+//    else if(alpha_){
+//      lrc_mode_ = 1;  //RCM
+//    }
+//    else{
+      lrc_mode_ = 0;  //TM
+//    }
+  }
+  else{  //FV1, FV2
+    if(alpha_ && beta_ && gamma_){
+      lrc_mode_ = 2;  
+    }
+    else if(alpha_ || beta_ || gamma_){
+      lrc_mode_ = 1;  
+    }
+    else{
+      lrc_mode_ = 0;
+    }
+  }
+}
+
+void LocalRC::updateData(ZmqData* zmq_data){
+  std::scoped_lock lock(data_mutex_);
+  if(zmq_data->src_index == 30){  //from CRC
+    est_vel_ = zmq_data->est_vel;
+    crc_mode_ = zmq_data->crc_mode;
+    preceding_truck_vel_ = zmq_data->preceding_truck_vel;
+    send_rear_camera_image_ = zmq_data->send_rear_camera_image;
+  }
+  else if(zmq_data->src_index == 10){  //from LV LRC to FVs LRC
+    if (lrc_mode_ == 0) {
+      tar_vel_ = zmq_data->tar_vel;
+      tar_dist_ = zmq_data->tar_dist;
+    }
+    else {  //FV1 reference velocity and gap distance on RCM mode
+      if(zmq_data->tar_vel > rcm_vel_) tar_vel_ = rcm_vel_;
+      else tar_vel_ = zmq_data->tar_vel;
+      if(zmq_data->tar_dist < rcm_dist_) tar_dist_ = rcm_dist_;
+      else tar_dist_ = zmq_data->tar_dist;
+    }
+  }
+}
+
 
 void LocalRC::recordData(struct timeval *startTime){
   struct timeval currentTime;
-  char file_name[] = "LocalRC_log00.csv";
+  char file_name[] = "LRC_log00.csv";
   static char file[128] = {0x00, };
   char buf[256] = {0x00,};
   static bool flag = false;
-  std::ifstream read_file;
-  std::ofstream write_file;
+  ifstream read_file;
+  ofstream write_file;
   if(!flag){
     for(int i = 0; i < 100; i++){
       file_name[7] = i/10 + '0';  //ASCII
@@ -151,45 +315,45 @@ void LocalRC::recordData(struct timeval *startTime){
       }
       read_file.close();
     }
-    write_file << "Time,Tar_dist,Cur_dist,Tar_vel,Ref_vel,Cur_vel,Lrc_mode" << std::endl; //seconds
+    write_file << "Time,Tar_dist,Cur_dist,Tar_vel,Ref_vel,Cur_vel,Lrc_mode" << endl; //seconds
     flag = true;
   }
   else{
     std::scoped_lock lock(data_mutex_);
     gettimeofday(&currentTime, NULL);
     time_ = ((currentTime.tv_sec - startTime->tv_sec)) + ((currentTime.tv_usec - startTime->tv_usec)/1000000.0);
-    //sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%d", time_, tar_dist_, cur_dist_, tar_vel_, ref_vel_, cur_vel_);
+    sprintf(buf, "%.10e,%.3f,%.3f,%.3f,%.3f,%.3f,%d", time_, tar_dist_, cur_dist_, tar_vel_, ref_vel_, cur_vel_, lrc_mode_);
     write_file.open(file, std::ios::out | std::ios::app);
-    write_file << buf << std::endl;
+    write_file << buf << endl;
   }
   write_file.close();
 }
 
 void LocalRC::printStatus(){
+  static int cnt = 0;
+  static int CNT = 0;
   if (EnableConsoleOutput_){
     printf("\033[2J");
     printf("\033[1;1H");
-    printf("LrcParams/lrc_index :%d\n", index_);
-    printf("Target Velocity:\t%.3f\n", tar_vel_);
-    printf("Current Velocity:\t%.3f\n", cur_vel_);
-    printf("Target Distance:\t%.3f\n", tar_dist_);
-    printf("Current Distance:\t%.3f\n", cur_dist_);
-    printf("ocr_vel:\t%.3f\n", ref_vel_);
-    printf("sat_vel:\t%.3f\n", sat_vel_);
-//    printf("Tar|Cur Vel     : %3.3f | %3.3f m/s\n", tar_vel_, cur_vel_);
-//    printf("Tar|Cur Dist    : %3.3f | %3.3f m\n", tar_dist_, cur_dist_);
-
+    printf("\nPredict Velocity:\t%.3f", est_vel_);
+    printf("\nTarget Velocity:\t%.3f", tar_vel_);
+    printf("\nCurrent Velocity:\t%.3f", cur_vel_);
+    printf("\nTarget Distance:\t%.3f", tar_dist_);
+    printf("\nCurrent Distance:\t%.3f", cur_dist_);
+    printf("\nEstimated Value:\t%.3f", fabs(cur_vel_ - hat_vel_));
+    printf("\nalpha, beta, gamma:\t%d, %d, %d", alpha_, beta_, gamma_); 
+    printf("\nMODE:\t%d", lrc_mode_);
+    printf("\n");
   }
 }
 
-
 void LocalRC::communicate(){
-  while(rclcpp::ok()){
-//    struct timeval start_time, end_time;
-//    gettimeofday(&start_time, NULL);
-//    static float cnt;
-//    static double diff_time, CycleTime_;
-
+  struct timeval startTime, endTime;
+  gettimeofday(&startTime, NULL);
+  static int cnt = 0;
+  while(ros::ok()){
+    //encoderCheck();
+    updateMode(crc_mode_);
     rosPub();
     printStatus();
 
@@ -198,85 +362,10 @@ void LocalRC::communicate(){
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
     if(!isNodeRunning()){
-      rclcpp::shutdown();
+      ros::requestShutdown();
       break;
     }
-
-//    gettimeofday(&end_time, NULL);
-//    diff_time += ((end_time.tv_sec - start_time.tv_sec) * 1000.0) + ((end_time.tv_usec - start_time.tv_usec) / 1000.0);
-//    cnt++;
-//
-//    CycleTime_ = diff_time / (double)cnt;
-//    RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", CycleTime_);
-//
-//    if (cnt > 3000){
-//      diff_time = 0.0;
-//      cnt = 0;
-//    }
   }
 }
 
-void LocalRC::XavCallback(const ros2_msg::msg::Xav2lrc::SharedPtr msg)
-{
-  std::scoped_lock lock(data_mutex_);
-  angle_degree_ = msg->steer_angle;
-  cur_dist_ = msg->cur_dist;
-  if(index_ == 10){  //only LV LRC
-    tar_vel_ = msg->tar_vel;
-    tar_dist_ = msg->tar_dist;
-  }
-
-//  /* delay time */
-//  static double stamp_time_sec, stamp_time_usec;
-//  static double delay_, diff_time;
-//  static float cnt_;
-//  struct timeval end_time;
-//
-//  stamp_time_sec = msg->stamp_sec;
-//  stamp_time_usec = msg->stamp_usec;
-//
-//  gettimeofday(&end_time, NULL);
-//  diff_time += ((end_time.tv_sec - stamp_time_sec) * 1000.0) + ((end_time.tv_usec - stamp_time_usec) / 1000.0);
-//
-//  cnt_++;
-//
-//  delay_ = diff_time / (double)cnt_;
-//  RCLCPP_INFO(this->get_logger(), "delay Time        : %3.3f ms\n", delay_);
-//
-//  if (cnt_ > 3000){
-//    diff_time = 0.0;
-//    cnt_ = 0;
-//  }
-//  /* delay time */
-
 }
-
-void LocalRC::OcrCallback(const ros2_msg::msg::Ocr2lrc::SharedPtr msg)   
-{
-  std::scoped_lock lock(data_mutex_);
-  ref_vel_ = msg->ref_vel;
-  cur_vel_ = msg->cur_vel;
-  sat_vel_ = msg->u_k;  //saturated velocity
-}
-
-/***************/
-/* FVs from LV */
-/***************/
-void LocalRC::LVCallback(const ros2_msg::msg::Lrc2xav::SharedPtr msg)
-{
-  std::scoped_lock lock(data_mutex_);
-  tar_vel_ = msg->tar_vel;
-  tar_dist_ = msg->tar_dist;
-}
-
-
-
-} /* namespace scale_truck_control */
-
-int main(int argc, char* argv[]){
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<LocalResiliencyCoordinator::LocalRC>());
-    rclcpp::shutdown();
-    return 0;
-}
-

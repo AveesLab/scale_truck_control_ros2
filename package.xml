@@ -1,36 +1,28 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="3">
-  <name>scale_truck_control_ros2</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="dksxodnr234@gmail.com">avees</maintainer>
-  <license>TODO: License declaration</license>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
-  
-  <depend>rclcpp</depend>
-  <depend>rclpy</depend>
-  <depend>rclcpp_action</depend>
-  <depend>std_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>ament_index_cpp</depend>
-  <depend>cv_bridge</depend>
-  <depend>OpenCV</depend>
-
-
-  <build_depend>qtbase5-dev</build_depend>
-  <build_depend>qtdeclarative5-dev</build_depend>
-  <exec_depend>libqt5-core</exec_depend>
-  <exec_depend>libqt5-gui</exec_depend>
-  <exec_depend>libqt5-quick</exec_depend>
-  <exec_depend>libqt5-widgets</exec_depend>
-
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
-
+<package format="2">
+  <name>scale_truck_control</name>
+  <version>0.1.0</version>
+  <description>The scale_truck_control package</description>
+  <maintainer email="alruminumfire@gmail.com">jaes</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>obstacle_detector</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>obstacle_detector</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>obstacle_detector</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
   <export>
-    <build_type>ament_cmake</build_type>
   </export>
 </package>

@@ -1,104 +1,167 @@
-cmake_minimum_required(VERSION 3.8)
-project(scale_truck_control_ros2)
+cmake_minimum_required(VERSION 2.8.3)
+project(scale_truck_control)
 
-set(REQUIRED_QT_VERSION 5.9.0)
+#add_compile_options(-std=c++11)
 
+enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(ENABLE_DRAFT ON)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 
-set(TRUCK_SDK_PATH "./sdk/")
-set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(ZeroMQ_DIR /usr/local/lib/)
+find_path(ZMQ_INCLUDE_DIR zmq.h)
+find_library(ZMQ_LIBRARY NAMES zmq)
+set(ZeroMQ_LIBRARIES ${ZMQ_LIBRARY})
+set(ZeroMQ_INCLUDE_DIRS ${ZMQ_INCLUDE_DIR})
 
-find_package(ament_cmake REQUIRED)
-find_package(ament_index_cpp REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(cv_bridge REQUIRED)
-find_package(ros2_msg REQUIRED)
+set(cppzmq_DIR /usr/local/share/cmake/cppzmq)
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Quick REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_WIN32_THREADS_INIT 0)
+set(CMAKE_USE_PTHREADS_INIT 1)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+add_library(cppzmq INTERFACE)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+target_link_libraries(cppzmq INTERFACE $<$<CONFIG:Debug>:libzmq>$<$<CONFIG:Release>:libzmq-static>)
+target_include_directories(cppzmq INTERFACE ${cppzmq_DIR})
+target_compile_definitions(cppzmq INTERFACE ZMQ_BUILD_DRAFT_API=1)
 
-set(QT_PROJECT_SOURCES
-  # src	
-  src/controller/main.cpp
-  src/controller/controller.cpp
-  src/controller/ros2node.cpp
-  src/controller/controller.ui
-  src/controller/lvthread.cpp
-  src/controller/fv1thread.cpp
-  src/controller/fv2thread.cpp
- 
-  # include
-  src/controller/controller.h
-  src/controller/ros2node.hpp
-  src/controller/lvthread.h
-  src/controller/fv1thread.h
-  src/controller/fv2thread.h
+set(OpenCV_DIR /usr/local/lib/cmake/opencv4/)
+#set(BOOST_ROOT /usr/include/boost/)
+#include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+#message("OpenCV_DIR=${OpenCV_INCLUDE_DIRS}")
+#message("catkin_DIR=${catkin_INCLUDE_DIRS}")
+
+find_package(OpenCV 4.4.0 REQUIRED)
+
+find_package(Boost REQUIRED python
+  COMPONENTS
+    thread
 )
 
-set(QT_PROJECT_SOURCES_DEPENDENCIES
-  rclcpp 
-  std_msgs 
-  Qt5Core 
-  Qt5Widgets 
-  ament_index_cpp 
-  ros2_msg
-  cv_bridge
+find_package(catkin REQUIRED
+  COMPONENTS
+    roscpp 
+    rospy 
+    std_msgs
+    message_generation
+    sensor_msgs
+    image_transport
+    geometry_msgs
+    cv_bridge
+    obstacle_detector 
+    pcl_ros
+)
+
+add_message_files(
+  FILES
+  lane_coef.msg
+  lane.msg
+  xav2lrc.msg
+  lrc2xav.msg
+  lrc2ocr.msg
+  ocr2lrc.msg
+  yolo_flag.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
+catkin_package(
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}
+  CATKIN_DEPENDS
+    roscpp
+    rospy
+    std_msgs
+    geometry_msgs
+    obstacle_detector
+  DEPENDS
+    Boost
 )
 
 include_directories(
-  include 
+  include
+  ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-) 
-
-add_executable(controller ${QT_PROJECT_SOURCES})
-ament_target_dependencies(controller ${QT_PROJECT_SOURCES_DEPENDENCIES})
-
-add_executable(lrc_node src/lrc.cpp)
-ament_target_dependencies(lrc_node rclcpp std_msgs ros2_msg)
-
-add_executable(control_node src/scale_truck_control.cpp)
-ament_target_dependencies(control_node rclcpp std_msgs ros2_msg)
-
-target_link_libraries(controller
-  Qt5::Core
-  Qt5::Quick
-  Qt5::Widgets
+  ${Boost_INCLUDE_DIRS}
+  ${cppzmq_INCLUDE_DIRS}
+  ${ZeroMQ_INCLUDE_DIRS}
 )
 
-install(TARGETS
-	lrc_node
-	control_node
-	controller
-	DESTINATION lib/${PROJECT_NAME}
-)
-install(DIRECTORY
-	launch
-	DESTINATION share/${PROJECT_NAME}
-)
-install(DIRECTORY
-	config
-	DESTINATION share/${PROJECT_NAME}
-)
-install(DIRECTORY 
-	include/
-  	DESTINATION include
+set(PROJECT_LIB_FILES
+  src/lane_detect.cpp
+  src/lrc.cpp
+  src/ScaleTruckController.cpp
+  src/sock_udp.cpp
+  src/zmq_class.cpp
 )
 
-ament_package()
+#
+# Build libs
+#
+
+add_library(${PROJECT_NAME}_lib
+  ${PROJECT_LIB_FILES}	
+)
+
+add_executable(${PROJECT_NAME}
+  nodes/control_node.cpp
+)
+
+add_dependencies(${PROJECT_NAME}
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
+target_link_libraries(${PROJECT_NAME}_lib
+  pthread
+  stdc++
+  ${OpenCV_LIBRARIES}
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${Boost_LIBRARIES}
+  ${cppzmq_LIBRARIES}
+  ${ZeroMQ_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_lib
+)
+
+add_library(LRC_lib
+  ${PROJECT_LIB_FILES}	
+)
+
+add_executable(LRC
+  nodes/lrc_node.cpp
+)
+
+add_dependencies(LRC
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
+target_link_libraries(LRC_lib
+  pthread
+  stdc++
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${cppzmq_LIBRARIES}
+  ${ZeroMQ_LIBRARIES}
+)
+
+target_link_libraries(LRC
+  LRC_lib
+)
+

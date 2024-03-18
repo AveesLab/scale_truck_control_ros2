@@ -1,72 +1,50 @@
-/**/scale_truck_control_node:
-  ros__parameters:    
-    subscribers/lane_to_xavier/topic: lane2xav_msg
-    subscribers/lane_to_xavier/queue_size: 1
-    subscribers/rearlane_to_xavier/topic: rear2xav_msg
-    subscribers/rearlane_to_xavier/queue_size: 1
-    subscribers/obstacle_reading/topic: min_distance #raw_obstacles min_distance
-    subscribers/obstacle_reading/queue_size: 10
-    subscribers/lrc_to_xavier/topic: lrc2xav_msg
-    subscribers/lrc_to_xavier/queue_size: 1
-    subscribers/cmd_to_xavier/topic: /cmd2xav_msg
-    subscribers/cmd_to_xavier/queue_size: 10
-    subscribers/yolo_to_xavier/topic: yolo_object_detection/Boundingbox
-    subscribers/yolo_to_xavier/queue_size: 1
-    subscribers/rearyolo_to_xavier/topic: rear_yolo_object_detection/Boundingbox
-    subscribers/rearyolo_to_xavier/queue_size: 1
-    
-    publishers/xavier_to_lane/topic: xav2lane_msg
-    publishers/xavier_to_lane/queue_size: 1
-    publishers/xavier_to_lrc/topic: xav2lrc_msg
-    publishers/xavier_to_lrc/queue_size: 1
-    publishers/xavier_to_cmd/topic: xav2cmd_msg
-    publishers/xavier_to_cmd/queue_size: 10
-    publishers/xavier_to_Yolo/topic: run_yolo_flag
-    publishers/xavier_to_Yolo/queue_size: 1
-    
-    params/index: 2
-    params/xav_log_path: /home/avees/ros2_ws/logfiles/
+subscribers:
+  camera_reading:
+    topic: /usb_cam/image_raw
+    queue_size: 1
+  obstacle_reading:
+    topic: /tracked_obstacles
+    queue_size: 100
+  lrc_to_xavier:
+    topic: /lrc2xav_msg
+    queue_size: 10
+  yolo_detector:
+    topic: /yolo_object_detection/bounding_box
+    queue_size: 1
+  cluster_reading:
+    topic: /preceding_truck_points
+    queue_size: 5
 
-    params/target_vel: 0.00
-    params/safety_vel: 0.45
-    params/fv_max_vel: 1.20
-    params/ref_vel: 0.00
+publishers:
+  xavier_to_lrc:
+    topic: /xav2lrc_msg
+    queue_size: 10
+  run_yolo:
+    topic: /run_yolo_flag
+    queue_size: 1
 
-    params/target_dist: 0.8
-    params/safety_dist: 1.5
-    params/lv_stop_dist: 0.5
-    params/fv_stop_dist: 0.5
+LaneDetector:  
+  steer_angle: 0.0
+  eL_height: 0.2
+  e1_height: 1.2563
+  trust_height: 0.6667
+  lp: 609.3 
+  eL_height2: 0.8
 
-    rss/a_max_accel: 0.100 #6.9 #0.087 
-    rss/a_min_brake: -0.225 #3.22 #-0.083
-    rss/a_max_brake: -0.472 #0.6 #2.136
-    rss/response_time: 1.23 #0.160 # 0.059
-    rss/SV_Vel_: 0.7  # 0.7 0.8 0.9
-#    rss/Truck_Vel_: # 0.6 0.8 1.0
+ROI:
+  dynamic_roi: true
+  threshold: 128
+  canny:
+    thresh1: 100
+    thresh2: 200
 
-#    icra/dist: 0.8 # FOR ICRA
-
-    image_view/enable_console_output: true
-    image_view/lane_change_right: false # cmd lane change
-    image_view/lane_change_left: false 
-
-/**/LRC:
-  ros__parameters:
-    LrcSub/xavier_to_lrc/topic: xav2lrc_msg
-    LrcSub/xavier_to_lrc/queue_size: 1
-    LrcSub/ocr_to_lrc/topic: ocr2lrc_msg
-    LrcSub/ocr_to_lrc/queue_size: 1
-    LrcSub/lv_to_fv/topic: /lv2fv_msg
-    LrcSub/lv_to_fv/queue_size: 1
-
-    LrcPub/lrc_to_xavier/topic: lrc2xav_msg
-    LrcPub/lrc_to_xavier/queue_size: 1
-    LrcPub/lrc_to_ocr/topic: lrc2ocr_msg
-    LrcPub/lrc_to_ocr/queue_size: 1
-    LrcPub/lv_to_fv/topic: /lv2fv_msg
-    LrcPub/lv_to_fv/queue_size: 1
-
-    LrcParams/lrc_index: 12
-    LrcParams/lrc_log_path: /home/avees/ros2_ws/logfiles/
-    LrcParams/enable_console_output: false
-
+crop:
+  x: 100
+  y: 0
+  width: 440
+  height: 380
+  
+image_view:
+  enable_opencv: true
+  wait_key_delay: 1
+  enable_console_output: true 
