@@ -2,6 +2,7 @@
 ROS2 based scale_truck_control system
 Lane change of Scale truck platooning system for RSS 2024
 ![image](https://github.com/AveesLab/scale_truck_control_ros2/assets/117966644/526e20f6-ff5d-49fc-a815-7d3c8befac7a)
+![image](https://github.com/AveesLab/scale_truck_control_ros2/assets/117966644/a54ab551-5af4-436c-93a1-ba4b36c0b9d8)
 
 
 # Develop History
